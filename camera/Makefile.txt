@@ -1,0 +1,6 @@
+CC = g++
+CFLAGS  = -g
+
+camera:
+    $(CC) $(CFLAGS) -o camera
+    

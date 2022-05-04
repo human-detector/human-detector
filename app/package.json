@@ -1,0 +1,11 @@
+{
+  "name": "human-detector-app",
+  "version": "0.0.0",
+  "description": "Companion app for the human detector camera",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL-3.0"
+}

@@ -6,9 +6,24 @@ server.on('error', err => {
     server.close();
 });
 
+let client1 = null;
+let client2 = null;
+let numClients = 0;
+
 server.on('message', (msg, rinfo) => {
     console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
-    server.send("Welcome!", rinfo.port, rinfo.address);
+    if (numClients == 0) {
+        client1 = rinfo;
+        server.send("Client1", rinfo.port, rinfo.address);
+        numClients++;
+    } else {
+        client2 = rinfo;
+        numClients = 0;
+        server.send("Client2", rinfo.port, rinfo.address);
+        
+        server.send(JSON.stringify(client2), client1.port, client1.address);
+        server.send(JSON.stringify(client1), client2.port, client2.address);
+    }
 });
 
 server.on('listening', () => {

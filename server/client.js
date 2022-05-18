@@ -19,6 +19,8 @@ socket.on('error', err => {
   socket.close();
 });
 
+let index = 0;
+
 socket.on('message', async (msg, rinfo) => {
   switch (state) {
     // Are we host sending info (stream) or client receiving?
@@ -43,7 +45,11 @@ socket.on('message', async (msg, rinfo) => {
       console.log(`UDP Port Punching worked!`);
       console.log(`Received message from: ${rinfo.address}:${rinfo.port}`);
       console.log(`Msg was.... ${msg}`);
-      socket.close();
+      socket.send(`Sending message ${index++}`, rinfo.port, rinfo.address, () => {
+        if (index >= 5) {
+          socket.close();
+        }
+      });
   }
 });
 

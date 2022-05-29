@@ -83,7 +83,7 @@ class Camera {
   }
 }
 
-function DisplayCameraButton({ camera }:MessageProp){
+export function DisplayCameraButton({ camera }:MessageProp){
   return (
   <View>
     <Button 

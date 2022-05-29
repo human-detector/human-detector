@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GroupButton Test 2: GroupOnPress() 1 Camera 1`] = `
+<View>
+  <Text>
+     Placeholder text
+  </Text>
+</View>
+`;
+
+exports[`GroupButton Test 3: GroupOnPress() 5 Cameras 1`] = `
+<View>
+  <Text>
+     Placeholder text
+  </Text>
+</View>
+`;
+
+exports[`GroupButton Test 4: GroupDisplayButton() empty group 1`] = `
+<View>
+  <Text>
+     Placeholder text
+  </Text>
+</View>
+`;
+
+exports[`GroupScreen Test 1: GroupOnPress() no cameras 1`] = `
+<View>
+  <Text>
+     Placeholder text
+  </Text>
+</View>
+`;
+
+exports[`GroupScreen Test 5: GroupDisplayButton regular group 1`] = `
+<View>
+  <Text>
+     Placeholder text
+  </Text>
+</View>
+`;
+
+exports[`display group correctly 1`] = `
+<View
+  accessibilityRole="button"
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <View
+    style={
+      Array [
+        Object {},
+      ]
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#007AFF",
+            "fontSize": 18,
+            "margin": 8,
+            "textAlign": "center",
+          },
+        ]
+      }
+    >
+      Test test
+    </Text>
+  </View>
+</View>
+`;

@@ -44,9 +44,9 @@ describe('CamerasController', () => {
   describe('PUT /cameras/' + invalidCamID + '/notification', () => {
     it('should fail to add a notification', () => {
       /* TODO: this should probably also check the value of getNotifications() before and after the call */
-      expect(camerasController.sendNotification(validCamID)).toBe(
-        new UnauthorizedException(),
-      );
+      expect(() => {
+        camerasController.sendNotification(invalidCamID);
+      }).toThrow(UnauthorizedException);
     });
   });
 });

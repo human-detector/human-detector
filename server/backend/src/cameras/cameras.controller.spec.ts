@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { CamerasController } from './cameras.controller';
 import { Notification, CamerasService } from './cameras.service';
 
-const validCamID = 'good-cam-id';
-const invalidCamID = 'bad-cam-id';
+const validCamID = '4df87db2-d185-4126-8570-28bec04c1b16';
+const invalidCamID = '9a988948-450d-4627-bf51-ee4a94f4d5bf';
 
 const mockCamerasService = {
   sendNotification(id: string): boolean {
@@ -47,6 +47,14 @@ describe('CamerasController', () => {
       expect(() => {
         camerasController.sendNotification(invalidCamID);
       }).toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('PUT /cameras/not-a-uuid/notification', () => {
+    it('should not accept the bogus text as a UUID', () => {
+      expect(() => {
+        camerasController.sendNotification('not-a-uuid');
+      }).toThrow(BadRequestException);
     });
   });
 });

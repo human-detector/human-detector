@@ -6,3 +6,6 @@ class ServerConnection:
         pass
 
     def send_snapshot(frame):
+        pass
+
+    

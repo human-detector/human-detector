@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { EntityRepository } from '@mikro-orm/core'
-import { InjectRepository } from '@mikro-orm/nestjs'
-import { Notification } from './notification.entity'
+import { EntityRepository } from '@mikro-orm/core';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Notification } from './notification.entity';
 
 @Injectable()
 export class CamerasService {
   constructor(
     @InjectRepository(Notification)
-    private notificationRepository: EntityRepository<Notification>
+    private notificationRepository: EntityRepository<Notification>,
   ) {}
 
   sendNotification(id: string): boolean {

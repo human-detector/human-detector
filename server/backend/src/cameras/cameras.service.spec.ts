@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EntityRepository } from '@mikro-orm/core';
-import { getRepositoryToken } from '@mikro-orm/nestjs'
+import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { CamerasService } from './cameras.service';
-import { Notification } from './notification.entity'
-import { NotFoundError } from '../errors.types'
+import { Notification } from './notification.entity';
+import { NotFoundError } from '../errors.types';
 
 const notAUUID = 'junk';
 const validCamID = '4fa660b3-bc2d-4d12-b427-32283ca04a07';
@@ -52,7 +52,9 @@ describe('CamerasService', () => {
     it('should add a new notification to the list', () => {
       let notifications = [...mockedNotificationRepository.notifications];
       camerasService.sendNotification(validCamID);
-      expect(mockedNotificationRepository.notifications.length).toBe(notifications.length+1);
+      expect(mockedNotificationRepository.notifications.length).toBe(
+        notifications.length + 1,
+      );
     });
   });
 

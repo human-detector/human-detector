@@ -1,6 +1,0 @@
-CC = g++
-CFLAGS  = -g
-
-camera:
-    $(CC) $(CFLAGS) -o camera src/camera.cpp
-    

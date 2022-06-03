@@ -18,3 +18,8 @@ Scenario: Entering incorrect username and password
     And enter my password incorrectly
     Then I should not have authorized access to the application
 
+Scenario: Entering incorrect username
+    Given I have an account
+    When I enter my username incorrectly
+    Then I should not have authorized access to the application
+

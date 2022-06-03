@@ -70,7 +70,7 @@ defineFeature(feature, (test) => {
     	});
 
     	then('I will not receive a push notification', () => {
-
+			
     	});
     });
 

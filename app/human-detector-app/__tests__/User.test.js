@@ -21,7 +21,6 @@ const scope = nock('https://api.github.com')
 
 //authenticateLogin()
 it("test", () => {
-    nock.
 })
 
 //loginUser()

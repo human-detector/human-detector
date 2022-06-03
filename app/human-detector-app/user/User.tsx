@@ -13,6 +13,14 @@ export default class User{
 }
 
 //will look through database
+export function isValidUsername(username:string):boolean{
+    return false;
+}
+
+export function isValidPassword(password:string):boolean{
+    return false;
+}
+
 export function authenticateLogin(username:string, password:string, passFromDB:string):boolean{
     return false
 }

@@ -4,7 +4,6 @@ class ServerConnection:
     def __init__(self, token, eyespy_api):
         self.token = token
         self.api = eyespy_api
-        pass
     
     def send_notification(frame):
         pass
@@ -14,5 +13,4 @@ class ServerConnection:
 
     def get_settings():
         pass
-
     

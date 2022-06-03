@@ -23,7 +23,7 @@ class TestDetector(unittest.TestCase):
         output = self.detector.detect(image)
         self.assertTrue(len(output) == 0)
         
-    def test_detector_no_human(self):
+    def test_detector_human(self):
         image = cv2.imread(os.path.join(self.dirname, "tests/images/human.jpg"))
         output = self.detector.detect(image)
         self.assertTrue(len(output) == 1)

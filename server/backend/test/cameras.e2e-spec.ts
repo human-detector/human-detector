@@ -18,13 +18,14 @@ describe('Cameras (e2e)', () => {
   beforeAll(async () => {
     /* FIXME: typescript. just define the MockNotificationRepository properly, extend the EntityRepository class */
     notificationRepository = {
-      notifications: [new Notification],
-      persist(notification: Notification) {}
+      notifications: [new Notification()],
+      persist(notification: Notification) {},
     };
     console.log(typeof notificationRepository);
     const moduleRef = await Test.createTestingModule({
       imports: [CamerasModule],
-    }).overrideProvider(getRepositoryToken(Notification))
+    })
+      .overrideProvider(getRepositoryToken(Notification))
       .useValue(notificationRepository)
       .compile();
 
@@ -32,39 +33,11 @@ describe('Cameras (e2e)', () => {
     await app.init();
   });
 
-  describe('PUT /cameras/:validCamID/notifications', () => {
-    const requestURL = `/cameras/${validCameraID}/notifications`;
-    it('should not accept unauthenticated requests', () => {
-      return request(app.getHttpServer())
-        .put(requestURL)
-        .expect(401);
-    });
-
-    it('should not accept invalid credentials', () => {
-      return request(app.getHttpServer())
-        .put(requestURL)
-        .auth(invalidToken, { type: 'bearer' })
-        .expect(401);
-    });
-
-    it('should accept valid credentials and add a new notification', () => {
-      let oldNotifications = [...notificationRepository.notifications];
-      let res = request(app.getHttpServer())
-        .put(requestURL)
-        .auth(validToken, { type: 'bearer' })
-        .expect(200);
-      expect(notificationRepository.length).toBe(oldNotifications.length + 1);
-      return res;
-    });
-  });
-
+  /* TODO: translate to .feature and BDD tests */
   describe('GET /cameras/:validCamID/notifications', () => {
     const requestURL = `/cameras/${validCameraID}/notifications`;
     it('should not accept unauthenticated requests', () => {
-      return request(app.getHttpServer())
-        .get(requestURL)
-        .expect(401);
-
+      return request(app.getHttpServer()).get(requestURL).expect(401);
     });
 
     it('should not accept invalid credentials', () => {
@@ -79,7 +52,7 @@ describe('Cameras (e2e)', () => {
         .get(requestURL)
         .auth(validToken, { type: 'bearer' })
         .expect(200)
-        .then(res => {
+        .then((res) => {
           expect(res.header['content-type']).toMatch(/^application\/json/);
           expect(res.body).toBe(notificationRepository.notifications);
         });

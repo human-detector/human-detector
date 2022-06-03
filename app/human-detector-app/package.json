@@ -9,10 +9,16 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest",
+    "testBDD": "jest LoggingIn.steps.js",
     "updateSnapshots": "jest --updateSnapshot"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "testMatch": [
+      "**/__tests__/**/*.[jt]s?(x)",
+      "**/?(*.)+(spec|test).[jt]s?(x)",
+      "**/__tests__/**/*.steps.js"
+    ]
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
@@ -37,6 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@cucumber/cucumber": "^8.2.2",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.66.13",
     "jest": "^26.6.3",

@@ -21,3 +21,6 @@ it('addNotification() Test 3: notification history already with one notification
     const add = new Notification();
     expect(addNotification(add, arr)[1]).toBe(add)
 })
+
+//sendNotification()
+//this will foll

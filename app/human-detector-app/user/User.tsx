@@ -13,7 +13,7 @@ export default class User{
 }
 
 //will look through database
-export function authenticateLogin(username:string, password:string):boolean{
+export function authenticateLogin(username:string, password:string, passFromDB:string):boolean{
     return false
 }
 
@@ -27,4 +27,8 @@ export function getUserNotifPerm(user:User):boolean{
 
 export function isSnoozeOn(user:User):boolean{
     return true;
+}
+
+function getUsersPassInDB(server:Object):string{
+    return 'pending'
 }

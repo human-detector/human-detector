@@ -3,6 +3,8 @@ import { authenticateLogin, loginUser, getUserNotifPerm, isSnoozeOn } from '../u
 import renderer from 'react-test-renderer';
 import User from '../user/User';
 
+
+//mock server
 const nock = require('nock')
 
 const scope = nock('https://api.github.com')
@@ -19,7 +21,7 @@ const scope = nock('https://api.github.com')
 
 //authenticateLogin()
 it("test", () => {
-    
+    nock.
 })
 
 //loginUser()

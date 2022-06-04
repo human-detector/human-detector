@@ -1,0 +1,11 @@
+{
+  "moduleFileExtensions": ["ts", "js", "json"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testMatch": [
+    "**/*.steps.ts"
+  ],
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  }
+}

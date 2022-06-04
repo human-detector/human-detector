@@ -27,7 +27,7 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
-# e2e tests
+# bdd tests
 $ npm run test:e2e
 
 # test coverage

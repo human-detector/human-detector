@@ -28,7 +28,7 @@ $ npm run start:prod
 $ npm run test
 
 # bdd tests
-$ npm run test:e2e
+$ npm run test:bdd
 
 # test coverage
 $ npm run test:cov

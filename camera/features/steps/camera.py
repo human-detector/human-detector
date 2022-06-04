@@ -1,8 +1,8 @@
 from behave import *
 import cv2
 import os
-from camera.src.detector import Detector
-from camera.src.socket import ServerConnection
+from src.detector import Detector
+from src.socket import ServerConnection
 from src.camera import Camera
 
 @given('a human walks into frame')
@@ -19,13 +19,13 @@ def step_impl(ctx):
 def step_impl(ctx):
     detector = Detector()
     result = detector.detect(ctx.frame)
-    assert len(result == 1)
+    assert len(result) == 1
 
 @when('a human is not detected')
 def step_impl(ctx):
     detector = Detector()
     result = detector.detect(ctx.frame)
-    assert len(result == 0)
+    assert len(result) == 0
 
 @then('a notification will be sent')
 def step_impl(ctx):

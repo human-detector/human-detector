@@ -1,0 +1,11 @@
+behave==1.2.6
+certifi==2022.5.18.1
+charset-normalizer==2.0.12
+idna==3.3
+numpy==1.22.4
+opencv-python==4.5.5.64
+parse==1.19.0
+parse-type==0.6.0
+requests==2.27.1
+six==1.16.0
+urllib3==1.26.9

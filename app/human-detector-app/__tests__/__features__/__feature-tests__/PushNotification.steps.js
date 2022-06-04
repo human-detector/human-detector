@@ -2,6 +2,8 @@ import { loadFeature, defineFeature } from 'jest-cucumber';
 import { getUserNotifPerm, isSnoozeOn} from '../../../user/User';
 import User from '../../../user/User';
 
+const nock = require('nock')
+
 const feature = loadFeature('__tests__/__features__/PushNotification.feature');
 
 defineFeature(feature, (test) => {
@@ -70,7 +72,7 @@ defineFeature(feature, (test) => {
     	});
 
     	then('I will not receive a push notification', () => {
-			
+
     	});
     });
 

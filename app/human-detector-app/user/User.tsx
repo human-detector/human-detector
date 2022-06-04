@@ -21,7 +21,7 @@ export function isValidPassword(password:string):boolean{
     return false;
 }
 
-export function authenticateLogin(username:string, password:string, passFromDB:string):boolean{
+export function authenticateLogin(username:string, password:string):boolean{
     return false
 }
 

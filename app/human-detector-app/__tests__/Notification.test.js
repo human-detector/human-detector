@@ -23,4 +23,4 @@ it('addNotification() Test 3: notification history already with one notification
 })
 
 //sendNotification()
-//this will foll
+//this will be tested on the device

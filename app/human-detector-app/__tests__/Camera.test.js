@@ -5,6 +5,8 @@ import { searchForCameras, renameCamera, isCameraOnline, initializeCamera, delet
 import Camera from '../camera/Camera';
 import Group from '../group/Group';
 
+const nock = require('nock')
+
 //renameCamera test values
 //Critical values: Empty name as input, name over character limit as input, invalid character values.
 it('renameCamera() Test 1: return same class with unchanged name', () => {
@@ -61,9 +63,9 @@ it('renameCamera() Test 8: return camera with unchanged name (invalid character)
 
 it('renameCamera() Test 9: return camera with unchanged name (invalid character)', () => {
     //character limit 30
-const cameraObj = new Camera("Camera 1", "ID");
-newName = 'dfsfss😮‍💨dawdawd';
-expect(renameCamera(newName, cameraObj).cameraName).toBe(newName);
+    const cameraObj = new Camera("Camera 1", "ID");
+    newName = 'dfsfss😮‍💨dawdawd';
+    expect(renameCamera(newName, cameraObj).cameraName).toBe(newName);
 })
 
 //searchForCameras()
@@ -71,6 +73,25 @@ expect(renameCamera(newName, cameraObj).cameraName).toBe(newName);
 
 //isCameraOnline()
 //Critical values: camera is online, camera is offline, camera doesn't exist
+it('isCameraOnline() Test 1: camera is online', () => {
+    const cam = new Camera('name', 'ID2')
+
+    const scope = nock('http:/eyespy.tkw')
+        .get('/cameras/<uuid>/cameras')
+        .reply(200, 'false')
+
+    expect(isCameraOnline(cam)).toBe(true)
+})
+
+it('isCameraOnline() Test 2: camera is offline', () => {
+    const cam = new Camera('name', 'ID2')
+
+    const scope = nock('http:/eyespy.tkw')
+        .get('/cameras/<uuid>/cameras')
+        .reply(200, 'true')
+
+    expect(isCameraOnline(cam)).toBe(false)
+})
 
 //initializeCamera()
 //Critical values: camera already initialized in the server

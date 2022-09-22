@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Camera from '../camera/Camera';
+import Camera from './Camera';
 
 
 export default class Group{

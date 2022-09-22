@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { authenticateLogin, loginUser, getUserNotifPerm, isSnoozeOn } from '../user/User';
+import { authenticateLogin, loginUser, getUserNotifPerm, isSnoozeOn } from '../classes/User';
 import renderer from 'react-test-renderer';
-import User from '../user/User';
+import User from '../classes/User';
 
 
 //mock server

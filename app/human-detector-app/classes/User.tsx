@@ -1,5 +1,3 @@
-
-
 export default class User{
     username:string;
     userID:string;

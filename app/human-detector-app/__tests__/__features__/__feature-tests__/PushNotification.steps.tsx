@@ -1,6 +1,6 @@
 import { loadFeature, defineFeature } from 'jest-cucumber';
-import { getUserNotifPerm, isSnoozeOn} from '../../../user/User';
-import User from '../../../user/User';
+import { getUserNotifPerm, isSnoozeOn} from '../../../classes/User';
+import User from '../../../classes/User';
 
 const nock = require('nock')
 
@@ -33,7 +33,7 @@ defineFeature(feature, (test) => {
     });
 
     test('Camera doesn\'t sense a detection', ({ given, when, and, then }) => {
-    	let user
+    	var user: User
         
         given('I am not home', () => {
             user = new User("usernameTest", "43789826743", "true")
@@ -57,7 +57,7 @@ defineFeature(feature, (test) => {
     });
 
     test('Snooze on', ({ given, when, and, then }) => {
-        let user
+        var user: User
 
     	given('I am home', () => {
             user = new User("usernameTest", "43789826743", "true")

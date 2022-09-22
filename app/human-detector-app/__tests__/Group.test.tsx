@@ -1,9 +1,9 @@
 import * as React from 'react';
 import renderer from 'react-test-renderer';
 import { Alert, Button } from 'react-native';
-import { renameGroup, addToGroup  } from '../group/Group';
-import Camera from '../camera/Camera';
-import Group from '../group/Group';
+import { renameGroup, addToGroup  } from '../classes/Group';
+import Camera from '../classes/Camera';
+import Group from '../classes/Group';
 
 
 //renameGroup test values

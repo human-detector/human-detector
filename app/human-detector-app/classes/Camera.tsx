@@ -7,7 +7,7 @@ export default class Camera {
   userId:string;
 
   //constructor
-  constructor(cameraId:string, cameraName:string, userId:string) {
+  constructor(userId:string, cameraName:string, cameraId:string) {
       this.cameraId = cameraId;
       this.cameraName = cameraName;
       this.userId = userId;

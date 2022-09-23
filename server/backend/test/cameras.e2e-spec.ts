@@ -3,11 +3,9 @@ import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { CamerasModule } from '../src/cameras/cameras.module';
-import { CamerasService } from '../src/cameras/cameras.service';
 import { Notification } from '../src/cameras/notification.entity';
 
 const validCameraID = '2cbc5197-65a5-4c8e-966a-bb168d1cfa67';
-const invalidCameraID = 'f48599ae-f4a5-4635-bd48-472b99f3ff62';
 const validToken = 'valid-bearer-token';
 const invalidToken = 'invalid-bearer-token';
 
@@ -19,7 +17,9 @@ describe('Cameras (e2e)', () => {
     /* FIXME: typescript. just define the MockNotificationRepository properly, extend the EntityRepository class */
     notificationRepository = {
       notifications: [new Notification()],
-      persist(notification: Notification) {},
+      persist: (notification: Notification) => {
+        return;
+      },
     };
     console.log(typeof notificationRepository);
     const moduleRef = await Test.createTestingModule({

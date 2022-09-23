@@ -18,7 +18,6 @@ const mockCamerasService = {
 
 describe('CamerasController', () => {
   let camerasController: CamerasController;
-  let camerasService: CamerasService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +31,6 @@ describe('CamerasController', () => {
     }).compile();
 
     camerasController = module.get<CamerasController>(CamerasController);
-    camerasService = module.get<CamerasService>(CamerasService);
   });
 
   describe('PUT /cameras/' + validCamID + '/notification', () => {

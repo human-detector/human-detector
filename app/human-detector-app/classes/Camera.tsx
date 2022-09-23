@@ -27,7 +27,7 @@ export default class Camera {
 
 }
 
-export function searchForCameras(): Camera[]{
+export function searchForCameras(userId: string): Camera[]{
   return new Array(5)
 }
 

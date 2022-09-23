@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "test": "jest",
-    "testBDD": "jest LoggingIn.steps.js PushNotification.steps.js",
+    "testBDD": "jest LoggingIn.steps.tsx PushNotification.steps.tsx",
     "updateSnapshots": "jest --updateSnapshot"
   },
   "jest": {

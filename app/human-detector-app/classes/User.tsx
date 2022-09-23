@@ -1,6 +1,6 @@
 export default class User{
     username:string;
-    userID:string;
+    uuid:string;
     loggedIn:boolean;
 
     constructor(username:string, userID:string, loggedIn:boolean){

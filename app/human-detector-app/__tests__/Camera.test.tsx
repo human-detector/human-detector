@@ -4,6 +4,7 @@ import { Alert, Button } from 'react-native';
 import { searchForCameras,  initializeCamera, deleteCamera, addCameraToGroup, removeCameraFromGroup } from '../classes/Camera';
 import Camera from '../classes/Camera';
 import Group from '../classes/Group';
+import { apiLink, getUsersCamerasUrlExtension } from '../config/ServerConfig';
 
 const nock = require('nock')
 
@@ -76,8 +77,8 @@ it('renameCamera() Test 9: return camera with unchanged name (invalid character)
 it('isCameraOnline() Test 1: camera is online', () => {
     const cam: Camera = new Camera('0', 'name', 'ID2')
 
-    const scope = nock('http:/eyespy.tkw')
-        .get('/cameras/<uuid>/cameras')
+    const scope = nock(apiLink)
+        .get(getUsersCamerasUrlExtension)
         .reply(200, 'false')
 
     expect(cam.isCameraOnline()).toBe(true)
@@ -86,8 +87,8 @@ it('isCameraOnline() Test 1: camera is online', () => {
 it('isCameraOnline() Test 2: camera is offline', () => {
     const cam: Camera = new Camera('0', 'name', 'ID2')
 
-    const scope = nock('http:/eyespy.tkw')
-        .get('/cameras/<uuid>/cameras')
+    const scope = nock(apiLink)
+        .get(getUsersCamerasUrlExtension)
         .reply(200, 'true')
 
     expect(cam.isCameraOnline()).toBe(false)

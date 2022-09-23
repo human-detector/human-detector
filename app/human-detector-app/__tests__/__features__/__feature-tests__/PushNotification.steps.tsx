@@ -1,5 +1,6 @@
 import { loadFeature, defineFeature } from 'jest-cucumber';
 import { getUserNotifPerm, isSnoozeOn} from '../../../classes/User';
+import { apiLink } from '../../../config/ServerConfig';
 import User from '../../../classes/User';
 
 const nock = require('nock')
@@ -9,10 +10,10 @@ const feature = loadFeature('__tests__/__features__/PushNotification.feature');
 defineFeature(feature, (test) => {
 
     test('Camera senses a detection', ({ given, when, and, then }) => {
-        let user;
+        let user: User;
 
     	given('I am not home', () => {
-            user = new User("usernameTest", "43789826743", "true")
+            user = new User("usernameTest", "43789826743", true)
     	});
 
     	when('my camera senses a detection', () => {
@@ -36,7 +37,7 @@ defineFeature(feature, (test) => {
     	var user: User
         
         given('I am not home', () => {
-            user = new User("usernameTest", "43789826743", "true")
+            user = new User("usernameTest", "43789826743", true)
     	});
 
     	when('my camera doesn\'t sense a detection', () => {
@@ -60,7 +61,7 @@ defineFeature(feature, (test) => {
         var user: User
 
     	given('I am home', () => {
-            user = new User("usernameTest", "43789826743", "true")
+            user = new User("usernameTest", "43789826743", true)
     	});
 
     	when('my camera senses a detection', () => {

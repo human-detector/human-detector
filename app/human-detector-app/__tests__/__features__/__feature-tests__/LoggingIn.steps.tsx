@@ -2,6 +2,7 @@
 import { loadFeature, defineFeature } from 'jest-cucumber';
 import { authenticateLogin, isValidUsername, isValidPassword } from '../../../classes/User';
 import User from '../../../classes/User';
+import { apiLink, loginUrlExtension } from '../../../config/ServerConfig';
 
 const nock = require('nock')
 
@@ -15,8 +16,8 @@ defineFeature(feature, (test) => {
 	let mockServer;
 
     given('I have an account', () => {
-		mockServer = nock('http://eyespy.tkw')
-			.get('/auth/login')
+		mockServer = nock(apiLink)
+			.get(loginUrlExtension)
 			.reply(200, 'testUserInput')
     });
 
@@ -25,21 +26,21 @@ defineFeature(feature, (test) => {
     });
 
     and('enter my password correctly', () => {
-		mockServer = nock('http://eyespy.tkw')
-			.get('/auth/login')
+		mockServer = nock(apiLink)
+			.get(loginUrlExtension)
 			.reply(200, 'testUserInputPass')
 		expect(isValidPassword('testUserInputPass')).toBe(true)
     });
 
 
     then('I should be authorized to have access to the application', () => {
-		expect(authenticateLogin("testUserInput", "testUserInput", "testServerInput")).toBe(true)
+		expect(authenticateLogin("testUserInput", "testUserInput")).toBe(true)
     });
 
     test('Entering incorrect username but correct password', ({ given, when, and, then }) => {
     	given('I have an account', () => {
-			mockServer = nock('http://eyespy.tkw')
-				.get('/auth/login')
+			mockServer = nock(apiLink)
+				.get(loginUrlExtension)
 				.reply(200, 'testUserInputPass')
     	});
 
@@ -48,21 +49,21 @@ defineFeature(feature, (test) => {
     	});
 
     	and('enter my password correctly', () => {
-			mockServer = nock('http://eyespy.tkw')
-				.get('/auth/login')
+			mockServer = nock(apiLink)
+				.get(loginUrlExtension)
 				.reply(200, 'testUserInputPass')
 			expect(isValidPassword('testUserInputPass')).toBe(true)
     	});
 
     	then('I should not have authorized access to the application', () => {
-			expect(authenticateLogin("testUserInput", "testUserInput", "testServerInput")).toBe(false)
+			expect(authenticateLogin("testUserInput", "testUserInput")).toBe(false)
     	});
     });
 
     test('Entering incorrect username and password', ({ given, when, and, then }) => {
     	given('I have an account', () => {
-		mockServer = nock('http://eyespy.tkw')
-			.get('/auth/login')
+		mockServer = nock(apiLink)
+			.get(loginUrlExtension)
 			.reply(200, 'testUserInput')
     	});
 
@@ -71,21 +72,21 @@ defineFeature(feature, (test) => {
     	});
 
     	and('enter my password incorrectly', () => {
-			mockServer = nock('http://eyespy.tkw')
-				.get('/auth/login')
+			mockServer = nock(apiLink)
+				.get(loginUrlExtension)
 				.reply(200, 'testUserInputPass')
 			expect(isValidPassword('testUserInputPass')).toBe(false)
     	});
 
     	then('I should not have authorized access to the application', () => {
-			expect(authenticateLogin("testUserInput", "testUserInput", "testServerInput")).toBe(false)
+			expect(authenticateLogin("testUserInput", "testUserInput")).toBe(false)
     	});
     });
 
 	test('Entering incorrect username', ({ given, when, then }) => {
     	given('I have an account', () => {
-			mockServer = nock('http://eyespy.tkw')
-				.get('/auth/login')
+			mockServer = nock(apiLink)
+				.get(loginUrlExtension)
 				.reply(200, 'testUserInputPass')
 			expect(isValidPassword('testUserInput')).toBe(false)
     	});

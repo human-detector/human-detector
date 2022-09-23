@@ -4,7 +4,6 @@ import { defineFeature, loadFeature } from 'jest-cucumber';
 import * as request from 'supertest';
 import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { CamerasModule } from '../../src/cameras/cameras.module';
-import { CamerasService } from '../../src/cameras/cameras.service';
 import { Camera } from '../../src/cameras/camera.entity';
 import { Notification } from '../../src/cameras/notification.entity';
 
@@ -20,7 +19,9 @@ defineFeature(feature, (test) => {
     /* FIXME: typescript. just define the MockNotificationRepository properly, extend the EntityRepository class */
     notificationRepository = {
       notifications: [],
-      persist(notification: Notification) {},
+      persist: (notification: Notification) => {
+        return;
+      },
       findByCameraID(id: string): Notification[] {
         return [];
       },
@@ -130,7 +131,7 @@ defineFeature(feature, (test) => {
       expect(sendRes.status).toBe(401);
     });
     and('Camera B has 2 notifications', async () => {
-      let res = await request(app.getHttpServer())
+      const res = await request(app.getHttpServer())
         .get(requestURL)
         .auth(cameraB.token, { type: 'bearer' });
       expect(res.status).toBe(200);
@@ -147,7 +148,6 @@ defineFeature(feature, (test) => {
   }) => {
     const requestURL = `/cameras/${cameraA.id}/notifications`;
     let token: string;
-    let beforeNotifications: Notification[];
     let sendRes: request.Response;
 
     given("I have camera A's credentials", () => {
@@ -155,7 +155,6 @@ defineFeature(feature, (test) => {
     });
     and('Camera A has 1 notification', () => {
       notificationRepository.notifications = [new Notification()];
-      beforeNotifications = [...notificationRepository.notifications];
     });
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
@@ -166,7 +165,7 @@ defineFeature(feature, (test) => {
       expect(sendRes.status).toBe(200);
     });
     and('Camera A has 2 notifications', async () => {
-      let res = await request(app.getHttpServer())
+      const res = await request(app.getHttpServer())
         .get(requestURL)
         .auth(token, { type: 'bearer' });
       expect(res.status).toBe(200);

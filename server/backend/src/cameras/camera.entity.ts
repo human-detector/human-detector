@@ -4,8 +4,8 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 @Entity()
 export class Camera {
   constructor(name: string, token: string) {
-    this.name! = name;
-    this.token! = token;
+    this.name = name;
+    this.token = token;
   }
 
   @PrimaryKey()

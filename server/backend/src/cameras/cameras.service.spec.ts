@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EntityRepository } from '@mikro-orm/core';
 import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { CamerasService } from './cameras.service';
 import { Notification } from './notification.entity';
@@ -16,7 +15,9 @@ describe('CamerasService', () => {
   beforeEach(async () => {
     mockedNotificationRepository = {
       notifications: [Notification],
-      persist(notification: Notification) {},
+      persist: (notification: Notification) => {
+        return;
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -50,7 +51,7 @@ describe('CamerasService', () => {
 
   describe('sendNotification(validCamID)', () => {
     it('should add a new notification to the list', () => {
-      let notifications = [...mockedNotificationRepository.notifications];
+      const notifications = [...mockedNotificationRepository.notifications];
       camerasService.sendNotification(validCamID);
       expect(mockedNotificationRepository.notifications.length).toBe(
         notifications.length + 1,

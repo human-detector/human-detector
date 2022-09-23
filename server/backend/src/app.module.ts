@@ -1,9 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CamerasModule } from './cameras/cameras.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +10,6 @@ import { AuthModule } from './auth/auth.module';
       autoLoadEntities: true,
     }),
     CamerasModule,
-    AuthModule],
+  ],
 })
 export class AppModule {}

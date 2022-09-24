@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button, Alert, TouchableOpacity } from 'react-native';
+import TopBar from './components/TopBar';
 
 export default function App(): React.ReactElement {
   return (
     <View style={styles2}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <TopBar/>
     </View>
   );
 }

@@ -78,7 +78,7 @@ it('isCameraOnline() Test 1: camera is online', () => {
     const cam: Camera = new Camera('0', 'name', 'ID2')
 
     const scope = nock(apiLink)
-        .get(getUsersCamerasUrlExtension)
+        .get(getUsersCamerasUrlExtension(cam.userId))
         .reply(200, 'false')
 
     expect(cam.isCameraOnline()).toBe(true)
@@ -88,7 +88,7 @@ it('isCameraOnline() Test 2: camera is offline', () => {
     const cam: Camera = new Camera('0', 'name', 'ID2')
 
     const scope = nock(apiLink)
-        .get(getUsersCamerasUrlExtension)
+        .get(getUsersCamerasUrlExtension(cam.userId))
         .reply(200, 'true')
 
     expect(cam.isCameraOnline()).toBe(false)

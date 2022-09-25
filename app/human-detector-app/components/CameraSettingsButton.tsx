@@ -1,0 +1,30 @@
+import React from 'react';
+import {Button, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import Camera from "../classes/Camera";
+import { AntDesign } from '@expo/vector-icons';
+
+export default function CameraSettingsButton( props: { cameraId:string } ): React.ReactElement {
+    return(
+        <TouchableOpacity
+            style={styles.menuItemSettingsButton}
+            onPress={() => {
+                //This will do something in the future for now. This is just a placeholder print statement
+                console.log(props.cameraId)
+            }}
+        >
+            {/*<Text style={styles.settingsCog}> ⚙️ </Text>*/}
+            <AntDesign name="setting" size={24} color="black" />
+        </TouchableOpacity>
+    );
+}
+
+const styles = StyleSheet.create({
+    settingsCog: {
+        fontSize: 35,
+    },
+    menuItemSettingsButton: {
+        alignSelf: "flex-end",
+        alignItems: "center"
+    }
+
+})

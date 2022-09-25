@@ -6,12 +6,12 @@ import Camera from './Camera';
 
 export default class Group{
     groupName:string
-    groupID:string
+    groupId:string
     cameras:Camera[]
 
     constructor(groupName:string, groupID:string){
         this.groupName = groupName
-        this.groupID = groupID
+        this.groupId = groupID
         this.cameras = new Array()
     }
 }

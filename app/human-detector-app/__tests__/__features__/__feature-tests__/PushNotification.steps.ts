@@ -1,7 +1,6 @@
 import { loadFeature, defineFeature } from 'jest-cucumber';
-import { getUserNotifPerm, isSnoozeOn} from '../../../classes/User';
+import User, { getUserNotifPerm, isSnoozeOn} from '../../../classes/User';
 import { apiLink } from '../../../config/ServerConfig';
-import User from '../../../classes/User';
 
 const nock = require('nock')
 
@@ -17,7 +16,7 @@ defineFeature(feature, (test) => {
     	});
 
     	when('my camera senses a detection', () => {
-            //tested on camera
+            // tested on camera
     	});
 
     	and('I have push notifications on', () => {
@@ -29,19 +28,19 @@ defineFeature(feature, (test) => {
     	});
 
     	then('I will receive a push notification', () => {
-            //according to notification docs, test this on device
+            // according to notification docs, test this on device
     	});
     });
 
     test('Camera doesn\'t sense a detection', ({ given, when, and, then }) => {
-    	var user: User
+    	let user: User
         
         given('I am not home', () => {
             user = new User("usernameTest", "43789826743", true)
     	});
 
     	when('my camera doesn\'t sense a detection', () => {
-            //nothing happens
+            // nothing happens
     	});
 
     	and('I have push notifications on', () => {
@@ -53,19 +52,19 @@ defineFeature(feature, (test) => {
     	});
 
     	then('I will not receive a push notification', () => {
-            //according to notification docs, test this on device
+            // according to notification docs, test this on device
     	});
     });
 
     test('Snooze on', ({ given, when, and, then }) => {
-        var user: User
+        let user: User
 
     	given('I am home', () => {
             user = new User("usernameTest", "43789826743", true)
     	});
 
     	when('my camera senses a detection', () => {
-            //tested in camera
+            // tested in camera
     	});
 
     	and('the snooze setting is on', () => {

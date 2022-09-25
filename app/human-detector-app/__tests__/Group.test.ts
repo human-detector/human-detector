@@ -1,74 +1,73 @@
 import * as React from 'react';
 import renderer from 'react-test-renderer';
 import { Alert, Button } from 'react-native';
-import { renameGroup, addToGroup  } from '../classes/Group';
+import Group, { renameGroup, addToGroup  } from '../classes/Group';
 import Camera from '../classes/Camera';
-import Group from '../classes/Group';
 
 
-//renameGroup test values
-//Critical values: Empty name as input, name over character limit as input, invalid character values.
+// renameGroup test values
+// Critical values: Empty name as input, name over character limit as input, invalid character values.
 it('renameGroup() Test 1: return same group with unchanged name', () => {
-    //character limit 30
+    // character limit 30
     const groupObj: Group = new Group("Group 1", "ID");
     expect(renameGroup('', groupObj)).toBe(groupObj);
 })
 
 it('renameGroup() Test 2: return group with unchanged name (empty input)', () => {
-    //character limit 30
+    // character limit 30
     const groupObj: Group = new Group("Group 1", "ID");
     expect(renameGroup('Test group name that will be over the limit', groupObj).groupName).toBe(groupObj.groupName);
 })
 
 it('renameGroup() Test 3: return group with unchanged name (over the character limit input)', () => {
-    //character limit 30
+    // character limit 30
     const groupObj: Group = new Group("Group 1", "ID");
     expect(renameGroup('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', groupObj).groupName).toBe(groupObj.groupObj);
 })
 
 it('renameGroup() Test 4: return group with changed name', () => {
-    //character limit 30
+    // character limit 30
     const groupObj: Group = new Group("Group 1", "ID");
-    let newName: string = 'Living room';
+    const newName: string = 'Living room';
     expect(renameGroup(newName, groupObj).groupName).toBe(newName);
 })
 
 it('renameGroup() Test 5: return group with changed name', () => {
-    //character limit 30
+    // character limit 30
     const groupObj: Group = new Group("Group 1", "ID");
-    let newName: string = 'Theater room';
+    const newName: string = 'Theater room';
     expect(renameGroup(newName, groupObj).groupName).toBe(newName);
 })
 
 it('renameGroup() Test 6: return group with changed name at exact character limit', () => {
-    //character limit 30
+    // character limit 30
     const groupObj: Group = new Group("Group 1", "ID");
-    let newName: string = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    const newName: string = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     expect(renameGroup(newName, groupObj).groupName).toBe(newName);
 })
 
 it('renameGroup() Test 7: return group with changed name at 1 character', () => {
-    //character limit 30
+    // character limit 30
     const groupObj = new Group("Group 1", "ID");
-    let newName: string = 'a';
+    const newName: string = 'a';
     expect(renameGroup(newName, groupObj).groupName).toBe(newName);
 })
 it('renameGroup() Test 8: return group with unchanged name (invalid character)', () => {
-    //character limit 30
+    // character limit 30
     const groupObj = new Group("Group 1", "ID");
-    let newName: string = '😮‍💨';
+    const newName: string = '😮‍💨';
     expect(renameGroup(newName, groupObj).groupName).toBe("Group 1");
 })
 
 it('renameGroup() Test 9: return group with unchanged name (invalid character)', () => {
-    //character limit 30
+    // character limit 30
     const groupObj = new Group("Group 1", "ID");
-    let newName: string = 'dfsfss😮‍💨dawdawd';
+    const newName: string = 'dfsfss😮‍💨dawdawd';
     expect(renameGroup(newName, groupObj).groupName).toBe("Group 1");
 })
 
-//addToGroup()
-//critical values: empty group(new group), there is no upper limit
+// addToGroup()
+// critical values: empty group(new group), there is no upper limit
 
 it('addToGroup Test 1: empty group returns group with 1 camera', () => {
     const groupObj: Group = new Group("Group 1", "ID")

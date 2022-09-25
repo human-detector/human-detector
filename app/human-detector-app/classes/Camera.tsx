@@ -1,12 +1,14 @@
 import Group from './Group';
 
 export default class Camera {
-  //field
+  // field
   cameraId:string;
+
   cameraName:string;
+
   userId:string;
 
-  //constructor
+  // constructor
   constructor(userId:string, cameraName:string, cameraId:string) {
       this.cameraId = cameraId;
       this.cameraName = cameraName;
@@ -38,7 +40,7 @@ export function initializeCamera(name:string, ID:string): Camera{
 
 
 export function deleteCamera(camArr:Camera[], id:string): Camera{
-    return new Camera('0','name', 'ID') //deleted camera
+    return new Camera('0','name', 'ID') // deleted camera
 }
 
 export function addCameraToGroup(cam:Camera, group:Group): Group {

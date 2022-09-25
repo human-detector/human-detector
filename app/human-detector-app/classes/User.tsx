@@ -1,6 +1,8 @@
 export default class User{
     username:string;
+
     uuid:string;
+
     loggedIn:boolean;
 
     constructor(username:string, userID:string, loggedIn:boolean){
@@ -10,7 +12,7 @@ export default class User{
     }
 }
 
-//will look through database
+// will look through database
 export function isValidUsername(username:string):boolean{
     return false;
 }

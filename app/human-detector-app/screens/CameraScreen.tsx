@@ -1,22 +1,21 @@
 import {useState} from "react";
-import Camera from "../classes/Camera";
 import {Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import CameraSettingsButton from "../components/CameraSettingsButton";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import CameraSettingsButton from "../components/CameraSettingsButton";
+import Camera from "../classes/Camera";
 
 export default function CameraScreen(){
-  let cameraOne:Camera = new Camera("123", "AAAAA's Camera", "99");
-  let cameraTwo:Camera = new Camera("124", "BBBBB's Camera", "725");
-  let cameraThree:Camera = new Camera("125", "CCCCC's Camera", "400");
+  const cameraOne:Camera = new Camera("123", "AAAAA's Camera", "99");
+  const cameraTwo:Camera = new Camera("124", "BBBBB's Camera", "725");
+  const cameraThree:Camera = new Camera("125", "CCCCC's Camera", "400");
 
   const[listOfCameras, setListOfCameras] = useState([cameraOne, cameraTwo, cameraThree])
 
   return (
       <View style={styles.container}>
           <ScrollView>
-              { listOfCameras.map((item) => {
-                  return (
+              { listOfCameras.map((item) => (
                       <View key={item.cameraId}>
                           <TouchableOpacity
                               style={styles.menuItem}
@@ -25,18 +24,17 @@ export default function CameraScreen(){
                               }}
                           >
                               <Text style={styles.menuButtonText}> {item.cameraName} </Text>
-                              <CameraSettingsButton cameraId={item.cameraId}></CameraSettingsButton>
+                              <CameraSettingsButton cameraId={item.cameraId} />
                           </TouchableOpacity>
                       </View>
-                  )
-              })}
+                  ))}
 
-              <View key={'add-button'}>
+              <View key="add-button">
                   <TouchableOpacity
                       style={[styles.menuItem, styles.addButtonItem]}
                       onPress = {() => {
                           const cameraList: Camera[] = [...listOfCameras];
-                          //adding camera here test
+                          // adding camera here test
                           cameraList.push(new Camera("test", "test", "test"));
                           setListOfCameras(cameraList);
                       }}
@@ -73,8 +71,8 @@ const styles = StyleSheet.create({
   container: {
       flex: 1,
       backgroundColor: '#fff',
-      //paddingTop: 40,
-      //paddingHorizontal: 20
+      // paddingTop: 40,
+      // paddingHorizontal: 20
   },
   textInput: {
       borderWidth: 1,

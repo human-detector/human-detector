@@ -1,7 +1,6 @@
 
 import { loadFeature, defineFeature } from 'jest-cucumber';
-import { authenticateLogin, isValidUsername, isValidPassword } from '../../../classes/User';
-import User from '../../../classes/User';
+import User, { authenticateLogin, isValidUsername, isValidPassword } from '../../../classes/User';
 import { apiLink, loginUrlExtension } from '../../../config/ServerConfig';
 
 const nock = require('nock')

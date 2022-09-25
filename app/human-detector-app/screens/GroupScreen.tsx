@@ -1,13 +1,13 @@
 import {useState} from "react";
-import Camera from "../classes/Camera";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import Camera from "../classes/Camera";
 import CameraSettingsButton from "../components/CameraSettingsButton";
 import Group from "../classes/Group";
 
 export default function GroupMenu( { navigation }: Props ) {
-    var groupOne:Group = new Group("AAAAAA's Group", "99");
-    var groupTwo:Group = new Group("BBBBB's Group", "725");
-    var groupThree:Group = new Group("CCCCC's Group", "400");
+    const groupOne:Group = new Group("AAAAAA's Group", "99");
+    const groupTwo:Group = new Group("BBBBB's Group", "725");
+    const groupThree:Group = new Group("CCCCC's Group", "400");
 
     const[listOfCameras, setListOfCameras] = useState([groupOne, groupTwo, groupThree])
 
@@ -19,26 +19,24 @@ export default function GroupMenu( { navigation }: Props ) {
     return (
         <View style={styles.container}>
             <ScrollView>
-                { listOfCameras.map((item) => {
-                    return (
+                { listOfCameras.map((item) => (
                         <View key={item.groupId}>
                             <TouchableOpacity
                                 style={styles.menuItem}
                                 onPress ={pressHandler}
                             >
                                 <Text style={styles.menuButtonText}> {item.groupName} </Text>
-                                <CameraSettingsButton cameraId={item.groupId}></CameraSettingsButton>
+                                <CameraSettingsButton cameraId={item.groupId} />
                             </TouchableOpacity>
                         </View>
-                    )
-                })}
+                    ))}
 
-                <View key={'add-button'}>
+                <View key="add-button">
                     <TouchableOpacity
                         style={[styles.menuItem, styles.addButtonItem]}
                         onPress = {() => {
                             const cameraList: Camera[] = [...listOfCameras];
-                            //adding camera here test
+                            // adding camera here test
                             cameraList.push(new Camera("test", "test", "test"));
                             setListOfCameras(cameraList);
                         }}
@@ -66,8 +64,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        //paddingTop: 40,
-        //paddingHorizontal: 20
+        // paddingTop: 40,
+        // paddingHorizontal: 20
     },
     textInput: {
         borderWidth: 1,

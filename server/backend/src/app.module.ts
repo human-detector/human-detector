@@ -1,15 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { CamerasModule } from './cameras/cameras.module';
+import { UsersModule } from './users/users.module';
+
+import config from '../mikro-orm.config';
 
 @Module({
-  imports: [
-    /* TODO: move config to a seperate config file.
-             https://mikro-orm.io/docs/installation#setting-up-the-commandline-tool */
-    MikroOrmModule.forRoot({
-      autoLoadEntities: true,
-    }),
-    CamerasModule,
-  ],
+  imports: [MikroOrmModule.forRoot(config), CamerasModule, UsersModule],
 })
 export class AppModule {}

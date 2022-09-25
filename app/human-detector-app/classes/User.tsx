@@ -1,42 +1,42 @@
-export default class User{
-    username:string;
+export default class User {
+  username: string;
 
-    uuid:string;
+  uuid: string;
 
-    loggedIn:boolean;
+  loggedIn: boolean;
 
-    constructor(username:string, userID:string, loggedIn:boolean){
-        this.username = username
-        this.userID = userID
-        this.loggedIn = loggedIn
-    }
+  constructor(username: string, userID: string, loggedIn: boolean) {
+    this.username = username;
+    this.userID = userID;
+    this.loggedIn = loggedIn;
+  }
 }
 
 // will look through database
-export function isValidUsername(username:string):boolean{
-    return false;
+export function isValidUsername(username: string): boolean {
+  return false;
 }
 
-export function isValidPassword(password:string):boolean{
-    return false;
+export function isValidPassword(password: string): boolean {
+  return false;
 }
 
-export function authenticateLogin(username:string, password:string):boolean{
-    return false
+export function authenticateLogin(username: string, password: string): boolean {
+  return false;
 }
 
-export function loginUser():User{
-    return new User('name', "ID", false);
+export function loginUser(): User {
+  return new User('name', 'ID', false);
 }
 
-export function getUserNotifPerm(user:User):boolean{
-    return false;
+export function getUserNotifPerm(user: User): boolean {
+  return false;
 }
 
-export function isSnoozeOn(user:User):boolean{
-    return true;
+export function isSnoozeOn(user: User): boolean {
+  return true;
 }
 
-function getUsersPassInDB(server:Object):string{
-    return 'pending'
+function getUsersPassInDB(server: Object): string {
+  return 'pending';
 }

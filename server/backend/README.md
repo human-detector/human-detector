@@ -24,12 +24,5 @@ $ npm run start:prod
 ## Test
 
 ```bash
-# unit tests
 $ npm run test
-
-# bdd tests
-$ npm run test:bdd
-
-# test coverage
-$ npm run test:cov
 ```

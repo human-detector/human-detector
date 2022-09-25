@@ -1,4 +1,3 @@
-// In App.js in a new project
 
 import * as React from 'react';
 import {View, Text, StyleSheet, Platform} from 'react-native';

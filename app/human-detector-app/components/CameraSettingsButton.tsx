@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {Button, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import { AntDesign } from '@expo/vector-icons';
 import Camera from "../classes/Camera";

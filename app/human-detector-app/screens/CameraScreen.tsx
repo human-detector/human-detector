@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {useState} from "react";
 import {Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import * as Notifications from "expo-notifications";
@@ -5,7 +6,7 @@ import * as Device from "expo-device";
 import CameraSettingsButton from "../components/CameraSettingsButton";
 import Camera from "../classes/Camera";
 
-export default function CameraScreen(){
+export default function CameraScreen(): React.ReactElement{
   const cameraOne:Camera = new Camera("123", "AAAAA's Camera", "99");
   const cameraTwo:Camera = new Camera("124", "BBBBB's Camera", "725");
   const cameraThree:Camera = new Camera("125", "CCCCC's Camera", "400");

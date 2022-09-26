@@ -12,16 +12,12 @@ export default function CameraSettingsButton(props: { cameraId: string }): React
         console.log(props.cameraId);
       }}
     >
-      {/* <Text style={styles.settingsCog}> ⚙️ </Text> */}
       <AntDesign name="setting" size={24} color="black" />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  settingsCog: {
-    fontSize: 35,
-  },
   menuItemSettingsButton: {
     alignSelf: 'flex-end',
     alignItems: 'center',

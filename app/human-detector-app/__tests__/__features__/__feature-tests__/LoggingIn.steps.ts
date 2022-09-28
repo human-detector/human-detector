@@ -1,104 +1,87 @@
-
 import { loadFeature, defineFeature } from 'jest-cucumber';
-import { authenticateLogin, isValidUsername, isValidPassword } from '../../../classes/User';
-import User from '../../../classes/User';
+import User, { authenticateLogin, isValidUsername, isValidPassword } from '../../../classes/User';
 import { apiLink, loginUrlExtension } from '../../../config/ServerConfig';
 
-const nock = require('nock')
+const nock = require('nock');
 
 const feature = loadFeature('__tests__/__features__/LoggingIn.feature');
 
 defineFeature(feature, (test) => {
-	let user;
+  let user;
 
   test('Entering correct username and password', ({ given, when, and, then }) => {
-
-	let mockServer;
+    let mockServer;
 
     given('I have an account', () => {
-		mockServer = nock(apiLink)
-			.get(loginUrlExtension)
-			.reply(200, 'testUserInput')
+      mockServer = nock(apiLink).get(loginUrlExtension).reply(200, 'testUserInput');
     });
 
     when('I enter my username correctly', () => {
-		expect(isValidUsername('testUserInput')).toBe(true)
+      expect(isValidUsername('testUserInput')).toBe(true);
     });
 
     and('enter my password correctly', () => {
-		mockServer = nock(apiLink)
-			.get(loginUrlExtension)
-			.reply(200, 'testUserInputPass')
-		expect(isValidPassword('testUserInputPass')).toBe(true)
+      mockServer = nock(apiLink).get(loginUrlExtension).reply(200, 'testUserInputPass');
+      expect(isValidPassword('testUserInputPass')).toBe(true);
     });
 
-
     then('I should be authorized to have access to the application', () => {
-		expect(authenticateLogin("testUserInput", "testUserInput")).toBe(true)
+      expect(authenticateLogin('testUserInput', 'testUserInput')).toBe(true);
     });
 
     test('Entering incorrect username but correct password', ({ given, when, and, then }) => {
-    	given('I have an account', () => {
-			mockServer = nock(apiLink)
-				.get(loginUrlExtension)
-				.reply(200, 'testUserInputPass')
-    	});
+      given('I have an account', () => {
+        mockServer = nock(apiLink).get(loginUrlExtension).reply(200, 'testUserInputPass');
+      });
 
-    	when('I enter my username incorrectly', () => {
-			expect(isValidUsername('testUserInput')).toBe(false)
-    	});
+      when('I enter my username incorrectly', () => {
+        expect(isValidUsername('testUserInput')).toBe(false);
+      });
 
-    	and('enter my password correctly', () => {
-			mockServer = nock(apiLink)
-				.get(loginUrlExtension)
-				.reply(200, 'testUserInputPass')
-			expect(isValidPassword('testUserInputPass')).toBe(true)
-    	});
+      and('enter my password correctly', () => {
+        mockServer = nock(apiLink).get(loginUrlExtension).reply(200, 'testUserInputPass');
+        expect(isValidPassword('testUserInputPass')).toBe(true);
+      });
 
-    	then('I should not have authorized access to the application', () => {
-			expect(authenticateLogin("testUserInput", "testUserInput")).toBe(false)
-    	});
+      then('I should not have authorized access to the application', () => {
+        expect(authenticateLogin('testUserInput', 'testUserInput')).toBe(false);
+      });
     });
 
     test('Entering incorrect username and password', ({ given, when, and, then }) => {
-    	given('I have an account', () => {
-		mockServer = nock(apiLink)
-			.get(loginUrlExtension)
-			.reply(200, 'testUserInput')
-    	});
+      given('I have an account', () => {
+        mockServer = nock(apiLink).get(loginUrlExtension).reply(200, 'testUserInput');
+      });
 
-    	when('I enter my username incorrectly', () => {
-			expect(isValidUsername('testUserInput')).toBe(false)
-    	});
+      when('I enter my username incorrectly', () => {
+        expect(isValidUsername('testUserInput')).toBe(false);
+      });
 
-    	and('enter my password incorrectly', () => {
-			mockServer = nock(apiLink)
-				.get(loginUrlExtension)
-				.reply(200, 'testUserInputPass')
-			expect(isValidPassword('testUserInputPass')).toBe(false)
-    	});
+      and('enter my password incorrectly', () => {
+        mockServer = nock(apiLink).get(loginUrlExtension).reply(200, 'testUserInputPass');
+        expect(isValidPassword('testUserInputPass')).toBe(false);
+      });
 
-    	then('I should not have authorized access to the application', () => {
-			expect(authenticateLogin("testUserInput", "testUserInput")).toBe(false)
-    	});
+      then('I should not have authorized access to the application', () => {
+        expect(authenticateLogin('testUserInput', 'testUserInput')).toBe(false);
+      });
     });
 
-	test('Entering incorrect username', ({ given, when, then }) => {
-    	given('I have an account', () => {
-			mockServer = nock(apiLink)
-				.get(loginUrlExtension)
-				.reply(200, 'testUserInputPass')
-			expect(isValidPassword('testUserInput')).toBe(false)
-    	});
+    test('Entering incorrect username', ({ given, when, then }) => {
+      given('I have an account', () => {
+        mockServer = nock(apiLink).get(loginUrlExtension).reply(200, 'testUserInputPass');
+        expect(isValidPassword('testUserInput')).toBe(false);
+      });
 
-    	when('I enter my username incorrectly', () => {
-			expect(isValidUsername('testUserInput')).toBe(false)
-    	});
+      when('I enter my username incorrectly', () => {
+        expect(isValidUsername('testUserInput')).toBe(false);
+      });
 
-    	then('I should not have authorized access to the application', () => {
-			expect(authenticateLogin("testUserInput", "testUserInputPass", "testServerInput")).toBe(false)
-    	});
+      then('I should not have authorized access to the application', () => {
+        expect(authenticateLogin('testUserInput', 'testUserInputPass', 'testServerInput')).toBe(
+          false
+        );
+      });
     });
-
   });
 });

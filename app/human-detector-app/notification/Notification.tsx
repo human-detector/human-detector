@@ -2,7 +2,7 @@ class Notification{
 
 }
 
-const notificationHistory = new Array()
+const notificationHistory = []
 
 export function addNotification(notif:Notification, hist:Notification[]): Notification[]{
     return hist;

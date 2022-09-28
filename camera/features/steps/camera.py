@@ -2,7 +2,7 @@ from behave import *
 import cv2
 import os
 from src.detector import Detector
-from src.socket import ServerConnection
+from eyeSocket import ServerConnection
 from src.camera import Camera
 
 @given('a human walks into frame')

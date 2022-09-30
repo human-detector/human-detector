@@ -13,16 +13,18 @@ LabelMapPath = os.path.join(CWD, "model/tflite_label_map.txt")
 
 class FFMPEGOutputStream:
     def __init__(self, resolution=(1920, 1080), fps=30, destination_ip="192.168.1.4", destination_port="2046"):
-        command = ["ffmpeg",
+        command = ["../rpi-ffmpeg/out/arm64-jammy-4.3.4-static-rel/ffmpeg",
                    "-re", # Real time
-                   "-hwaccel", "auto", # Use hwaccel if you don't want to suffer
+                   "-hwaccel", "drm", # Use hwaccel if you don't want to suffer
                    "-f", "rawvideo",
+                   "-vcodec", "rawvideo",
                    "-pix_fmt", "bgr24",
                    "-s", "1920x1080",
                    "-r", "30",
                    "-i", "-", # Use pipe for input
                    "-an", # No audio
-                   "-f", "mjpeg",
+                   "-vcodec", "h264_v4l2m2m",
+                   "-f", "YU12",
                    "udp://" + destination_ip + ":" + destination_port + "?pkt_size=1316"
                    ]
 
@@ -49,15 +51,16 @@ class FFMPEGOutputStream:
             cv2.rectangle(frame, (box_x_min, label_ymin-labelSize[1]-10), (box_x_min+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
             cv2.putText(frame, label, (box_x_min, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
         
-        print("submit: " + str(time.perf_counter() - timer_start))
         self.proc.stdin.write(frame.tobytes())
 
 class WebcamStream:
     udpStreamEnabled = False
     running = True
     frame = None
+    output_stream = None
+    frame_data = []
 
-    def __init__(self, resolution=(1920, 1080), fps=30):
+    def __init__(self, output_stream=None, resolution=(1920, 1080), fps=30):
         camera = cv2.VideoCapture(0)
         if not camera.isOpened():
             print("Error opening camera")
@@ -69,6 +72,7 @@ class WebcamStream:
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         camera.set(cv2.CAP_PROP_FPS, fps)
         self.camera = camera
+        output_stream = None
         (_, self.frame) = self.camera.read()
         
         Thread(target=self.update, args=()).start()
@@ -84,11 +88,16 @@ class WebcamStream:
             if self.udpStreamEnabled:
                 pass
 
+            output_stream.submit(self.frame, self.frame_data)
+
     def stop(self):
         self.running = False
 
     def getFrame(self):
         return self.frame
+
+    def updateFrameData(self, frame_data):
+        self.frame_data = frame_data
 
     def openStream(self):
         pass
@@ -96,8 +105,8 @@ class WebcamStream:
     def closeStream(self):
         pass
 
-stream = WebcamStream()
 output_stream = FFMPEGOutputStream()
+input_stream = WebcamStream(output_stream)
 
 # Load map between model output and labels
 with open(LabelMapPath, 'r') as map:
@@ -105,8 +114,8 @@ with open(LabelMapPath, 'r') as map:
 
 print (labels)
 
-# Load model
-tflite_interpreter = tflite.Interpreter(CheckpointPath, num_threads=4)
+# Load mod2l
+tflite_interpreter = tflite.Interpreter(CheckpointPath, num_threads=2)
 tflite_interpreter.allocate_tensors()
 
 input_details = tflite_interpreter.get_input_details()
@@ -123,7 +132,7 @@ input_std = 127.5
 results = []
 
 while True:
-    frame = stream.getFrame().copy()
+    frame = input_stream.getFrame().copy()
     
     # lower resolution
     # resized_frame = cv2.resize(frame, (1138, 640), interpolation = cv2.INTER_AREA)
@@ -173,7 +182,7 @@ while True:
             "name": labels[int(clasz)]
         })
 
-    output_stream.submit(frame, results)
+    input_stream.updateFrameData(results)
 
     if cv2.waitKey(1) == ord('q'):
         break

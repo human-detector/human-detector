@@ -1,5 +1,5 @@
-from src.image_sources.jpg_source import JpgSource
-from src.transforms.mobilenet_v2_transform import MobilenetV2Transform
+from src.image_sources import JpgSource
+from src.transforms import MobilenetV2Transform
 import os
 import unittest
 

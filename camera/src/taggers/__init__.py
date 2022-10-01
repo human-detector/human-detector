@@ -1,0 +1,1 @@
+from .object_detecter_tagger import *

@@ -1,8 +1,8 @@
-from image_sources.camera_source import CameraSource
-from transforms.mobilenet_v2_transform import MobilenetV2Transform
-from detectors.tensorflow_lite_detector import TensorflowDetector
-from taggers.object_detecter_tagger import ObjectDetecterTagger
-from outputs.ffmpeg_output import FFMPEGOutput
+from image_sources import CameraSource
+from transforms import MobilenetV2Transform
+from detectors import TensorflowDetector
+from taggers import ObjectDetecterTagger
+from outputs import FFMPEGOutput
 from pipeline import DetectorPipeline
 import os
 import signal

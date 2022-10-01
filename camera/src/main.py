@@ -2,7 +2,7 @@ from image_sources.camera_source import CameraSource
 from transforms.mobilenet_v2_transform import MobilenetV2Transform
 from detectors.tensorflow_lite_detector import TensorflowDetector
 from taggers.object_detecter_tagger import ObjectDetecterTagger
-from outputs.imshow_output import ImshowOutput
+from outputs.ffmpeg_output import FFMPEGOutput
 from pipeline import DetectorPipeline
 import os
 import signal
@@ -17,10 +17,11 @@ MODEL_PATH = os.path.join(cwd, "model/model.tflite")
 LABELS_PATH = os.path.join(cwd, "model/tflite_label_map.txt")
 
 camera = CameraSource(INPUT_RESOLUTION, FPS)
+output = FFMPEGOutput(INPUT_RESOLUTION, FPS, "localhost", "2046")
 mobilenet_transform = MobilenetV2Transform(TENSOR_RESOLUTION)
 detector = TensorflowDetector(MODEL_PATH, LABELS_PATH, min_score=0.3)
 tagger = ObjectDetecterTagger(INPUT_RESOLUTION)
-output = ImshowOutput()
+# output = ImshowOutput()
 
 pipeline = DetectorPipeline(
     camera,

@@ -47,6 +47,9 @@ class TensorflowDetector:
 
         self.min_score = min_score
 
+    def __call__(self, frame):
+        self.detect(frame)
+
     def detect(self, frame):
         if frame == None:
             raise TensorflowFormatException("Null input given")

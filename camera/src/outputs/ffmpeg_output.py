@@ -13,12 +13,10 @@ class FFMPEGOutput:
     """
 
     def __init__(self, resolution, fps, destination_ip, destination_port):
-        type = platform.machine()
-        is_pi = "aarch64" in type or "arm" in type
-
-        # h264_v4l2m2m is a codec for Arm/Pis which can use hardware acceleration
-        output_codec = "h264_v4l2m2m" if is_pi else "mjpeg"
         hwaccel = self.get_hwaccel()
+
+        # TODO: If we look at streaming later, check for h264_v4l2m2m for hwaccel on the pi
+        # Using this gave no output in VLC but it seemed to work otherwise
 
         command = ["ffmpeg",
                    "-re",                   # Real time
@@ -30,7 +28,7 @@ class FFMPEGOutput:
                    "-r", f"{fps}",
                    "-i", "-",               # FFMPEG Input from stdin pipe
                    "-an",                   # No audio
-                   "-vcodec", output_codec, # Output codec
+                   "-vcodec", "mjpeg",      # Required, otherwise ffmpeg freaks out
                    "-f", "mjpeg",           # Motion jpeg output for stream
                    "udp://" + destination_ip + ":" + destination_port + "?pkt_size=1316"
                    ]

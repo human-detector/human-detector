@@ -4,16 +4,28 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
+import LoginScreen from './screens/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function App(): React.ReactElement {
-  // registerNNPushToken(4044, 'bbBo3vbjuqXCetI9mvFYic');
-  // console.log(DeviceInfo.getModel()); // it returns 'Simulator'
-
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            title: 'EyeSpy',
+            headerStyle: {
+              backgroundColor: '#1E90FF',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+        />
         <Stack.Screen
           name="Groups"
           component={GroupScreen}

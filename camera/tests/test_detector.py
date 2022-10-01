@@ -1,8 +1,6 @@
-import cv2
-import os
 import unittest
 from image_sources.jpg_source import JpgSource
-from src.detector import Detector
+from detectors.tensorflow_lite_detector import Detector
 
 class TestDetector(unittest.TestCase):
     def setUp(self):

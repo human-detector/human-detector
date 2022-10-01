@@ -1,5 +1,4 @@
 from threading import Thread
-import cv2
 
 class DetectorPipeline:
     """Pipeline which takes an input source and runs the necessary steps for detection"""

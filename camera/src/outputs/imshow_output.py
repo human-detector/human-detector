@@ -7,7 +7,3 @@ class ImshowOutput:
     
     def submit(self, frame):
         cv2.imshow("Detector output", frame)
-
-
-
-    

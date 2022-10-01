@@ -38,5 +38,5 @@ class CameraSource:
 
         if not success:
             raise RuntimeCameraException
-
+        
         return frame

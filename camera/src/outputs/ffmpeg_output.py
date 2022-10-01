@@ -42,6 +42,3 @@ class FFMPEGOutput:
     
     def submit(self, frame):
         self.proc.stdin.write(frame.tobytes())
-
-
-    

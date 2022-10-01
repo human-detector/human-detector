@@ -1,8 +1,7 @@
+from src.eyeSocket import ServerConnection
 import unittest
-
 import cv2
 import os
-from eyeSocket import ServerConnection
 
 class TestDetector(unittest.TestCase):
     def setUp(self):

@@ -15,7 +15,7 @@ class TensorflowFormatException(Exception):
     """Raised when an illformated input is given"""
 
 class TensorflowDetector:
-    def __init__(self, checkpoint_path, labels_map_path, threads=2, min_score=0.3):
+    def __init__(self, checkpoint_path, labels_map_path, threads=2, min_score=0.4):
         # Class/Labels come out as integer indexes from tensorflow. This map is used
         # to convert from those indices to a human readable label.
         with open(labels_map_path, 'r') as map:
@@ -83,10 +83,11 @@ class TensorflowDetector:
         for i in range(len(output_scores)):
             box = output_boxes[i]
             score = output_scores[i]
-            clasz = output_classes[i]
+            label = self.labels_map[int(output_classes[i])]
 
-            # Ignore any results which are not very confident
+            # Ignore any results which are not very confident or not as person
             if score < self.min_score: continue
+            if label != "person": continue
 
             y_min = max(0, box[0])
             x_min = max(0, box[1])
@@ -101,7 +102,7 @@ class TensorflowDetector:
             results.append({
                 "box": (lower_left, upper_right),
                 "score": int(score * 100),
-                "name": self.labels_map[int(clasz)]
+                "name": label
             })
 
         return results

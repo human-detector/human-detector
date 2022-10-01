@@ -1,6 +1,5 @@
 import os
 import subprocess
-import platform
 
 class FFMPEGNotFoundException(Exception):
     """Raised when FFMPEG can not start or is not found"""

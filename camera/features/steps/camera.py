@@ -1,30 +1,38 @@
 from behave import *
-import cv2
-import os
-from detectors.tensorflow_lite_detector import Detector
+from transforms import MobilenetV2Transform
+from detectors import TensorflowDetector
 from eyeSocket import ServerConnection
-from image_sources.camera_source import CameraSource
+from image_sources import JpgSource
+import os
+
+cwd = os.getcwd()
+MODEL_PATH = os.path.join(cwd, "model/model.tflite")
+LABELS_PATH = os.path.join(cwd, "model/tflite_label_map.txt")
 
 @given('a human walks into frame')
 def step_impl(ctx):
     dirname = os.path.realpath('.')
-    ctx.frame = cv2.imread(os.path.join(dirname, "tests/images/human.jpg"))
+    source = JpgSource(os.path.join(dirname, "tests/images/human.jpg"))
+    ctx.frame = source.get_frame()
     
 @given('a human is not in frame')
 def step_impl(ctx):
     dirname = os.path.realpath('.')
-    ctx.frame = cv2.imread(os.path.join(dirname, "tests/images/no_human.jpg"))
+    source = JpgSource(os.path.join(dirname, "tests/images/no_human.jpg"))
+    ctx.frame = source.get_frame()
 
 @when('a human is detected')
 def step_impl(ctx):
-    detector = Detector()
-    result = detector.detect(ctx.frame)
-    assert len(result) == 1
+    transform = MobilenetV2Transform()
+    detector = TensorflowDetector(MODEL_PATH, LABELS_PATH)
+    result = detector(transform(ctx.frame))
+    assert len(result) >= 1
 
 @when('a human is not detected')
 def step_impl(ctx):
-    detector = Detector()
-    result = detector.detect(ctx.frame)
+    transform = MobilenetV2Transform()
+    detector = TensorflowDetector(MODEL_PATH, LABELS_PATH)
+    result = detector(transform(ctx.frame))
     assert len(result) == 0
 
 @then('a notification will be sent')

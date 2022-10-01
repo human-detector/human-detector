@@ -1,7 +1,9 @@
 import { v4 } from 'uuid';
 import {
+  Collection,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryKey,
   Property,
   UuidType,
@@ -18,6 +20,9 @@ export class Camera {
 
   @Property()
   token!: string;
+
+  @ManyToOne(() => Group)
+  group: Group;
 
   constructor(name: string, token: string) {
     this.name = name;

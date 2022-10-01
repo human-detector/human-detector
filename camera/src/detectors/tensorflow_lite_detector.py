@@ -1,4 +1,4 @@
-import importlib
+import importlib.util
 import numpy as np
 
 # Try to detect tensorflow package

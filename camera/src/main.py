@@ -17,7 +17,7 @@ MODEL_PATH = os.path.join(cwd, "model/model.tflite")
 LABELS_PATH = os.path.join(cwd, "model/tflite_label_map.txt")
 
 camera = CameraSource(INPUT_RESOLUTION, FPS)
-output = FFMPEGOutput(INPUT_RESOLUTION, FPS, "localhost", "2046")
+output = FFMPEGOutput(INPUT_RESOLUTION, FPS, "192.168.1.4", "2046")
 mobilenet_transform = MobilenetV2Transform(TENSOR_RESOLUTION)
 detector = TensorflowDetector(MODEL_PATH, LABELS_PATH, min_score=0.3)
 tagger = ObjectDetecterTagger(INPUT_RESOLUTION)

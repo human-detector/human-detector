@@ -1,5 +1,5 @@
-from src.image_sources.null_source import NullSource
-from src.image_sources.jpg_source import JpgSource
+from src.image_sources import NullSource
+from src.image_sources import JpgSource
 import os
 import unittest
 

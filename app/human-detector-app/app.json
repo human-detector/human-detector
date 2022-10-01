@@ -21,15 +21,6 @@
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.eyespycamera.humandetectorapp",
-      "versionCode": 1,
-      "googleServicesFile": "./google-services.json"
-    },
     "web": {
       "favicon": "./assets/images/favicon.png"
     }

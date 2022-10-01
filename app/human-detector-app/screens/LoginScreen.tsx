@@ -30,7 +30,10 @@ export default function LoginScreen(): React.ReactElement {
 
   return (
     <View>
-      <Button onPress={promptAsync}>
+      <Button 
+      onPress={promptAsync}
+      title="Login with KeyCloak"
+      >
         <Text>Test</Text>
       </Button>
     </View>

@@ -40,11 +40,6 @@ class TensorflowDetector:
         self.expected_input_height = input_details[0]['shape'][1]
         self.expected_input_width = input_details[0]['shape'][2]
 
-        # Model takes 0.0-1.0 float inputs. These values are used to convert UINT8
-        # inputs into a float.
-        self.input_mean = 127.5
-        self.input_std = 127.5
-
         self.min_score = min_score
 
     def __call__(self, frame):

@@ -1,9 +1,9 @@
 from behave import *
 import cv2
 import os
-from src.detector import Detector
+from detectors.tensorflow_lite_detector import Detector
 from eyeSocket import ServerConnection
-from src.camera import Camera
+from image_sources.camera_source import CameraSource
 
 @given('a human walks into frame')
 def step_impl(ctx):

@@ -1,7 +1,5 @@
-
 import subprocess
 import platform
-
 
 class FFMPEGOutput:
     """

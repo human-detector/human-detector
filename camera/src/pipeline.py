@@ -1,4 +1,5 @@
 from threading import Thread
+import cv2
 
 class DetectorPipeline:
     """Pipeline which takes an input source and runs the necessary steps for detection"""
@@ -23,7 +24,7 @@ class DetectorPipeline:
             frame = self.input.get_frame()
             transformed_frame = self.transform(frame.copy())
             results = self.detector(transformed_frame)
-            self.tagger(frame.copy(), results)
-            self.label_image(frame, results)
-
+            output_image = self.tagger(frame.copy(), results)
+            self.output(output_image)
+            char = cv2.waitKey(1)
     

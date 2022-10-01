@@ -11,7 +11,7 @@ class MobilenetV2Transform:
         self.output_resolution = resolution
 
     def __call__(self, frame):
-        self.transform(frame)
+        return self.transform(frame)
     
     def transform(self, frame):
         cropped_frame = cv2.resize(frame, self.output_resolution, interpolation = cv2.INTER_AREA)

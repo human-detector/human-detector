@@ -19,7 +19,7 @@ LABELS_PATH = os.path.join(cwd, "model/tflite_label_map.txt")
 camera = CameraSource(INPUT_RESOLUTION, FPS)
 mobilenet_transform = MobilenetV2Transform(TENSOR_RESOLUTION)
 detector = TensorflowDetector(MODEL_PATH, LABELS_PATH, min_score=0.3)
-tagger = ObjectDetecterTagger()
+tagger = ObjectDetecterTagger(INPUT_RESOLUTION)
 output = ImshowOutput()
 
 pipeline = DetectorPipeline(
@@ -32,7 +32,7 @@ pipeline = DetectorPipeline(
 
 running = True
 
-def ctrl_c_handler():
+def ctrl_c_handler(sig, frame):
     global running
     running = False
 

@@ -20,10 +20,12 @@ export default class Camera {
   }
 
   renameCamera(name: string): Camera {
+    //P1
     return new Camera('0', 'name', 'ID');
   }
 
   isCameraOnline(): boolean {
+    //P0
     return true;
   }
 }

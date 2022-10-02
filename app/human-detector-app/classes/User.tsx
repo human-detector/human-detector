@@ -1,7 +1,7 @@
 export default class User {
   username: string;
 
-  uuid: string;
+  userID: string;
 
   loggedIn: boolean;
 

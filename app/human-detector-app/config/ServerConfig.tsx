@@ -4,3 +4,5 @@ export const getUsersCamerasUrlExtension = (userId: string): string => `/users/$
 export const getSendNotifKeyUrlExtension = (userId: string): string =>
   `/users/${userId}/notifyToken`;
 export const getGroupsListUrlExtension = (userId: string): string => `/users/${userId}/groups`;
+export const getNotificationHistoryUrlExtension = (userId: string): string =>
+  `/users/${userId}/notifications`;

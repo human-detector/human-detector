@@ -37,3 +37,19 @@ jobs:
       - name: Run tests
         working-directory: ./app/human-detector-app
         run: npm test
+  
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: server/backend/package-lock.json
+      - name: Install dependencies
+        working-directory: ./server/backend
+        run: npm install
+      - name: Run tests
+        working-directory: ./server/backend
+        run: npm test

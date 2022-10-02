@@ -10,6 +10,7 @@
     "eject": "expo eject",
     "test": "jest",
     "testBDD": "jest LoggingIn.steps.ts PushNotification.steps.ts",
+    "testTest": "jest BackendService.test.ts",
     "updateSnapshots": "jest --updateSnapshot",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
   },
@@ -26,6 +27,7 @@
     "@react-navigation/bottom-tabs": "^6.0.5",
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.1.0",
+    "axios": "^0.27.2",
     "expo": "~45.0.0",
     "expo-asset": "~8.5.0",
     "expo-constants": "~13.1.1",
@@ -38,6 +40,7 @@
     "expo-system-ui": "~1.2.0",
     "expo-updates": "~0.13.4",
     "expo-web-browser": "~10.2.0",
+    "node-fetch": "^3.2.10",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-native": "0.68.2",

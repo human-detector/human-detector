@@ -4,8 +4,6 @@ on:
   push:
   pull_request:
 
-env:
-
 jobs:
   python-tests:
     runs-on: ubuntu-latest

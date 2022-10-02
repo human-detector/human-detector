@@ -10,7 +10,6 @@
     "eject": "expo eject",
     "test": "jest",
     "testBDD": "jest LoggingIn.steps.ts PushNotification.steps.ts",
-    "testTest": "jest BackendService.test.ts",
     "updateSnapshots": "jest --updateSnapshot",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
   },

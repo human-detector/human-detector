@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        working-directory: ./camera
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ./requirements.txt
+      - name: Run tests
+        working-directory: ./camera
+        run: make test
+
+  app-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        working-directory: ./app/human-detector-app
+        run: npm ci
+      - name: Run tests
+        working-directory: ./app/human-detector-app
+        run: npm test
+  
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        working-directory: ./server/backend
+        run: npm ci
+      - name: Run tests
+        working-directory: ./server/backend
+        run: npm test

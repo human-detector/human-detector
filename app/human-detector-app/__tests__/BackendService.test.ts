@@ -5,6 +5,11 @@ import Group from '../classes/Group';
 import Camera from '../classes/Camera';
 import Notification from '../classes/Notification';
 
+/**
+ * This file is to take care of tests on methods that will be used
+ * to reach our REST API backend endpoints.
+ */
+
 const nock = require('nock');
 
 // test putting notification key

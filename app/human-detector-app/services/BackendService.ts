@@ -52,40 +52,31 @@ export async function getGroupListAPI(userId: string): Promise<Group[] | null> {
  *
  * @param userIdFromLogin : userId of the user that just logged in
  * @param expoTokenFromLogin : notification token of the user that just logged in
- * @returns '200' string if success, else it will return the status code that backend responds with.
+ * @returns void string if success, else it will return the error message
  */
 export async function sendNotifyTokenAPI(
   userIdFromLogin: string,
   expoTokenFromLogin: string
-): Promise<string> {
-  let successful: boolean = false;
-  let testData: string;
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-  };
-  const apiLinkWithExtension: string =
-    ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(userIdFromLogin);
-  await axios
-    .put(
+): Promise<void> {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    };
+    const apiLinkWithExtension: string =
+      ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(userIdFromLogin);
+    const response = await axios.put(
       apiLinkWithExtension,
       {
         expoToken: expoTokenFromLogin,
       },
       config
-    )
-    .then((response) => {
-      successful = true;
-
-      testData = response.status.toString();
-    })
-    .catch((error) => {
-      testData = error.response.status.toString();
-    });
-
-  return testData;
+    );
+  } catch (error) {
+    return Promise.reject(error.message);
+  }
 }
 
 /**

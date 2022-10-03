@@ -20,26 +20,19 @@ describe(BackendService.sendNotifyTokenAPI, () => {
       .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userID))
       .reply(200, 'success');
 
-    const result: string = await BackendService.sendNotifyTokenAPI(
-      newUser.userID,
-      'ExponentPushToken[0000000000]'
-    );
-
-    expect(result).toBe('200');
+    await BackendService.sendNotifyTokenAPI(newUser.userID, 'ExponentPushToken[0000000000]');
   });
 
   it("should return code 401 if user id doesn't exist", async () => {
+    const errorMsg = 'Request failed with status code 401';
     const newUser: User = new User('tucker', '987654', true);
     const scope = nock(ServerConfig.apiLink)
       .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userID))
       .reply(401, 'fail');
 
-    const result = await BackendService.sendNotifyTokenAPI(
-      newUser.userID,
-      'ExponentPushToken[0000000000]'
-    );
-
-    expect(result).toBe('401');
+    await expect(
+      BackendService.sendNotifyTokenAPI(newUser.userID, 'ExponentPushToken[0000000000]')
+    ).rejects.toBe(errorMsg);
   });
 });
 

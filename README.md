@@ -18,6 +18,34 @@ make bdd
 
 These tests assume that `python3` is installed and that both `python3` and `pip3` both are valid commands.
 
+## Deploying to Raspberry Pi
+
+Create an SD card with Raspian Lite 64-bit. Then run the below on the Pi:
+
+```
+# Update everything on the pi to latest
+sudo apt update && sudo apt upgrade
+# Install required packages
+sudo apt install git ffmpeg
+
+# Optionally install virtualenv if the Pi is used for other projects
+sudo apt install virtualenv
+
+# Download project
+git clone https://github.com/tucker-moore/human-detector.git
+cd human-detector/camera
+
+# Optionally use virtualenv to not mix Python dependencies with other projects
+virtualenv .env
+source .env/bin/activate # This needs to be ran everytime you login to the Pi!
+
+# Install python requirements
+make pi-install
+
+# Run detector
+python src/main.py
+```
+
 ### Requirements
 
 The below are installed when running `make install`:

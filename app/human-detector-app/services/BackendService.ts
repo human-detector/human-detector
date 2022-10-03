@@ -19,31 +19,21 @@ import * as ServerUrl from '../config/ServerConfig';
  *          An array of Groups that are owned by the user with the userId.
  */
 export async function getGroupListAPI(userId: string): Promise<Group[] | null> {
-  const apiLinkWithExtension: string =
-    ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(userId);
-  let testData: any;
-  let success: boolean = false;
-  const config = {
-    headers: {
-      Accept: 'application/json',
-    },
-  };
+  try {
+    const apiLinkWithExtension: string =
+      ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(userId);
+    const config = {
+      headers: {
+        Accept: 'application/json',
+      },
+    };
 
-  await axios
-    .get(apiLinkWithExtension, config)
-    .then((response) => {
-      testData = response.data;
-      success = true;
-    })
-    .catch((error) => {
-      console.error(`Error code: ${error.response.status}`);
-    });
-
-  if (!success) {
+    const response = await axios.get(apiLinkWithExtension, config);
+    return response.data;
+  } catch (error) {
+    console.error(`Error in getGroupListAPI status code: ${error.message}`);
     return null;
   }
-
-  return testData;
 }
 
 /**
@@ -75,8 +65,10 @@ export async function sendNotifyTokenAPI(
       config
     );
   } catch (error) {
+    console.error(`Error in sendNotifyAPI status code ${error.message}`);
     return Promise.reject(error.message);
   }
+  // no error: return void
 }
 
 /**
@@ -87,28 +79,19 @@ export async function sendNotifyTokenAPI(
  *          An array of notifications resembling notification history
  */
 export async function getNotificationHistoryAPI(userId: string): Promise<Notification[] | null> {
-  const apiLinkWithExtension: string =
-    ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(userId);
-  let testData: any;
-  let success: boolean = false;
-  const config = {
-    headers: {
-      Accept: 'application/json',
-    },
-  };
-  await axios
-    .get(apiLinkWithExtension, config)
-    .then((response) => {
-      testData = response.data;
-      success = true;
-    })
-    .catch((error) => {
-      console.error(`Error code: ${error.response.status}`);
-    });
+  try {
+    const apiLinkWithExtension: string =
+      ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(userId);
+    const config = {
+      headers: {
+        Accept: 'application/json',
+      },
+    };
 
-  if (!success) {
+    const response = await axios.get(apiLinkWithExtension, config);
+    return response.data;
+  } catch (error) {
+    console.error(`Error in getNotificationHistoryAPI status code: ${error.message}`);
     return null;
   }
-
-  return testData;
 }

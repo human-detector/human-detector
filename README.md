@@ -35,7 +35,7 @@ sudo apt install virtualenv
 git clone https://github.com/tucker-moore/human-detector.git
 cd human-detector/camera
 
-# Optioanlly use virtualenv to not mix Python dependencies with other projects
+# Optionally use virtualenv to not mix Python dependencies with other projects
 virtualenv .env
 source .env/bin/activate # This needs to be ran everytime you login to the Pi!
 

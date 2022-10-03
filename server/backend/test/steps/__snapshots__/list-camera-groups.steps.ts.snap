@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Listing a user's camera groups User A is attempting to list another user B's camera groups 1`] = `
+Object {
+  "message": "Forbidden",
+  "statusCode": 403,
+}
+`;
+
+exports[`Listing a user's camera groups User A is attempting to list the camera groups of user B, a non-existent user 1`] = `
+Object {
+  "message": "Forbidden",
+  "statusCode": 403,
+}
+`;

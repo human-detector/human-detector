@@ -23,13 +23,15 @@ $ npm run start:prod
 
 ## Test
 
+### Prerequisites
+
+- Pull the `postgres` Docker container:
+  ```bash
+  $ docker pull postgres:14-alpine
+  ```
+
+### Running
+
 ```bash
-# unit tests
 $ npm run test
-
-# bdd tests
-$ npm run test:bdd
-
-# test coverage
-$ npm run test:cov
 ```

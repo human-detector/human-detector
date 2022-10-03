@@ -6,3 +6,6 @@ bdd:
 
 install:
 	pip install -r requirements.txt
+
+pi-install:
+	pip install -r runtime-requirements.txt

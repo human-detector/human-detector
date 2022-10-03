@@ -20,7 +20,7 @@ describe(BackendService.sendNotifyTokenAPI, () => {
       .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userID))
       .reply(200, 'success');
 
-    const result: Promise<string> = await BackendService.sendNotifyTokenAPI(
+    const result: string = await BackendService.sendNotifyTokenAPI(
       newUser.userID,
       'ExponentPushToken[0000000000]'
     );
@@ -75,8 +75,6 @@ describe(BackendService.getGroupListAPI, () => {
 
     const result = await BackendService.getGroupListAPI(newUser.userID);
 
-    expect(result[0]).toEqual(groups[0]);
-    expect(result[1]).toEqual(groups[1]);
     expect(result).toEqual(groups);
   });
 });

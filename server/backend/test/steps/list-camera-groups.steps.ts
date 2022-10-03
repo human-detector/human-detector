@@ -1,64 +1,39 @@
 import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { v4 } from 'uuid';
 import * as request from 'supertest';
-import { UsersModule } from '../../src/users/users.module';
-import {
-  PostgreSqlContainer,
-  StartedPostgreSqlContainer,
-} from 'testcontainers';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
-import options from '../../mikro-orm.config';
-import * as path from 'path';
 import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { User } from '../../src/users/user.entity';
 import { Group } from '../../src/groups/group.entity';
 import { Camera } from '../../src/cameras/camera.entity';
 import { GetGroupsOutput } from '../../src/users/users.controller';
-
-jest.setTimeout(30000);
+import {
+  buildTestStack,
+  TestStack,
+  TEST_STACK_TIMEOUT,
+} from '../helpers/test-stack';
+import { UsersModule } from '../../src/users/users.module';
 
 defineFeature(
   loadFeature('test/features/list-camera-groups.feature'),
   (test) => {
     let app: INestApplication;
-    let dbContainer: StartedPostgreSqlContainer;
+    let testStack: TestStack;
     let userRepository: EntityRepository<User>;
 
     beforeAll(async () => {
-      dbContainer = await new PostgreSqlContainer('postgres:14-alpine')
-        .withBindMount(
-          path.resolve('../../dist'),
-          '/docker-entrypoint-initdb.d',
-        )
-        .start();
-      const moduleRef = await Test.createTestingModule({
-        imports: [
-          MikroOrmModule.forRoot({
-            ...options,
-            host: 'localhost',
-            dbName: dbContainer.getDatabase(),
-            user: dbContainer.getUsername(),
-            password: dbContainer.getPassword(),
-            port: dbContainer.getPort(),
-            allowGlobalContext: true,
-          }),
-          UsersModule,
-        ],
-      }).compile();
+      testStack = await buildTestStack({ imports: [UsersModule] });
+      userRepository = testStack.module
+        .get<MikroORM>(MikroORM)
+        .em.getRepository(User);
 
-      const orm = moduleRef.get<MikroORM>(MikroORM);
-      await orm.getSchemaGenerator().createSchema();
-      userRepository = orm.em.getRepository(User);
-
-      app = moduleRef.createNestApplication();
+      app = testStack.module.createNestApplication();
       await app.init();
-    });
+    }, TEST_STACK_TIMEOUT);
 
     afterAll(async () => {
       await app.close();
-      await dbContainer.stop();
+      await testStack.dbContainer.stop();
     });
 
     test('User is viewing their camera groups from the app', ({
@@ -113,9 +88,9 @@ defineFeature(
       let userTokenA: string;
       let response: request.Response;
 
-      given("I have user A's credentials", () => {
+      given("I have user A's credentials", async () => {
         userB = new User('user-b');
-        userRepository.persistAndFlush(userB);
+        await userRepository.persistAndFlush(userB);
         userTokenA = 'wogus'; // FIXME: test with well-formed tokens
       });
       when("I request user B's camera groups", async () => {

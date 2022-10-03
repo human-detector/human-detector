@@ -5,10 +5,22 @@ import requests
 URL_API="api.averycb.net"
 
 def get_notif_url(id):
-    return f"/cameras/{id}/notifications"
+    return URL_API + f"/cameras/{id}/notifications"
+
+def send_notification():
+    url = get_notif_url("111")
+
+    headers = {
+        "Accept": "application/json",
+        "Authorization": "aaaa"
+    }
+    
+    data = {}
+    response = requests.put(url=url, headers=headers, data=data)
+    return response.status_code == 200, response
 
 def get_heartbeat_url(id):
-    return f"/cameras/{id}/heartbeat"
+    return URL_API + f"/cameras/{id}/heartbeat"
 
 def send_heartbeat(time):
     url = get_heartbeat_url("111")

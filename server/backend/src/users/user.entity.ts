@@ -17,6 +17,12 @@ export class User {
   @Property()
   name!: string;
 
+  // A user might not have a push notification:
+  // - After account registration
+  // - If they never allow notification permissions in the app
+  @Property({ nullable: true })
+  expoToken?: string;
+
   @OneToMany(() => Group, (group) => group.user)
   groups = new Collection<Group>(this);
 

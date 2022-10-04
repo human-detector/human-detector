@@ -97,17 +97,19 @@ export async function getNotificationHistoryAPI(userId: string): Promise<Notific
 }
 
 /**
+ *  This method will send a code from login to the backend.  The backend will
+ *  send back an access token which will be used to access the backend.
  *
- *
- * @param code
- * @param redirectUri
- * @returns
+ * @param code: The code the user will produce after logging in through Keycloak
+ * @param redirectUri: redirectUri from the Keycloak auth request
+ * @returns null if error
+ *          Returns the object which will c
  */
 
 export async function exchangeCodeForTokenAPI(
   code: string,
   redirectUri: string
-): Promise<string | null> {
+): Promise<object | null> {
   try {
     const apiLinkWithExtension: string =
       ServerUrl.apiLink + ServerUrl.exchangeCodeForTokenUrlExtension;

@@ -95,3 +95,39 @@ export async function getNotificationHistoryAPI(userId: string): Promise<Notific
     return null;
   }
 }
+
+/**
+ *
+ *
+ * @param code
+ * @param redirectUri
+ * @returns
+ */
+
+export async function exchangeCodeForTokenAPI(
+  code: string,
+  redirectUri: string
+): Promise<string | null> {
+  try {
+    const apiLinkWithExtension: string =
+      ServerUrl.apiLink + ServerUrl.exchangeCodeForTokenUrlExtension;
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    };
+
+    const body = {
+      code,
+      redirectUri,
+    };
+
+    const response = await axios.post(apiLinkWithExtension, body, config);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error in exchangeCodeForTokenAPI status code: ${error.message}`);
+    return null;
+  }
+}

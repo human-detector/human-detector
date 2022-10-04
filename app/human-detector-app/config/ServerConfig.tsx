@@ -6,3 +6,4 @@ export const getSendNotifKeyUrlExtension = (userId: string): string =>
 export const getGroupsListUrlExtension = (userId: string): string => `/users/${userId}/groups`;
 export const getNotificationHistoryUrlExtension = (userId: string): string =>
   `/users/${userId}/notifications`;
+export const exchangeCodeForTokenUrlExtension = '/auth/userAccessToken';

@@ -102,3 +102,33 @@ describe(BackendService.getNotificationHistoryAPI, () => {
     expect(result).toEqual(notifHistory);
   });
 });
+
+describe(BackendService.exchangeCodeForTokenAPI, () => {
+  it('should return with token if the backend responds successfully', async () => {
+    const tokenMock = {
+      access_token: '893849234',
+      token_type: 'Bearer',
+      refresh_token: '8xLOxBtZp8',
+      expires_in: 3600,
+      id_token:
+        'jsojfeoisjofjsfoijOSEFJOOSIFJOSEIJFOQI#)_R0989438uweoISFJ(WEUISJFKEU09#W(FEDUHISCJKPEjgfuww0w49rijsklfdnoEHIFESJFOIU0e9wjfoJSOFsOIFOIFHE)(WtjfwEV)(SJCDINBgh98wuthforVDSjnioJREFHDSJJVIRSGHIUNJSDJVIOWUJSENVJ)(ERtUWOTHGFOjsdNFOEUS)FUJDSKJVFPEWuhOJKNVoiskgn[pr]gl}{:ELP{SPKOFJESKJFNKLSJf',
+    };
+    const scope = nock(ServerConfig.apiLink)
+      .post(ServerConfig.exchangeCodeForTokenUrlExtension)
+      .reply(200, JSON.stringify(tokenMock));
+
+    expect(
+      await BackendService.exchangeCodeForTokenAPI('4873947934', 'http://redirecturi.com')
+    ).toEqual(tokenMock);
+  });
+
+  it('should return null if the backend responds with an error status code', async () => {
+    const scope = nock(ServerConfig.apiLink)
+      .post(ServerConfig.exchangeCodeForTokenUrlExtension)
+      .reply(401, 'fail');
+
+    expect(
+      await BackendService.exchangeCodeForTokenAPI('384394834', 'http://redirecturi.com')
+    ).toBe(null);
+  });
+});

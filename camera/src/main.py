@@ -1,5 +1,5 @@
 from time import sleep
-from eye_socket import Heartbeat
+from net_requests import Heartbeat
 from image_sources import CameraSource
 from outputs.notification_output import NotificationOutput
 from transforms import MobilenetV2Transform

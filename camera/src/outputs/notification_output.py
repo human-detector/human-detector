@@ -1,5 +1,5 @@
 from exit_codes import NETWORK_ERROR
-import eye_socket
+from net_requests import NetConfig
 import cv2
 import numpy as np
 import time
@@ -46,7 +46,7 @@ class NotificationOutput:
             return
         
         jpg_arr = np.array(img_encode)
-        success, _ = eye_socket.send_notification(jpg_arr.tobytes())
+        success, _ = NetConfig.send_notification(jpg_arr)
 
         if not success:
             raise (NETWORK_ERROR)

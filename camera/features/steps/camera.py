@@ -1,7 +1,7 @@
 from behave import *
 from transforms import MobilenetV2Transform
 from detectors import TensorflowDetector
-from eye_socket import ServerConnection
+from net_requests import ServerConnection
 from image_sources import JpgSource
 import os
 

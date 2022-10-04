@@ -1,8 +1,6 @@
 import axios from 'axios';
-import { executeNativeBackPress } from 'react-native-screens';
 import { z } from 'zod';
 import Group from '../classes/Group';
-import User from '../classes/User';
 import Notification from '../classes/Notification';
 import * as ServerUrl from '../config/ServerConfig';
 
@@ -103,7 +101,7 @@ export async function getNotificationHistoryAPI(userId: string): Promise<Notific
  * @param code: The code the user will produce after logging in through Keycloak
  * @param redirectUri: redirectUri from the Keycloak auth request
  * @returns null if error
- *          Returns the object which will c
+ *          Returns the contents of the HTTP request
  */
 
 export async function exchangeCodeForTokenAPI(

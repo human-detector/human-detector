@@ -49,5 +49,5 @@ class FFMPEGOutput:
     def __del__(self):
         self.stop()
 
-    def __call__(self, frame):
+    def __call__(self, frame, results):
         self.proc.stdin.write(frame.tobytes())

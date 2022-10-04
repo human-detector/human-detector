@@ -7,7 +7,7 @@ URL_API="api.averycb.net"
 def get_notif_url(id):
     return URL_API + f"/cameras/{id}/notifications"
 
-def send_notification():
+def send_notification(frame):
     url = get_notif_url("111")
 
     headers = {
@@ -15,12 +15,18 @@ def send_notification():
         "Authorization": "aaaa"
     }
     
-    data = {}
+    data = {
+        "Frame": frame
+    }
+
     response = requests.put(url=url, headers=headers, data=data)
     return response.status_code == 200, response
 
 def get_heartbeat_url(id):
     return URL_API + f"/cameras/{id}/heartbeat"
+
+def seconds_to_milliseconds(seconds):
+    return int(seconds * 1000)
 
 def send_heartbeat(time):
     url = get_heartbeat_url("111")
@@ -31,12 +37,11 @@ def send_heartbeat(time):
     }
 
     data = {
-        "Timestamp": time
+        "Timestamp": seconds_to_milliseconds(time)
     }
 
     response = requests.put(url=url, headers=headers, data=data)
     return response.status_code == 200, response
-    
 
 class Heartbeat:
     def __init__(self, heartbeat_delay=5):
@@ -52,14 +57,14 @@ class Heartbeat:
 
     def update(self):
         while self.running:
-            cur_time = time.time()
+            cur_time = time()
             success, _ = send_heartbeat(cur_time)
             if success:
                 self.last_heartbeat = cur_time
 
             sleep(self.heartbeat_delay)   
     
-    def connected(self):
-        time_diff = time.time() - self.last_heartbeat
-        return time.time() - time_diff < (self.heartbeat_delay * 5)
+    def is_connected(self):
+        time_diff = time() - self.last_heartbeat
+        return time_diff < (self.heartbeat_delay * 5)
     

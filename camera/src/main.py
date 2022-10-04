@@ -1,12 +1,11 @@
-from time import sleep
 from net_requests import Heartbeat
 from image_sources import CameraSource
-from outputs.notification_output import NotificationOutput
 from transforms import MobilenetV2Transform
 from detectors import TensorflowDetector
 from taggers import ObjectDetecterTagger
-from outputs import FFMPEGOutput
+from outputs import FFMPEGOutput, NotificationOutput
 from pipeline import DetectorPipeline
+from time import sleep
 import os
 import signal
 

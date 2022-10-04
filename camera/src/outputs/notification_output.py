@@ -1,4 +1,3 @@
-from exit_codes import NETWORK_ERROR
 from net_requests import NetConfig
 import cv2
 import numpy as np
@@ -49,4 +48,4 @@ class NotificationOutput:
         success, _ = NetConfig.send_notification(jpg_arr)
 
         if not success:
-            raise (NETWORK_ERROR)
+            raise NotificationNetworkException

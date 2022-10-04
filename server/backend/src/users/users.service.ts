@@ -28,4 +28,22 @@ export class UsersService {
     }
     return user.groups;
   }
+
+  /**
+   * Update's the user's push notification token.
+   *
+   * @param userId the user's ID.
+   * @param notifyToken the new notification token.
+   */
+  public async updateNotifyToken(
+    userId: string,
+    notifyToken: string,
+  ): Promise<void> {
+    const user = await this.usersRepository.findOne({ id: userId });
+    if (user === null) {
+      throw new NotFoundError(`User with ID "${userId}" does not exist.`);
+    }
+    user.expoToken = notifyToken;
+    await this.usersRepository.flush();
+  }
 }

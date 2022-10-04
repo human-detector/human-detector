@@ -1,9 +1,11 @@
 import {
+  Body,
   Controller,
   ForbiddenException,
   Get,
   Inject,
   Param,
+  Put,
 } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
 import { UsersService } from './users.service';
@@ -33,6 +35,22 @@ export class UsersController {
           name: camera.name,
         })),
       }));
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  @Put(':id/notifyToken')
+  async updateNotifyToken(
+    @Param('id') id: string,
+    @Body('expoToken') notifyToken: string,
+  ): Promise<void> {
+    try {
+      await this.usersService.updateNotifyToken(id, notifyToken);
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();

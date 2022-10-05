@@ -5,5 +5,7 @@ class ImshowOutput:
     def __del__(self):
         cv2.destroyAllWindows()
     
-    def __call__(self, frame):
+    def __call__(self, frame, results):
         cv2.imshow("Detector output", frame)
+        # CV2 expects events to be processed, otherwise imshow does not show images
+        _ = cv2.waitKey(1)

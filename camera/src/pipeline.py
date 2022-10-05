@@ -4,12 +4,12 @@ import cv2
 class DetectorPipeline:
     """Pipeline which takes an input source and runs the necessary steps for detection"""
 
-    def __init__(self, input_source, transform, detector, tagger, output):
+    def __init__(self, input_source, transform, detector, tagger, outputs):
         self.input = input_source
         self.transform = transform
         self.detector = detector
         self.tagger = tagger
-        self.output = output
+        self.outputs = outputs
 
         self.running = True
         self.thread = Thread(target=self.run, args=())
@@ -25,6 +25,10 @@ class DetectorPipeline:
             transformed_frame = self.transform(frame.copy())
             results = self.detector(transformed_frame)
             output_image = self.tagger(frame.copy(), results)
-            self.output(output_image)
-            char = cv2.waitKey(1)
+            for output in self.outputs:
+                output(output_image)
+    
+    def check_alive(self):
+        self.thread.join(timeout=0.0)
+        return self.thread.is_alive()
     

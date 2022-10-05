@@ -1,12 +1,13 @@
+from net_requests import Heartbeat
 from image_sources import CameraSource
 from transforms import MobilenetV2Transform
 from detectors import TensorflowDetector
 from taggers import ObjectDetecterTagger
-from outputs import FFMPEGOutput
+from outputs import FFMPEGOutput, NotificationOutput
 from pipeline import DetectorPipeline
+from time import sleep
 import os
 import signal
-import sys
 
 INPUT_RESOLUTION = (1920, 1080)
 TENSOR_RESOLUTION = (640, 640)
@@ -21,8 +22,13 @@ pipeline = DetectorPipeline(
     MobilenetV2Transform(TENSOR_RESOLUTION),
     TensorflowDetector(MODEL_PATH, LABELS_PATH),
     ObjectDetecterTagger(INPUT_RESOLUTION),
-    FFMPEGOutput(INPUT_RESOLUTION, FPS, "192.168.1.4", "2046")
+    [
+        FFMPEGOutput(INPUT_RESOLUTION, FPS, "192.168.1.4", "2046"),
+        NotificationOutput()
+    ]
 )
+
+heartbeat = Heartbeat()
 
 running = True
 
@@ -33,8 +39,7 @@ def ctrl_c_handler(sig, frame):
 signal.signal(signal.SIGINT, ctrl_c_handler)
 
 while running:
-    char = sys.stdin.read(1)
-    if char == 'q':
-        running = False
+    sleep(1)
+    running = pipeline.check_alive() and heartbeat.is_connected()
 
 pipeline.stop()

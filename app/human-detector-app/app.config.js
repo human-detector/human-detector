@@ -4,4 +4,5 @@ module.exports = {
     extra: {
       keycloakUrl: process.env.KEYCLOAK_URL,
     },
+    scheme: 'myapp',
   };

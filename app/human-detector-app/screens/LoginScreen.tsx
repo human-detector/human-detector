@@ -1,20 +1,21 @@
 import * as React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
-import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { makeRedirectUri, useAuthRequest, ResponseType } from 'expo-auth-session';
 import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
+import { generateRandom } from 'expo-auth-session/build/PKCE';
 
 export default function LoginScreen(): React.ReactElement {
   // eslint-disable-next-line no-unsafe-optional-chaining
   const apiUrl: string = Constants.manifest?.extra?.keycloakUrl;
 
   const discovery = AuthSession.useAutoDiscovery(`${apiUrl}/realms/myrealm`);
-  console.log(discovery);
 
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: 'myclient',
       scopes: ['openid'],
+      codeChallenge: generateRandom(30),
       redirectUri: makeRedirectUri({}),
     },
     discovery

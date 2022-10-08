@@ -17,7 +17,7 @@ function genCodeVerifier(size: number) {
  * will hold values that will be important to keep track of.
  *
  * To get the authorization token, we need to make sure that codeVerifier and
- * redirectUri stay the same.  These are used for verification of authorization.
+ * redirectUri don't change after being given a value.  These are used for verification of authorization.
  */
 export default class KeyCloakInstance {
   // Code verifier to be sent

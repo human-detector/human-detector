@@ -33,7 +33,7 @@ export default function KeyCloakButton(): React.ReactElement {
         onPress={() => {
           promptAsync();
         }}
-        title="Login with KeyCloak"
+        title="Login"
       />
     </View>
   );

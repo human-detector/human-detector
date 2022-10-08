@@ -29,7 +29,6 @@
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.1.0",
     "axios": "^0.27.2",
-    "base64url": "^3.0.1",
     "crypto-js": "^4.1.1",
     "expo": "~45.0.0",
     "expo-asset": "~8.5.0",

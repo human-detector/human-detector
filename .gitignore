@@ -2,4 +2,6 @@
 **/node_modules/
 **/__pycache__
 .vscode
+# Ignore python virtual environment`
 **/.env
+**/.venv

@@ -80,7 +80,7 @@ To run the app, you must have the expo cli installed on your machine. You also m
 
 ```
 npm install -g expo-cli // install the expo-cli if you haven't already for glpbal expo cli
-// You can also install as a dev dependency with npm install expo-cli --save-dev and use npx with expo for local expo cli
+// or for convenience, after an npm install, use npx expo for local expo
 
 cd app/human-detector-app // enter the mobile app directry
 

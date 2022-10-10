@@ -50,15 +50,15 @@ python src/main.py
 
 The below are installed when running `make install`:
 
-* Opencv-Python: OpenCV can read images and camera streams. Contains lots of computer vision functionality
-* Requests: HTTPS request library
-* Behave: Behavior tests
+- Opencv-Python: OpenCV can read images and camera streams. Contains lots of computer vision functionality
+- Requests: HTTPS request library
+- Behave: Behavior tests
 
 ## Mobile Application Tests
 
 To test the mobile application, you must have `node` and `npm` installed.
 
-To run the mobile application tests, when in the directory `/human-detector/app/human-detector-app/`, you can run `npm test`.  This command will both run unit tests, and behavior tests through jest and jest-cucumber.
+To run the mobile application tests, when in the directory `/human-detector/app/human-detector-app/`, you can run `npm test`. This command will both run unit tests, and behavior tests through jest and jest-cucumber.
 
 ```
 cd app/human-detector-app
@@ -96,3 +96,40 @@ Running tests for the backend requires installing `node` and `npm`.
 It may work with older versions, but it is confirmed working on NodeJS 16.5.1 LTS.
 Once you have `node` and `npm` installed, navigate to `server/backend` and follow
 the instructions in the README for testing.
+
+### Manual integration tests
+
+For full integration tests (like with the mobile app and camera), you can spawn
+a full test stack using [Docker](https://docs.docker.com/get-docker/). You'll need
+to set the following environment variables:
+
+1. `DB_NAME` - the name of the database (different from hostname)
+2. `DB_USER` - Postgres username
+3. `DB_PASSWORD` - the password
+
+For testing, you can set these to whatever you want. Setting them to something easy
+to type would be useful for your sanity if you want to connect to and inspect the
+database during testing.
+
+Some useful commands:
+
+- Build the containers for each component
+  ```sh
+  $ docker-compose build
+  ```
+- Run the test stack
+  ```sh
+  $ DB_NAME=... DB_USER=... DB_PASSWORD=... docker-compose up
+  ```
+- List running containers
+  ```sh
+  $ docker container ls
+  ```
+- Connect to the database
+  ```sh
+  $ docker exec -it ${POSTGRES_CONTAINER_NAME} psql -U ${DB_USER} ${DB_NAME}
+  ```
+- Clean up the resources created by `docker-compose`
+  ```sh
+  $ docker-compose down
+  ```

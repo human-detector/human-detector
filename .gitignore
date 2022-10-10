@@ -5,3 +5,5 @@
 # Ignore python virtual environment`
 **/.env
 **/.venv
+**/target/
+**/.idea/

@@ -26,7 +26,7 @@ class DetectorPipeline:
             results = self.detector(transformed_frame)
             output_image = self.tagger(frame.copy(), results)
             for output in self.outputs:
-                output(output_image)
+                output(output_image, results)
     
     def check_alive(self):
         self.thread.join(timeout=0.0)

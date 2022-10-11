@@ -1,0 +1,11 @@
+{
+  "realm": "users",
+  "enabled": true,
+  "registrationAllowed": true,
+  "eventsEnabled": false,
+  "eventsListeners": [
+    "sync-users",
+    "jboss-logging"
+  ],
+  "keycloakVersion": "19.0.2"
+}

@@ -9,6 +9,8 @@ RUN mvn package
 
 FROM quay.io/keycloak/keycloak:19.0.2 AS keycloak-builder
 COPY --from=spi-builder /sync-users-spi/target/sync-users.jar /opt/keycloak/providers
+COPY ./data/import /opt/keycloak/data/import
+RUN /opt/keycloak/bin/kc.sh -v import --dir /opt/keycloak/data/import
 RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:19.0.2

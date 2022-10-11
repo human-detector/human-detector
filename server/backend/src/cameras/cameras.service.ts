@@ -4,38 +4,34 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { NotFoundError } from '../errors.types';
 import { Notification } from './notification.entity';
 import { Camera } from './camera.entity';
-import { NotFoundError } from '../errors.types';
 
 @Injectable()
 export class CamerasService {
   constructor(
-    @InjectRepository(Notification)
-    private notificationRepository: EntityRepository<Notification>,
     @InjectRepository(Camera)
     private cameraRepository: EntityRepository<Camera>,
+    @InjectRepository(Notification)
+    private notificationRepository: EntityRepository<Notification>,
   ) {}
 
-  sendNotification(id: string): boolean {
+  public async sendNotification(idCam: string): Promise<boolean> {
     /* TODO: verify that ID refers to a valid camera and add a notification to DB */
-	
-	const cam = await this.notificationRepository.findOne({camera, {id, this.id}});
-	if (cam === null) {
-		throw new NotFoundError(`Camera with given ID does not exist.`);
-	}
-	await this.notificationRepository.persistAndFlush(new Notification());
-	
+    const cam = await this.cameraRepository.findOne({ id: idCam });
+    if (cam === null) {
+      throw new NotFoundError(`Camera with given ID does not exist.`);
+    }
+    cam.notifications.add(new Notification());
     return true;
   }
 
-  public async getNotifications(id: string): Promise<Notification[]> {
+  public async getNotifications(idCam: string): Promise<Notification[]> {
     /* TODO: verify ID, get the notifications */
-	
-	const notifications = await this.notificationRepository.findOne(
-		{camera, {id, this.id}},
-		{populate: ['camera.notifications']});
-	if (notifications === null) {
-		throw new NotFoundError(`Camera with given ID does not exist.`);
-	}
+
+    const cam = await this.cameraRepository.findOne({ id: idCam });
+    if (cam === null) {
+      throw new NotFoundError(`Camera with given ID does not exist.`);
+    }
+    const notifications = await this.notificationRepository.find({ id: idCam });
     return notifications;
   }
 

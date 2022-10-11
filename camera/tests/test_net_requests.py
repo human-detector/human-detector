@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from src.net_requests import *
+from src.networking import *
 import responses
 import unittest
 import time
@@ -8,44 +8,44 @@ import base64
 
 class TestNetRequests(unittest.TestCase):
     def setUp(self) -> None:
+        self.key = KeyManager.create_random_key("111")
+        self.net = NetRequests(self.key)
         return super().setUp()
     
     @responses.activate
     def test_heartbeat_timer(self):
-        id = "111"
         call_count = 3
         heartbeat_delay = 0.1
 
         resp = responses.put(
-            NetConfig.get_heartbeat_url(id),
+            NetConfig.get_heartbeat_url(self.key.get_serial()),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "aaaa"
+                "Authorization": self.key.get_auth_token()
             }
         )
 
-        heartbeat = Heartbeat(heartbeat_delay=heartbeat_delay)
+        heartbeat = Heartbeat(self.net, heartbeat_delay=heartbeat_delay)
         sleep(heartbeat_delay * call_count)
         heartbeat.stop()
         self.assertTrue(resp.call_count == call_count)
     
     @responses.activate
     def test_heartbeat_request(self):
-        id = "111"
-
         cur_time = time.time()
+
         responses.put(
-            NetConfig.get_heartbeat_url(id),
+            NetConfig.get_heartbeat_url(self.key.get_serial()),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "aaaa"
+                "Authorization": self.key.get_auth_token()
             },
             json={
                 "Timestamp": NetRequests.seconds_to_milliseconds(cur_time)
             }
         )
 
-        success, response = NetRequests.send_heartbeat(cur_time)
+        success, response = self.net.send_heartbeat(cur_time)
         self.assertTrue(response.status_code == 200)
         self.assertTrue(success)
     
@@ -65,33 +65,31 @@ class TestNetRequests(unittest.TestCase):
     @responses.activate
     def test_notification(self):
         frame = np.random.rand(50)
-        id = "111"
 
         responses.put(
-            NetConfig.get_notif_url(id),
+            NetConfig.get_notif_url(self.key.get_serial()),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "aaaa"
+                "Authorization": self.key.get_auth_token()
             },
             json={
                 "Frame": base64.b64encode(frame).decode()
             }
         )
 
-        success, response = NetRequests.send_notification(frame)
+        success, response = self.net.send_notification(frame)
         self.assertTrue(response.status_code == 200)
         self.assertTrue(success)
 
     @responses.activate
     def test_heartbeat_request_fail(self):
-        id = "111"
-
         cur_time = time.time()
+
         responses.put(
-            NetConfig.get_heartbeat_url(id),
+            NetConfig.get_heartbeat_url(self.key.get_serial()),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "aaaa"
+                "Authorization": self.key.get_auth_token()
             },
             json={
                 "Timestamp": NetRequests.seconds_to_milliseconds(cur_time)
@@ -99,26 +97,25 @@ class TestNetRequests(unittest.TestCase):
             status=401
         )
 
-        success, response = NetRequests.send_heartbeat(cur_time)
+        success, response = self.net.send_heartbeat(cur_time)
         self.assertTrue(response.status_code == 401)
         self.assertFalse(success)
         
     @responses.activate
     def test_heartbeat_fail(self):
-        id = "111"
         call_count = 5
         heartbeat_delay = 0.1
 
         responses.put(
-            NetConfig.get_heartbeat_url(id),
+            NetConfig.get_heartbeat_url(self.key.get_serial()),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": "aaaa"
+                "Authorization": self.key.get_auth_token()
             },
             status=401
         )
 
-        heartbeat = Heartbeat(heartbeat_delay=heartbeat_delay)
+        heartbeat = Heartbeat(self.net, heartbeat_delay=heartbeat_delay)
         sleep(heartbeat_delay * call_count)
         heartbeat.stop()
         self.assertFalse(heartbeat.is_connected())

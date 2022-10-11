@@ -74,6 +74,21 @@ To run the tests, make sure to install the dependencies of the project using `np
 
 To run only behavior tests through jest-cucumber, you can use the command `npm run testBDD` which will run all the cucumber tests with corresponding `.feature` files.
 
+## Running the Mobile Application
+
+To run the app, you must have the expo cli installed on your machine. You also must set the Keycloak environment variable for authentication. 
+
+```
+npm install -g expo-cli // install the expo-cli if you haven't already for glpbal expo cli
+// or for convenience, after an npm install, use npx expo for local expo
+
+cd app/human-detector-app // enter the mobile app directry
+
+npm install //install dependencies
+
+KEYCLOAK_URL=<keycloakUrl> expo start //start the mobile application
+```
+
 
 ## Testing the Backend
 

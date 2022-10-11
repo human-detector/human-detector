@@ -1,8 +1,6 @@
 import axios from 'axios';
-import { executeNativeBackPress } from 'react-native-screens';
 import { z } from 'zod';
 import Group from '../classes/Group';
-import User from '../classes/User';
 import Notification from '../classes/Notification';
 import * as ServerUrl from '../config/ServerConfig';
 

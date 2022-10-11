@@ -1,4 +1,4 @@
-from net_requests import Heartbeat
+from networking import Heartbeat, KeyManager
 from image_sources import CameraSource
 from transforms import MobilenetV2Transform
 from detectors import TensorflowDetector

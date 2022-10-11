@@ -1,5 +1,6 @@
-from networking import Heartbeat, KeyManager
+from networking import Heartbeat
 from image_sources import CameraSource
+from networking.net_requests import NetRequests
 from transforms import MobilenetV2Transform
 from detectors import TensorflowDetector
 from taggers import ObjectDetecterTagger
@@ -17,6 +18,8 @@ cwd = os.getcwd()
 MODEL_PATH = os.path.join(cwd, "model/model.tflite")
 LABELS_PATH = os.path.join(cwd, "model/tflite_label_map.txt")
 
+network = NetRequests()
+
 pipeline = DetectorPipeline(
     CameraSource(INPUT_RESOLUTION, FPS),
     MobilenetV2Transform(TENSOR_RESOLUTION),
@@ -24,11 +27,11 @@ pipeline = DetectorPipeline(
     ObjectDetecterTagger(INPUT_RESOLUTION),
     [
         FFMPEGOutput(INPUT_RESOLUTION, FPS, "192.168.1.4", "2046"),
-        NotificationOutput()
+        NotificationOutput(network)
     ]
 )
 
-heartbeat = Heartbeat()
+heartbeat = Heartbeat(network)
 
 running = True
 

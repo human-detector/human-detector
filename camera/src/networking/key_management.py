@@ -12,12 +12,9 @@ def _is_raspi():
 
 _DEFAULT_KEY_LOC = "~/.eyespy/key"
 def _load_key(filename = _DEFAULT_KEY_LOC):
-    try:
-        with open(filename, 'rb') as priv_file:
-            priv_key = priv_file.read()
-            return Ed25519PrivateKey.from_private_bytes(priv_key)
-    except Exception: 
-        return None
+    with open(filename, 'rb') as priv_file:
+        priv_key = priv_file.read()
+        return Ed25519PrivateKey.from_private_bytes(priv_key)
 
 def _get_serial():
     if not _is_raspi():

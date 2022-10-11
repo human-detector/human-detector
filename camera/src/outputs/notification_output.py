@@ -1,4 +1,4 @@
-from net_requests import NetConfig
+from networking import NetRequests
 import cv2
 import numpy as np
 import time
@@ -11,13 +11,14 @@ class NotificationOutput:
     Output notifications to the app. Too make sure we aren't spamming the user, there is a cooldown after sending a notification
     """
 
-    def __init__(self, cooldown_seconds={5*60}, person_lost_frames=5):
+    def __init__(self, network, cooldown_seconds={5*60}, person_lost_frames=5):
         # Seconds between notifications if person stays in frames
         self.cooldown_seconds = cooldown_seconds
         # Number of frames without a person detected before person is considered gone
         self.person_lost_frames = person_lost_frames
         self.frames_countdown = 0
 
+        self.net = network
         self.last_notif = time.time()
 
     def __call__(self, frame, results):
@@ -45,7 +46,7 @@ class NotificationOutput:
             return
         
         jpg_arr = np.array(img_encode)
-        success, _ = NetConfig.send_notification(jpg_arr)
+        success, _ = self.net.send_notification(jpg_arr)
 
         if not success:
             raise NotificationNetworkException

@@ -5,8 +5,8 @@ from .net_config import NetConfig
 from .key_management import KeyManager
 
 class NetRequests:
-    def __init__(self, key=KeyManager()):
-        self.key = key
+    def __init__(self, key=None):
+        self.key = KeyManager() if key is None else key
 
     def send_notification(self, frame):
         url = NetConfig.get_notif_url(self.key.get_serial())

@@ -1,7 +1,8 @@
-import base64
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import load_ssh_private_key
-import io
 from os.path import expanduser
+import base64
+import io
 
 def _is_raspi():
     try:
@@ -30,9 +31,9 @@ class KeyManager():
         key = Ed25519PrivateKey.generate()
         return KeyManager(key, id)
 
-    def __init__(self, priv_key = _load_key(), serial = _get_serial()):
-        self.priv_key = priv_key
-        self.serial = serial
+    def __init__(self, priv_key = None, serial = None):
+        self.priv_key = _load_key() if priv_key is None else priv_key
+        self.serial = _get_serial() if serial is None else serial
 
     def get_priv_key(self):
         return self.priv_key

@@ -1,15 +1,26 @@
 import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 import * as helpers from '../helpers';
 import { sendNotifyTokenAPI } from '../../services/backendService';
 
 /**
- * This method will handle sending a users expo token
- * to the backend for push notifications.
+ * The isUserNotificationsOn method will check if a user has
+ * notifications turned on.  If they do, then this will return true.
  *
- * @returns a rejected Promise if something went wrong when retrieving or sending the expo token
+ * @returns true if the user has notifications turned on.  Else, false.
  */
-export default async function sendExpoNotifToken(): Promise<void> {}
+async function isUserNotificationsOn(): Promise<boolean> {
+  // Check if the user allows notifications
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+  if (finalStatus !== 'granted') {
+    return false;
+  }
+  return true;
+}
 
 /**
  * The getExponentPushToken is a helper for the sendExpoNotifToken function
@@ -18,47 +29,46 @@ export default async function sendExpoNotifToken(): Promise<void> {}
  *
  * @returns the current users expo token.
  */
-async function getExponentPushToken(): Promise<string> {
-  // Check if device is an emulator or not
-  // Check for perms
+export async function getExponentPushToken(): Promise<string> {
+  // For notifications, the channel must be default for android
+  try {
+    if (helpers.getOS() === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    if (helpers.isDevice() && (await isUserNotificationsOn())) {
+      const token: string = (await Notifications.getExpoPushTokenAsync()).data; // get token
+      return token;
+    }
+    console.error('Failed to get push token for push notification!');
+    return await Promise.reject(new Error('Failed to get push token for push notification!'));
+  } catch (error) {
+    // Takes care of other errors
+    return Promise.reject(error);
+  }
 }
 
 /**
- * The checkUserNotificationPermissions method will check if a user has
- * notifications turned on.  If they do, then this will return true.
+ * This method will handle sending a users expo token
+ * to the backend for push notifications.
  *
- * @returns true if the user has notifications turned on.  Else, false.
+ * @returns a rejected Promise if something went wrong when retrieving or sending the expo token
  */
-async function checkUserNotificationPermissions(): Promise<boolean> {
-  // Check if the user allows notifications
+// eslint-disable-next-line import/prefer-default-export
+export async function sendExpoNotifToken(userId: string): Promise<void> {
+  try {
+    // Get the token from the user device
+    const token = await getExponentPushToken();
+    // Send the token if success
+    await sendNotifyTokenAPI(userId, token);
+    return await Promise.resolve();
+  } catch (error) {
+    // If any error occurs, reject out
+    return Promise.reject(error.message);
+  }
 }
-
-const registerForPushNotificationsAsync = async () => {
-  // Push notifications will only run on an actual device (no emulators)
-  if (helpers.isDevice()) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return;
-    }
-    const token: string = (await Notifications.getExpoPushTokenAsync()).data; //get token
-    console.log(token);
-  } else {
-    alert('Must use physical device for Push Notifications');
-  }
-
-  // Need to set notification channel to default for android devices
-  if (helpers.getOS() === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-};

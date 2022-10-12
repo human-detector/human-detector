@@ -3,6 +3,8 @@ import { View, StyleSheet, Button } from 'react-native';
 import Constants from 'expo-constants';
 import { makeRedirectUri, useAutoDiscovery } from 'expo-auth-session';
 import * as KeyCloakAuth from '../src/auth/keyCloakAuth';
+import { sendNotifyTokenAPI } from '../services/backendService';
+import { getExponentPushToken } from '../src/notifications/notifTokenInit';
 
 /**
  * Temporary codeVerifier generator
@@ -47,6 +49,8 @@ export default function KeyCloakButton(): React.ReactElement {
       KeyCloakAuth.exchangeCodeForToken(code, discovery, codeVerifier, redirectUri);
     }
     setCodeVerifier(genCodeVerifier(100));
+    //test notification
+    getExponentPushToken();
   }, [response]);
 
   return (

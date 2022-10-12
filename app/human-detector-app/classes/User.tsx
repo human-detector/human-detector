@@ -1,3 +1,6 @@
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+
 export default class User {
   username: string;
 
@@ -5,10 +8,17 @@ export default class User {
 
   loggedIn: boolean;
 
+  expoPushToken: string;
+
   constructor(username: string, userID: string, loggedIn: boolean) {
     this.username = username;
     this.userID = userID;
     this.loggedIn = loggedIn;
+    this.expoPushToken = '';
+  }
+
+  set setExpoPushToken(expoPushToken: string) {
+    this.expoPushToken = expoPushToken;
   }
 }
 
@@ -29,14 +39,6 @@ export function loginUser(): User {
   return new User('name', 'ID', false);
 }
 
-export function getUserNotifPerm(user: User): boolean {
-  return false;
-}
-
 export function isSnoozeOn(user: User): boolean {
   return true;
-}
-
-function getUsersPassInDB(server: Object): string {
-  return 'pending';
 }

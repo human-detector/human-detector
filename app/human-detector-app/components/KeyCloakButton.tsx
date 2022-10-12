@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
 import Constants from 'expo-constants';
 import { makeRedirectUri, useAutoDiscovery } from 'expo-auth-session';
-import * as KeyCloakAuth from '../auth/KeyCloakAuth';
+import * as KeyCloakAuth from '../src/auth/keyCloakAuth';
 
 /**
  * Temporary codeVerifier generator

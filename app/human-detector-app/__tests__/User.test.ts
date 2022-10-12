@@ -16,6 +16,8 @@ it('getUserNotifPerm() Tets 2: Notifications off should return false', () => {
   expect(getUserNotifPerm(user)).toBe(false);
 });
 
+// sendExpoToken()
+
 // isSnoozeOn()
 // critical values: snooze on, snooze off
 it('isSnoozeOn() Test 1: Notifications on should return true', () => {

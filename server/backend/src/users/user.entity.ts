@@ -15,7 +15,7 @@ export class User {
   id = v4();
 
   @Property()
-  name!: string;
+  name: string;
 
   // A user might not have a push notification:
   // - After account registration

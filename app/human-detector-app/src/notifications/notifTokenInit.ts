@@ -16,10 +16,7 @@ async function isUserNotificationsOn(): Promise<boolean> {
     const { status } = await Notifications.requestPermissionsAsync();
     finalStatus = status;
   }
-  return finalStat === 'granted';
-    return false;
-  }
-  return true;
+  return finalStatus === 'granted';
 }
 
 /**
@@ -66,7 +63,6 @@ export async function sendExpoNotifToken(userId: string): Promise<void> {
     const token = await getExponentPushToken();
     // Send the token if success
     await sendNotifyTokenAPI(userId, token);
-    return await Promise.resolve();
   } catch (error) {
     // If any error occurs, reject out
     return Promise.reject(error.message);

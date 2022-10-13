@@ -43,9 +43,8 @@ export async function getExponentPushToken(): Promise<string> {
       return token;
     }
     console.error('Failed to get push token for push notification!');
-    return await Promise.reject(new Error('Failed to get push token for push notification!'));
+    throw new Error('Failed to get push token for push notification!');
   } catch (error) {
-    // Takes care of other errors
     return Promise.reject(error);
   }
 }

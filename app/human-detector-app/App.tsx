@@ -1,15 +1,12 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { TokenResponse } from 'expo-auth-session';
-import JWT from 'expo-jwt';
-import * as CryptoJS from 'crypto-js';
-import User from './classes/User';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
-import { getExponentPushToken, sendExpoNotifToken } from './src/notifications/notifTokenInit';
+import { sendExpoNotifToken } from './src/notifications/notifTokenInit';
+import { getUserFromIDToken } from './src/auth/keyCloakAuth';
 
 const Stack = createNativeStackNavigator();
 
@@ -55,16 +52,10 @@ export default function App(): React.ReactElement {
 
   // If logged in, make the user and put them into the app
 
-  // Decode Base64
-  const words = CryptoJS.enc.Base64.parse(tokenResponse.idToken.split('.')[1]); // Get the payload
-  const textString = CryptoJS.enc.Utf8.stringify(words);
+  // Translates IDToken to a user
+  const user = getUserFromIDToken(tokenResponse.idToken);
 
-  const user = new User(
-    JSON.parse(textString).preferred_username,
-    JSON.parse(textString).sub,
-    isUserSignedIn
-  );
-
+  // If they just login;
   sendExpoNotifToken(user.userID).catch(() => console.error('Error in sending expo token!'));
 
   // If the user is logged in return the stack with all the information

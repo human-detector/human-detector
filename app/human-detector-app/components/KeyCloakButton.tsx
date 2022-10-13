@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import { makeRedirectUri, useAutoDiscovery } from 'expo-auth-session';
 import * as KeyCloakAuth from '../src/auth/keyCloakAuth';
 import { sendNotifyTokenAPI } from '../services/backendService';
-import { getExponentPushToken } from '../src/notifications/notifTokenInit';
+import { getExponentPushToken, sendExpoNotifToken } from '../src/notifications/notifTokenInit';
 
 /**
  * Temporary codeVerifier generator
@@ -30,7 +30,7 @@ const redirectUri = makeRedirectUri();
  *
  * @returns KeyCloakButton component
  */
-export default function KeyCloakButton(): React.ReactElement {
+export default function KeyCloakButton({ setTokenResponse }): React.ReactElement {
   const [codeVerifier, setCodeVerifier] = React.useState(genCodeVerifier(100));
   const apiUrl: string = Constants.manifest?.extra?.keycloakUrl;
 
@@ -46,11 +46,15 @@ export default function KeyCloakButton(): React.ReactElement {
       const { code } = response.params;
 
       // Returns authorization code will be connected to a user object
-      KeyCloakAuth.exchangeCodeForToken(code, discovery, codeVerifier, redirectUri);
+      KeyCloakAuth.exchangeCodeForToken(code, discovery, codeVerifier, redirectUri)
+        .then((val) => {
+          setTokenResponse(val);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
     setCodeVerifier(genCodeVerifier(100));
-    //test notification
-    getExponentPushToken();
   }, [response]);
 
   return (

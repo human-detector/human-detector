@@ -37,6 +37,10 @@ describe('sendExpoNotifToken() iOS', () => {
     expect(Notifications.getPermissionsAsync).toHaveBeenCalledTimes(1);
     expect(Notifications.getExpoPushTokenAsync).toHaveBeenCalledTimes(1);
     expect(Notifications.requestPermissionsAsync).toHaveBeenCalledTimes(0);
+    expect(BackendService.sendNotifyTokenAPI).toBeCalledWith(
+      user.userID,
+      'ExponentPushToken[000000000000]'
+    );
   });
 
   it('will return void if successful and user just turns on notifications', async () => {

@@ -8,17 +8,14 @@ export default class User {
 
   loggedIn: boolean;
 
-  expoPushToken: string;
-
   constructor(username: string, userID: string, loggedIn: boolean) {
     this.username = username;
-    this.userID = userID;
+    this.userID = ''; // Should always be from authorization token
     this.loggedIn = loggedIn;
-    this.expoPushToken = '';
   }
 
-  set setExpoPushToken(expoPushToken: string) {
-    this.expoPushToken = expoPushToken;
+  set setUserID(userID: string) {
+    this.userID = userID;
   }
 }
 

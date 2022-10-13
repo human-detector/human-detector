@@ -9,10 +9,10 @@ import KeyCloakButton from '../components/KeyCloakButton';
  *
  * @returns LoginScreen component
  */
-export default function LoginScreen(): React.ReactElement {
+export default function LoginScreen({ setTokenResponse }): React.ReactElement {
   return (
     <View>
-      <KeyCloakButton />
+      <KeyCloakButton setTokenResponse={setTokenResponse} />
     </View>
   );
 }

@@ -11,7 +11,7 @@
     "test": "jest",
     "testBDD": "jest LoggingIn.steps.ts PushNotification.steps.ts",
     "updateSnapshots": "jest --updateSnapshot",
-    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
   },
   "jest": {
     "preset": "jest-expo",
@@ -37,6 +37,7 @@
     "expo-crypto": "~10.2.0",
     "expo-device": "~4.2.0",
     "expo-font": "~10.1.0",
+    "expo-jwt": "^1.4.1",
     "expo-linking": "~3.1.0",
     "expo-notifications": "~0.15.4",
     "expo-random": "~12.2.0",
@@ -45,6 +46,7 @@
     "expo-system-ui": "~1.2.0",
     "expo-updates": "~0.13.4",
     "expo-web-browser": "~10.2.1",
+    "jsonwebtoken": "^8.5.1",
     "node-fetch": "^3.2.10",
     "react": "17.0.2",
     "react-dom": "17.0.2",

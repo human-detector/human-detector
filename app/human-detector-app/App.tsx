@@ -54,7 +54,6 @@ export default function App(): React.ReactElement {
   }
 
   // If logged in, make the user and put them into the app
-  console.log(tokenResponse);
 
   // Decode Base64
   const words = CryptoJS.enc.Base64.parse(tokenResponse.idToken.split('.')[1]); // Get the payload

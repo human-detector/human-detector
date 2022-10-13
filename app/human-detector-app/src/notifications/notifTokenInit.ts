@@ -42,10 +42,10 @@ export async function getExponentPushToken(): Promise<string> {
       const token: string = (await Notifications.getExpoPushTokenAsync()).data; // get token
       return token;
     }
-    console.error('Failed to get push token for push notification!');
     throw new Error('Failed to get push token for push notification!');
   } catch (error) {
-    return Promise.reject(error);
+    console.error(error.message);
+    throw error;
   }
 }
 
@@ -64,6 +64,7 @@ export async function sendExpoNotifToken(userId: string): Promise<void> {
     await sendNotifyTokenAPI(userId, token);
   } catch (error) {
     // If any error occurs, reject out
-    return Promise.reject(error.message);
+    console.error(error.message);
+    throw error;
   }
 }

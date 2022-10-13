@@ -16,7 +16,7 @@ async function isUserNotificationsOn(): Promise<boolean> {
     const { status } = await Notifications.requestPermissionsAsync();
     finalStatus = status;
   }
-  if (finalStatus !== 'granted') {
+  return finalStat === 'granted';
     return false;
   }
   return true;

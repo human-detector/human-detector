@@ -1,7 +1,22 @@
-import { Get, Put, Param, Controller, UseGuards } from '@nestjs/common';
-import { CameraAuthGuard } from './camera-auth.guard';
+import {
+  Get,
+  Put,
+  Param,
+  Controller,
+  UseGuards,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CamerasService } from './cameras.service';
+import { CameraAuthGuard } from './camera-auth.guard';
 import { Notification } from './notification.entity';
+import { NotFoundError } from '../errors.types';
+import { Camera } from './camera.entity';
+//import { map } from 'rxjs';
+
+export type GetNotificationsOutput = {
+  id: string;
+  timestamp: string;
+}[];
 
 @Controller('cameras')
 @UseGuards(CameraAuthGuard)
@@ -10,14 +25,39 @@ export class CamerasController {
 
   /* TODO: this endpoint needs an auth guard */
   @Put(':id/notifications')
-  sendNotification(@Param('id') id: string): boolean {
-    return this.camerasService.sendNotification(id);
+  async sendNotification(@Param('id') id: string): Promise<boolean> {
+    try {
+      const notifSent = await this.camerasService.sendNotification(id);
+      return notifSent;
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
   }
 
   /* TODO: this endpoint needs an auth guard */
   @Get(':id/notifications')
-  getNotifications(@Param('id') id: string): Notification[] {
-    return this.camerasService.getNotifications(id);
+  async getNotifications(
+    @Param('id') id: string,
+  ): Promise<GetNotificationsOutput> {
+    try {
+      const notificationsJSON = (
+        await this.camerasService.getNotifications(id)
+      ).toJSON();
+      return notificationsJSON.map((notifications) => ({
+        id: notifications.id,
+        timestamp: notifications.timestamp,
+      }));
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
   }
 
   // FIXME: do the cameras need to send a heartbeat?

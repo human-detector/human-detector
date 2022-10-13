@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EntityRepository } from '@mikro-orm/core';
+import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { NotFoundError } from '../errors.types';
 import { Notification } from './notification.entity';
@@ -24,15 +24,20 @@ export class CamerasService {
     return true;
   }
 
-  public async getNotifications(idCam: string): Promise<Notification[]> {
+  public async getNotifications(
+    idCam: string,
+  ): Promise<Collection<Notification>> {
     /* TODO: verify ID, get the notifications */
 
-    const cam = await this.cameraRepository.findOne({ id: idCam });
+    const cam = await this.cameraRepository.findOne(
+      { id: idCam },
+      { populate: ['notifications'] },
+    );
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
-    const notifications = await this.notificationRepository.find({ id: idCam });
-    return notifications;
+    //const notifications = await this.notificationRepository.find({ id: idCam });
+    return cam.notifications;
   }
 
   /**

@@ -10,6 +10,8 @@ jest.mock('expo-notifications');
 
 // Example user
 const user: User = new User('fjosejfoesf', '3232323', true);
+// Example access token
+const exampleAccessToken = 'ExampleAccessToken';
 
 // Permanent mocks
 beforeEach(() => {
@@ -31,7 +33,7 @@ describe('sendExpoNotifToken() iOS', () => {
     });
     BackendService.sendNotifyTokenAPI = jest.fn(() => Promise.resolve());
 
-    await sendExpoNotifToken(user.userID);
+    await sendExpoNotifToken(user.userID, exampleAccessToken);
     expect(helpers.isDevice).toHaveBeenCalledTimes(1);
     expect(helpers.getOS).toHaveBeenCalledTimes(1);
     expect(Notifications.getPermissionsAsync).toHaveBeenCalledTimes(1);
@@ -39,7 +41,8 @@ describe('sendExpoNotifToken() iOS', () => {
     expect(Notifications.requestPermissionsAsync).toHaveBeenCalledTimes(0);
     expect(BackendService.sendNotifyTokenAPI).toBeCalledWith(
       user.userID,
-      'ExponentPushToken[000000000000]'
+      'ExponentPushToken[000000000000]',
+      exampleAccessToken
     );
   });
 
@@ -52,7 +55,7 @@ describe('sendExpoNotifToken() iOS', () => {
     });
     BackendService.sendNotifyTokenAPI = jest.fn(() => Promise.resolve());
 
-    await sendExpoNotifToken(user.userID);
+    await sendExpoNotifToken(user.userID, exampleAccessToken);
     expect(helpers.isDevice).toHaveBeenCalledTimes(1);
     expect(helpers.getOS).toHaveBeenCalledTimes(1);
     expect(Notifications.getPermissionsAsync).toHaveBeenCalledTimes(1);
@@ -66,7 +69,9 @@ describe('sendExpoNotifToken() iOS', () => {
     Notifications.requestPermissionsAsync.mockResolvedValue({ status: 'denied' });
 
     const errorMsg = 'Failed to get push token for push notification!';
-    await expect(sendExpoNotifToken(user.userID)).rejects.toStrictEqual(new Error(errorMsg));
+    await expect(sendExpoNotifToken(user.userID, exampleAccessToken)).rejects.toStrictEqual(
+      new Error(errorMsg)
+    );
   });
 
   it('will return a reject if notifications are off', async () => {
@@ -77,7 +82,9 @@ describe('sendExpoNotifToken() iOS', () => {
     });
 
     const errorMsg = 'Failed to get push token for push notification!';
-    await expect(sendExpoNotifToken(user.userID)).rejects.toStrictEqual(new Error(errorMsg));
+    await expect(sendExpoNotifToken(user.userID, exampleAccessToken)).rejects.toStrictEqual(
+      new Error(errorMsg)
+    );
   });
 
   it('will return a reject with error message error in sending to server', async () => {
@@ -87,7 +94,9 @@ describe('sendExpoNotifToken() iOS', () => {
     ); // Sending to server error
 
     const errorMsg = 'Placeholder Error';
-    await expect(sendExpoNotifToken(user.userID)).rejects.toStrictEqual(new Error(errorMsg));
+    await expect(sendExpoNotifToken(user.userID, exampleAccessToken)).rejects.toStrictEqual(
+      new Error(errorMsg)
+    );
   });
 
   it('will return a reject if there is an error with getting the ExpoPushToken from the user', async () => {
@@ -97,7 +106,9 @@ describe('sendExpoNotifToken() iOS', () => {
     ); // Getting from the user error
 
     const errorMsg = 'Placeholder Error for Test 4';
-    await expect(sendExpoNotifToken(user.userID)).rejects.toStrictEqual(new Error(errorMsg));
+    await expect(sendExpoNotifToken(user.userID, exampleAccessToken)).rejects.toStrictEqual(
+      new Error(errorMsg)
+    );
   });
 });
 
@@ -112,7 +123,7 @@ describe('sendExpoNotifToken() android', () => {
     });
     BackendService.sendNotifyTokenAPI = jest.fn(() => Promise.resolve());
 
-    await sendExpoNotifToken(user.userID);
+    await sendExpoNotifToken(user.userID, exampleAccessToken);
     expect(helpers.isDevice).toHaveBeenCalledTimes(1);
     expect(helpers.getOS).toHaveBeenCalledTimes(1);
     expect(Notifications.getPermissionsAsync).toHaveBeenCalledTimes(1);

@@ -29,7 +29,9 @@ export default function App(): React.ReactElement {
 
   React.useEffect(() => {
     if (isUserSignedIn) {
-      sendExpoNotifToken(user.userID).catch(() => console.error('Error in sending expo token!'));
+      sendExpoNotifToken(user.userID, tokenResponse.accessToken).catch(() =>
+        console.error('Error in sending expo token!')
+      );
     }
     console.log('print test');
   }, [isUserSignedIn]);
@@ -64,8 +66,6 @@ export default function App(): React.ReactElement {
 
   // Translates IDToken to a user
   const user = getUserFromIDToken(tokenResponse.idToken);
-
-  // If they just login, this useEffect will
 
   // If the user is logged in return the stack with all the information
   return (

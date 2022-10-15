@@ -8,6 +8,8 @@ import * as ServerUrl from '../config/ServerConfig';
  * This file handles HTTP requests to our backend
  */
 
+const BEARER_ = 'Bearer ';
+
 /**
  * This method is used to get the group list that is connected to a user.  This group list
  * will contain cameras and other information that will be stored as a group object.
@@ -16,6 +18,7 @@ import * as ServerUrl from '../config/ServerConfig';
  * @returns null if error occurs.
  *          An array of Groups that are owned by the user with the userId.
  */
+
 export async function getGroupListAPI(userId: string): Promise<Group[] | null> {
   try {
     const apiLinkWithExtension: string =
@@ -44,11 +47,13 @@ export async function getGroupListAPI(userId: string): Promise<Group[] | null> {
  */
 export async function sendNotifyTokenAPI(
   userIdFromLogin: string,
-  expoTokenFromLogin: string
+  expoTokenFromLogin: string,
+  userAccessToken: string
 ): Promise<void> {
   try {
     const config = {
       headers: {
+        Authorization: BEARER_ + userAccessToken,
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },

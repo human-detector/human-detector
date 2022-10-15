@@ -12,17 +12,27 @@ const Stack = createNativeStackNavigator();
 
 export default function App(): React.ReactElement {
   let isUserSignedIn = false;
+  // Hooks
 
   // Update upon getting a token
   const [tokenResponse, setTokenResponse] = React.useState(null);
 
   // Check if the token is expired
   if (tokenResponse != null) {
+    // TODO: check if token is expired
     // TODO: refresh token if expired
+    // TODO: if token can't be refreshed, prompt user to login
 
     // if not expired, then user is signed in
     isUserSignedIn = true;
   }
+
+  React.useEffect(() => {
+    if (isUserSignedIn) {
+      sendExpoNotifToken(user.userID).catch(() => console.error('Error in sending expo token!'));
+    }
+    console.log('print test');
+  }, [isUserSignedIn]);
 
   // If the user isn't logged in
   if (!isUserSignedIn) {
@@ -55,8 +65,7 @@ export default function App(): React.ReactElement {
   // Translates IDToken to a user
   const user = getUserFromIDToken(tokenResponse.idToken);
 
-  // If they just login;
-  sendExpoNotifToken(user.userID).catch(() => console.error('Error in sending expo token!'));
+  // If they just login, this useEffect will
 
   // If the user is logged in return the stack with all the information
   return (

@@ -5,6 +5,7 @@ import {
   Controller,
   UseGuards,
   ForbiddenException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CamerasService } from './cameras.service';
 import { CameraAuthGuard } from './camera-auth.guard';
@@ -31,7 +32,7 @@ export class CamerasController {
       return notifSent;
     } catch (error) {
       if (error instanceof NotFoundError) {
-        throw new ForbiddenException();
+        throw new UnauthorizedException();
       } else {
         throw error;
       }
@@ -53,7 +54,7 @@ export class CamerasController {
       }));
     } catch (error) {
       if (error instanceof NotFoundError) {
-        throw new ForbiddenException();
+        throw new UnauthorizedException();
       } else {
         throw error;
       }

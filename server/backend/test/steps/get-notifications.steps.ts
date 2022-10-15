@@ -64,7 +64,7 @@ defineFeature(feature, (test) => {
         .get(`/cameras/${cameraA.id}/notifications`)
         .auth(token, { type: 'bearer' });
     });
-    then('the request will go through', async () => {
+    then('the request will go through', () => {
       expect(getRes.status).toBe(200);
     });
     and('I will receive a Notification array of 2', async () => {
@@ -86,7 +86,6 @@ defineFeature(feature, (test) => {
     let cameraA: Camera;
     let cameraB: Camera;
     let getRes: request.Response;
-    let tokenA: string;
     let tokenB: string;
 
     given("I have camera A's details", async () => {
@@ -94,7 +93,6 @@ defineFeature(feature, (test) => {
       cameraA.group = new Group('test-group2');
       cameraA.group.user = new User('test-user2');
       await cameraRepository.persistAndFlush(cameraA);
-      tokenA = cameraA.token;
     });
     and('camera A has 1 notification', async () => {
       cameraA.notifications.add(new Notification());
@@ -104,19 +102,19 @@ defineFeature(feature, (test) => {
       cameraB = new Camera('CameraB', 'test-token2B');
       tokenB = cameraB.token;
       await request(app.getHttpServer())
-        .get(`/cameras/${tokenB}/notifications`)
+        .get(`/cameras/${cameraB.id}/notifications`)
         .auth(tokenB, { type: 'bearer' })
         .expect(200);
     });
     when(
-      "I request to get the notifications from camera A with camera B's ID",
+      "I request to get the notifications from camera A with camera B's token",
       async () => {
         getRes = await request(app.getHttpServer())
-          .get(`/cameras/${tokenA}/notifications`)
+          .get(`/cameras/${cameraA.id}/notifications`)
           .auth(tokenB, { type: 'bearer' });
       },
     );
-    then("the request will receive an 'Unauthorized' error", async () => {
+    then("the request will receive an 'Unauthorized' error", () => {
       expect(getRes.status).toBe(401);
     });
   });
@@ -132,7 +130,7 @@ defineFeature(feature, (test) => {
     let beforeNotification: Notification[];
     let token: string;
 
-    given('I have no credentials', async () => {
+    given('I have no credentials', () => {
       token = '';
     });
     and('camera A has 1 notification attributed to it', async () => {
@@ -148,7 +146,7 @@ defineFeature(feature, (test) => {
         .get(`/cameras/${cameraA.id}/notifications`)
         .auth(token, { type: 'bearer' });
     });
-    then("I will receive an 'Unauthorized' error", async () => {
+    then("I will receive an 'Unauthorized' error", () => {
       expect(getRes.status).toBe(401);
     });
     and('Camera A will have the same notification as before', async () => {
@@ -169,7 +167,7 @@ defineFeature(feature, (test) => {
     let token: string;
     let id: string;
 
-    given('I have no credentials', async () => {
+    given('I have no credentials', () => {
       token = '';
       id = '';
     });
@@ -181,8 +179,8 @@ defineFeature(feature, (test) => {
           .auth(token, { type: 'bearer' });
       },
     );
-    then("I will receive an 'Unauthorized' error", async () => {
-      expect(res.status).toBe(401);
+    then("I will receive a 'Not Found' error", () => {
+      expect(res.status).toBe(404);
     });
   });
 });

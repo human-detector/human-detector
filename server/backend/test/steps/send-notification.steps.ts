@@ -14,6 +14,7 @@ import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
+import { getSystemErrorMap } from 'util';
 
 const feature = loadFeature('test/features/send-notification.feature');
 
@@ -51,7 +52,11 @@ defineFeature(feature, (test) => {
     and('Camera A has 3 notifications', async () => {
       const { camera } = createCameraWithKeyPair('Camera A', 'Serial A');
       cameraA = camera;
-      cameraA.notifications.add(new Notification());
+      cameraA.notifications.add(
+        new Notification(),
+        new Notification(),
+        new Notification(),
+      );
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
@@ -165,7 +170,8 @@ defineFeature(feature, (test) => {
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
         .put(`/cameras/${cameraA.id}/notifications`)
-        .set('Authorization', token);
+        .set('Authorization', token)
+        .send(new Notification());
     });
     then('The request succeeded', () => {
       expect(sendRes.status).toBe(200);

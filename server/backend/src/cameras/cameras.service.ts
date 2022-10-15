@@ -21,6 +21,7 @@ export class CamerasService {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
     cam.notifications.add(new Notification());
+    this.cameraRepository.flush();
     return true;
   }
 

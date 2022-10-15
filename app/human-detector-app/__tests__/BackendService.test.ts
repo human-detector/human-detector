@@ -1,4 +1,4 @@
-import * as BackendService from '../services/BackendService';
+import * as BackendService from '../services/backendService';
 import * as ServerConfig from '../config/ServerConfig';
 import User from '../classes/User';
 import Group from '../classes/Group';

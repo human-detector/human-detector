@@ -1,6 +1,7 @@
 import { useAuthRequest } from 'expo-auth-session';
 import * as AuthSession from 'expo-auth-session';
 import * as CryptoJS from 'crypto-js';
+import User from '../../classes/User';
 
 /**
  * getAuthRequest() will return what useAuthRequest() returns, using the
@@ -65,4 +66,24 @@ export async function exchangeCodeForToken(
     return Promise.reject(error);
   });
   return tokenSet;
+}
+
+/**
+ * The getUserFromIDToken() method will make a user from information
+ * from an idToken.
+ *
+ * @param idToken idToken from TokenResponse
+ * @returns user with information from idToken
+ */
+export function getUserFromIDToken(idToken: string): User {
+  const words = CryptoJS.enc.Base64.parse(idToken.split('.')[1]); // Get the payload
+  const textString = CryptoJS.enc.Utf8.stringify(words);
+
+  const user = new User(
+    JSON.parse(textString).preferred_username,
+    JSON.parse(textString).sub,
+    true // they should be logged in when getting here
+  );
+
+  return user;
 }

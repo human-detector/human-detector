@@ -1,31 +1,76 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
+import { sendExpoNotifToken } from './src/notifications/notifTokenInit';
+import { getUserFromIDToken } from './src/auth/keyCloakAuth';
 
 const Stack = createNativeStackNavigator();
 
 export default function App(): React.ReactElement {
+  let isUserSignedIn = false;
+  // Hooks
+
+  // Update upon getting a token
+  const [tokenResponse, setTokenResponse] = React.useState(null);
+
+  // Check if the token is expired
+  if (tokenResponse != null) {
+    // TODO: check if token is expired
+    // TODO: refresh token if expired
+    // TODO: if token can't be refreshed, prompt user to login
+
+    // if not expired, then user is signed in
+    isUserSignedIn = true;
+  }
+
+  React.useEffect(() => {
+    if (isUserSignedIn) {
+      sendExpoNotifToken(user.userID).catch(() => console.error('Error in sending expo token!'));
+    }
+    console.log('print test');
+  }, [isUserSignedIn]);
+
+  // If the user isn't logged in
+  if (!isUserSignedIn) {
+    // Open the login screen
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Login"
+            options={{
+              title: 'EyeSpy',
+              headerStyle: {
+                backgroundColor: '#1E90FF',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          >
+            {(props) => <LoginScreen setTokenResponse={setTokenResponse} />}
+          </Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
+  }
+
+  // If logged in, make the user and put them into the app
+
+  // Translates IDToken to a user
+  const user = getUserFromIDToken(tokenResponse.idToken);
+
+  // If they just login, this useEffect will
+
+  // If the user is logged in return the stack with all the information
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{
-            title: 'EyeSpy',
-            headerStyle: {
-              backgroundColor: '#1E90FF',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-        />
         <Stack.Screen
           name="Groups"
           component={GroupScreen}

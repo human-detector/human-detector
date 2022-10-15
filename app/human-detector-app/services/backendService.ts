@@ -40,7 +40,7 @@ export async function getGroupListAPI(userId: string): Promise<Group[] | null> {
  *
  * @param userIdFromLogin : userId of the user that just logged in
  * @param expoTokenFromLogin : notification token of the user that just logged in
- * @returns void string if success, else it will return the error message
+ * @returns void if success, else it will return the error message
  */
 export async function sendNotifyTokenAPI(
   userIdFromLogin: string,

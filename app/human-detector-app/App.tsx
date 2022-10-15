@@ -33,7 +33,6 @@ export default function App(): React.ReactElement {
         console.error('Error in sending expo token!')
       );
     }
-    console.log('print test');
   }, [isUserSignedIn]);
 
   // If the user isn't logged in

@@ -31,3 +31,13 @@ services:
     ports:
       - "8080:8080"
     command: ["start-dev"]
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+

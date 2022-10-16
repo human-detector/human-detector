@@ -61,6 +61,7 @@ export async function sendNotifyTokenAPI(
     };
     const apiLinkWithExtension: string =
       ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(userIdFromLogin);
+
     const response = await axios.put(
       apiLinkWithExtension,
       {

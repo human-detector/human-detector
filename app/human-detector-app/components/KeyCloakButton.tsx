@@ -34,7 +34,7 @@ export default function KeyCloakButton({ setTokenResponse }): React.ReactElement
   const [codeVerifier, setCodeVerifier] = React.useState(genCodeVerifier(100));
   const apiUrl: string = Constants.manifest?.extra?.keycloakUrl;
 
-  const discovery = useAutoDiscovery(`${apiUrl}/realms/myrealm`);
+  const discovery = useAutoDiscovery(`${apiUrl}/realms/users`);
   const [request, response, promptAsync] = KeyCloakAuth.getAuthRequest(
     discovery,
     redirectUri,

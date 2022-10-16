@@ -10,7 +10,7 @@ export default class User {
 
   constructor(username: string, userID: string, loggedIn: boolean) {
     this.username = username;
-    this.userID = ''; // Should always be from authorization token
+    this.userID = userID; // Should always be from authorization token
     this.loggedIn = loggedIn;
   }
 

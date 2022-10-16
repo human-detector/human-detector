@@ -5,6 +5,7 @@ import responses
 import unittest
 import time
 import base64
+from time import sleep
 
 class TestNetRequests(unittest.TestCase):
     def setUp(self) -> None:

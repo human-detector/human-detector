@@ -29,6 +29,10 @@ $ npm run start:prod
   ```bash
   $ docker pull postgres:14-alpine
   ```
+- Build the Keycloak container:
+  ```bash
+  $ docker-compose build keycloak
+  ```
 
 ### Running
 

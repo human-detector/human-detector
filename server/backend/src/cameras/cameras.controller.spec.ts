@@ -56,4 +56,10 @@ describe('CamerasController', () => {
       }).toThrow(BadRequestException);
     });
   });
+
+  describe('PUT /cameras/' + validCamID + '/heartbeat', () => {
+    it('should return 200 OK', () => {
+      expect(camerasController.heartbeat(validCamID)).toBe('');
+    });
+  });
 });

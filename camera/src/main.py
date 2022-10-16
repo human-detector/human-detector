@@ -32,7 +32,6 @@ input_resolution = (int(res[0]), int(res[1]))
 fps = args.fps
 
 outputs = []
-heartbeat = None
 
 if args.stream_ip != '':
     if args.stream_port == '':

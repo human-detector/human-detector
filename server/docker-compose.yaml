@@ -8,7 +8,8 @@ services:
       - DB_USER
       - DB_PASSWORD
     ports:
-      - "3000:3000"
+      - "3000"
+
   database:
     image: "postgres:14-alpine"
     environment:
@@ -19,15 +20,54 @@ services:
       - "5432"
     volumes:
       - ./database/init:/docker-entrypoint-initdb.d
+      - backend-database:/var/lib/postgresql/data
+
+  keycloak-database:
+    image: "postgres:14-alpine"
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: keycloak
+    expose:
+      - "5432"
+    volumes:
+      - keycloak-database:/var/lib/postgresql/data
+
   keycloak:
     build: ./keycloak
     environment:
-      KEYCLOAK_ADMIN: "admin"
-      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      # Default admin user
+      KEYCLOAK_ADMIN: "${KC_USER}"
+      KEYCLOAK_ADMIN_PASSWORD: "${KC_PASSWORD}"
+      # Keycloak database
+      KC_DB_USERNAME: "${DB_USER}"
+      KC_DB_PASSWORD: "${DB_PASSWORD}"
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-database
+      # Backend database
       SYNC_USERS_DB_HOST: database
       SYNC_USERS_DB_NAME: "${DB_NAME}"
       SYNC_USERS_DB_USER: "${DB_USER}"
       SYNC_USERS_DB_PASSWORD: "${DB_PASSWORD}"
     ports:
-      - "8080:8080"
-    command: ["start-dev"]
+      - "8080"
+    command: ["start-dev", "--proxy", "edge"]
+  
+  nginx:
+    image: nginx:latest
+    ports:
+      - "${HTTP_PORT}:80"
+      - "${HTTPS_PORT}:443"
+    restart: always
+    environment:
+      API_URL: "${API_URL}"
+      AUTH_URL: "${AUTH_URL}"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./nginx/conf/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+
+volumes:
+  backend-database:
+    external: true
+  keycloak-database:
+    external: true

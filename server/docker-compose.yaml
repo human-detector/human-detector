@@ -7,6 +7,7 @@ services:
       - DB_NAME
       - DB_USER
       - DB_PASSWORD
+      - KEYCLOAK_HOST=keycloak:8080
     ports:
       - "3000"
 

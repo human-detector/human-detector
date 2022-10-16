@@ -1,7 +1,7 @@
 set names 'utf8';
 set session_replication_role = 'replica';
 
-create table "user" ("id" uuid not null, "name" varchar(255), "expo_token" varchar(255) null, constraint "user_pkey" primary key ("id"));
+create table "user" ("id" uuid not null, "expo_token" varchar(255) null, constraint "user_pkey" primary key ("id"));
 
 create table "group" ("id" uuid not null, "name" varchar(255) not null, "user_id" uuid not null, constraint "group_pkey" primary key ("id"));
 

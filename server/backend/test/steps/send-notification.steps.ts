@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { defineFeature, loadFeature } from 'jest-cucumber';
-import * as request from 'supertest';
+import request from 'supertest';
 import { Camera } from '../../src/cameras/camera.entity';
 import { Notification } from '../../src/cameras/notification.entity';
 import {
@@ -35,6 +35,7 @@ defineFeature(feature, (test) => {
 
   afterAll(async () => {
     await app.close();
+    await testStack.kcContainer.stop();
     await testStack.dbContainer.stop();
   });
 
@@ -51,7 +52,7 @@ defineFeature(feature, (test) => {
       cameraA = new Camera('Camera-A', 'TODO');
       cameraA.notifications.add(new Notification());
       cameraA.group = new Group('g');
-      cameraA.group.user = new User('test');
+      cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
       beforeNotifications = cameraA.notifications.getItems();
     });
@@ -83,7 +84,7 @@ defineFeature(feature, (test) => {
     given("I have camera A's credentials", async () => {
       cameraA = new Camera('CameraA', 'TODO :)');
       cameraA.group = new Group('e');
-      cameraA.group.user = new User('eorwabk');
+      cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
       token = cameraA.token;
     });
@@ -124,7 +125,7 @@ defineFeature(feature, (test) => {
     given("I have camera A's credentials", async () => {
       cameraA = new Camera('Camera-A', 'TODO!! :)');
       cameraA.group = new Group('g');
-      cameraA.group.user = new User('test');
+      cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
       token = cameraA.token;
     });
@@ -132,7 +133,7 @@ defineFeature(feature, (test) => {
       cameraB = new Camera('Camera-B', 'TODO KEYCLOAK AAAAA');
       cameraB.notifications.add(new Notification(), new Notification());
       cameraB.group = new Group('b');
-      cameraB.group.user = new User('g');
+      cameraB.group.user = new User();
       await cameraRepository.persistAndFlush(cameraB);
       beforeNotifications = cameraB.notifications.getItems();
     });
@@ -167,7 +168,7 @@ defineFeature(feature, (test) => {
     given("I have camera A's credentials", async () => {
       cameraA = new Camera('Camera-A', 'TODO !!!!!!!');
       cameraA.group = new Group('group');
-      cameraA.group.user = new User('user');
+      cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
       token = cameraA.token;
     });

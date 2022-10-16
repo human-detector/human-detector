@@ -76,7 +76,7 @@ To run only behavior tests through jest-cucumber, you can use the command `npm r
 
 ## Running the Mobile Application
 
-To run the app, you must have the expo cli installed on your machine. You also must set the Keycloak environment variable for authentication. 
+To run the app, you must have the expo cli installed on your machine. You also must set the Keycloak environment variable for authentication.
 
 ```
 npm install -g expo-cli // install the expo-cli if you haven't already for glpbal expo cli
@@ -89,7 +89,6 @@ npm install //install dependencies
 KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> npx expo start //start the mobile application
 ```
 
-
 ## Testing the Backend
 
 Running tests for the backend requires installing `node` and `npm`.
@@ -100,16 +99,7 @@ the instructions in the README for testing.
 ### Manual integration tests
 
 For full integration tests (like with the mobile app and camera), you can spawn
-a full test stack using [Docker](https://docs.docker.com/get-docker/). You'll need
-to set the following environment variables:
-
-1. `DB_NAME` - the name of the database (different from hostname)
-2. `DB_USER` - Postgres username
-3. `DB_PASSWORD` - the password
-
-For testing, you can set these to whatever you want. Setting them to something easy
-to type would be useful for your sanity if you want to connect to and inspect the
-database during testing.
+a full test stack using [Docker](https://docs.docker.com/get-docker/).
 
 Some useful commands:
 
@@ -119,7 +109,7 @@ Some useful commands:
   ```
 - Run the test stack
   ```sh
-  $ DB_NAME=... DB_USER=... DB_PASSWORD=... docker-compose up
+  $ docker-compose --env-file dev.env up
   ```
 - List running containers
   ```sh

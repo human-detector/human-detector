@@ -39,7 +39,7 @@ export class CamerasService {
     messages.push({
       to: expoToken,
       sound: 'default',
-      title: `${cam.name} " has detected movement!"`,
+      title: `${cam.name} has detected movement!`,
       body: 'This is a test notification',
       data: { withSome: 'data' },
     });

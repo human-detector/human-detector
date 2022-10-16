@@ -59,6 +59,7 @@ defineFeature(feature, (test) => {
       );
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       beforeNotifications = cameraA.notifications.toArray();
     });
@@ -87,6 +88,7 @@ defineFeature(feature, (test) => {
       cameraA = camera;
       cameraA.group = new Group('e');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       token = getCameraAuthToken(camera, keyPair.privateKey);
     });
@@ -120,6 +122,7 @@ defineFeature(feature, (test) => {
       cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       token = getCameraAuthToken(camera, keyPair.privateKey);
     });
@@ -160,6 +163,7 @@ defineFeature(feature, (test) => {
       cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });

@@ -7,31 +7,51 @@ from taggers import ObjectDetecterTagger
 from outputs import FFMPEGOutput, NotificationOutput
 from pipeline import DetectorPipeline
 from time import sleep
-import os
+import argparse
 import signal
+import os
 
-INPUT_RESOLUTION = (1920, 1080)
 TENSOR_RESOLUTION = (640, 640)
-FPS = 30
 
 cwd = os.getcwd()
-MODEL_PATH = os.path.join(cwd, "model/model.tflite")
-LABELS_PATH = os.path.join(cwd, "model/tflite_label_map.txt")
+parser = argparse.ArgumentParser(description="Detect the humans")
+parser.add_argument('--resolution', help="Capture resolution", default="1920x1080")
+parser.add_argument('--fps', type=int, help="Capture fps", default=5)
+parser.add_argument('--model', help="Tensorflow lite model directory", default=os.path.join(cwd, "model"))
 
-network = NetRequests()
+parser.add_argument('--stream-ip', help="IP to stream too [default='']", default='')
+parser.add_argument('--stream-port', help="Port to stream too [default='']", default='')
+parser.add_argument('--net', help="Enable networking", action='store_true')
+parser.add_argument('--no-net', dest='net', action='store_false')
+
+args = parser.parse_args()
+model_path = os.path.join(args.model, "model.tflite")
+labels_path = os.path.join(args.model, "tflite_label_map.txt")
+res = tuple(args.resolution.split('x')[:])
+input_resolution = (int(res[0]), int(res[1]))
+fps = args.fps
+
+outputs = []
+
+if args.stream_ip != '':
+    if args.stream_port == '':
+        print("No port given for streaming output")
+        exit(-1)
+    
+    outputs.append(FFMPEGOutput(input_resolution, fps, args.stream_ip, args.stream_port))
+
+if args.net:
+    network = NetRequests()
+    outputs.append(NotificationOutput(network))
+    heartbeat = Heartbeat(network)
 
 pipeline = DetectorPipeline(
-    CameraSource(INPUT_RESOLUTION, FPS),
+    CameraSource(input_resolution, fps),
     MobilenetV2Transform(TENSOR_RESOLUTION),
-    TensorflowDetector(MODEL_PATH, LABELS_PATH),
-    ObjectDetecterTagger(INPUT_RESOLUTION),
-    [
-        FFMPEGOutput(INPUT_RESOLUTION, FPS, "192.168.1.4", "2046"),
-        NotificationOutput(network)
-    ]
+    TensorflowDetector(model_path, labels_path),
+    ObjectDetecterTagger(input_resolution),
+    outputs
 )
-
-heartbeat = Heartbeat(network)
 
 running = True
 
@@ -43,6 +63,10 @@ signal.signal(signal.SIGINT, ctrl_c_handler)
 
 while running:
     sleep(1)
-    running = pipeline.check_alive() and heartbeat.is_connected()
+    running = pipeline.check_alive() and (not args.net or heartbeat.is_connected())
+
+if args.net:
+    heartbeat.stop()
 
 pipeline.stop()
+

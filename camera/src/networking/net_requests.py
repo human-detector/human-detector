@@ -17,7 +17,7 @@ class NetRequests:
         }
     
         data = {
-            "Frame": base64.b64encode(frame).decode()
+            "Frame": frame.decode()
         }
 
         response = requests.put(url=url, headers=headers, json=data)
@@ -45,4 +45,4 @@ class NetRequests:
 
         response = requests.put(url=url, headers=headers, json=data)
         return response.status_code == 200, response
-    
+ 

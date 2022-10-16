@@ -31,4 +31,4 @@ class DetectorPipeline:
     def check_alive(self):
         self.thread.join(timeout=0.0)
         return self.thread.is_alive()
-    
+

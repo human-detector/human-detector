@@ -5,6 +5,7 @@ import responses
 import unittest
 import time
 import base64
+from time import sleep
 
 class TestNetRequests(unittest.TestCase):
     def setUp(self) -> None:
@@ -65,6 +66,7 @@ class TestNetRequests(unittest.TestCase):
     @responses.activate
     def test_notification(self):
         frame = np.random.rand(50)
+        base64_frame = base64.b64encode(frame)
 
         responses.put(
             NetConfig.get_notif_url(self.key.get_serial()),
@@ -73,11 +75,11 @@ class TestNetRequests(unittest.TestCase):
                 "Authorization": self.key.get_auth_token()
             },
             json={
-                "Frame": base64.b64encode(frame).decode()
+                "Frame": base64_frame.decode()
             }
         )
 
-        success, response = self.net.send_notification(frame)
+        success, response = self.net.send_notification(base64_frame)
         self.assertTrue(response.status_code == 200)
         self.assertTrue(success)
 

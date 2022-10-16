@@ -23,7 +23,7 @@ def _get_serial():
         return None
     
     with open('/sys/firmware/devicetree/base/serial-number', 'r') as serial:
-        return serial.read()
+        return serial.read().rstrip('\x00')
 
 class KeyManager():
     @staticmethod

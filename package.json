@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "dotenv": "^16.0.3",
-    "expo-server-sdk": "^3.6.0"
-  }
-}

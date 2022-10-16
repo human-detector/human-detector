@@ -1,7 +1,10 @@
 import { useAuthRequest } from 'expo-auth-session';
 import * as AuthSession from 'expo-auth-session';
 import * as CryptoJS from 'crypto-js';
+import Constants from 'expo-constants';
 import User from '../../classes/User';
+
+const clientId = Constants.manifest?.extra?.clientId;
 
 /**
  * getAuthRequest() will return what useAuthRequest() returns, using the
@@ -24,7 +27,7 @@ export function getAuthRequest(
   () => Promise<AuthSession.AuthSessionResult>
 ] {
   const config: AuthSession.AuthRequestConfig = {
-    clientId: 'myclient',
+    clientId,
     scopes: ['openid'],
     redirectUri,
     extraParams: {
@@ -52,7 +55,7 @@ export async function exchangeCodeForToken(
 ): Promise<AuthSession.TokenResponse | void> {
   const tokenSet = await AuthSession.exchangeCodeAsync(
     {
-      clientId: 'myclient',
+      clientId,
       redirectUri,
       code,
       extraParams: {

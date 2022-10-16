@@ -6,7 +6,9 @@ import {
   Inject,
   Param,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtIdentityGuard } from '../auth/jwt-identity.guard';
 import { NotFoundError } from '../errors.types';
 import { UsersService } from './users.service';
 
@@ -20,6 +22,7 @@ export type GetGroupsOutput = {
 }[];
 
 @Controller('users')
+@UseGuards(JwtIdentityGuard)
 export class UsersController {
   constructor(@Inject(UsersService) private usersService: UsersService) {}
 

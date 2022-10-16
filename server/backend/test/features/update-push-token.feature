@@ -18,4 +18,4 @@ Feature: Updating a user's Expo push token
     Given I have a new Expo push token
     And I have a bogus user ID
     When I try to update their push token
-    Then It fails with an unauthorized error
+    Then It fails with a forbidden error

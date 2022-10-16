@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { v4 } from 'uuid';
-import * as request from 'supertest';
+import request from 'supertest';
 import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { User } from '../../src/users/user.entity';
 import { Group } from '../../src/groups/group.entity';
@@ -33,6 +33,7 @@ defineFeature(
 
     afterAll(async () => {
       await app.close();
+      await testStack.kcContainer.stop();
       await testStack.dbContainer.stop();
     });
 
@@ -46,7 +47,7 @@ defineFeature(
       let response: request.Response;
 
       given('I have credentials', async () => {
-        user = new User('test-user');
+        user = new User();
         user.groups.add(new Group('group-a'));
         user.groups[0].cameras.add(new Camera('My camera :)', 'wajebawk'));
         await userRepository.persistAndFlush(user);
@@ -89,7 +90,7 @@ defineFeature(
       let response: request.Response;
 
       given("I have user A's credentials", async () => {
-        userB = new User('user-b');
+        userB = new User();
         await userRepository.persistAndFlush(userB);
         userTokenA = 'wogus'; // FIXME: test with well-formed tokens
       });

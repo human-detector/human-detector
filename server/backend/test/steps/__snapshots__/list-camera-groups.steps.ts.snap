@@ -13,3 +13,10 @@ Object {
   "statusCode": 403,
 }
 `;
+
+exports[`Listing a user's camera groups User is attempting to view their camera groups with an expired token 1`] = `
+Object {
+  "message": "Unauthorized",
+  "statusCode": 401,
+}
+`;

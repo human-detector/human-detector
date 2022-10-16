@@ -17,4 +17,10 @@ export class CamerasController {
   getNotifications(@Param('id') id: string): Notification[] {
     return this.camerasService.getNotifications(id);
   }
+
+  // FIXME: do the cameras need to send a heartbeat?
+  @Put(':id/heartbeat')
+  heartbeat(@Param('id') id: string) {
+    return '';
+  }
 }

@@ -1,5 +1,5 @@
 class NetConfig:
-    URL_API="http://api.averycb.net"
+    URL_API="https://api.averycb.net"
 
     @staticmethod
     def get_notif_url(id):

@@ -61,7 +61,7 @@ services:
     restart: always
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
-      - ./nginx/conf/:/etc/nginx/:ro
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
   backend-database:

@@ -1,0 +1,77 @@
+server {
+    server_name  ${AUTH_URL};
+
+    location ~ /\.well-known/acme-challenge/ {
+        allow all;
+        root /var/www/letsencrypt;
+        try_files $uri =404;
+        break;
+    }
+
+    proxy_set_header X-Forwarded-For $proxy_protocol_addr; # To forward the original client's IP address 
+    proxy_set_header X-Forwarded-Proto $scheme; # to forward the  original protocol (HTTP or HTTPS)
+    proxy_set_header Host $host; # to forward the original host requested by the client
+
+    location ~ /* {
+        proxy_pass http://keycloak:8080;
+    }
+    
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/${AUTH_URL}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/${AUTH_URL}/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    server_name  ${API_URL};
+    
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    location ~ /\.well-known/acme-challenge/ {
+        allow all;
+        root /var/www/letsencrypt;
+        try_files $uri =404;
+        break;
+    }
+
+    location ~ /* {
+        proxy_pass http://backend:3000;
+    }
+    
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/${API_URL}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/${API_URL}/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = ${API_URL}) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen       80;
+    server_name  ${API_URL};
+    return 404; # managed by Certbot
+}
+
+server {
+    if ($host = ${AUTH_URL}) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen       80;
+    server_name  ${AUTH_URL};
+    return 404; # managed by Certbot
+}

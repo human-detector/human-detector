@@ -53,15 +53,17 @@ export async function getExponentPushToken(): Promise<string> {
  * This method will handle sending a users expo token
  * to the backend for push notifications.
  *
+ * @param userId The users user id
+ * @param accessToken The users access token for bearer auth
  * @returns a rejected Promise if something went wrong when retrieving or sending the expo token
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function sendExpoNotifToken(userId: string): Promise<void> {
+export async function sendExpoNotifToken(userId: string, accessToken: string): Promise<void> {
   try {
     // Get the token from the user device
     const token = await getExponentPushToken();
     // Send the token if success
-    await sendNotifyTokenAPI(userId, token);
+    await sendNotifyTokenAPI(userId, token, accessToken);
   } catch (error) {
     // If any error occurs, reject out
     console.error(error.message);

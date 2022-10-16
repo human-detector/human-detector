@@ -11,6 +11,7 @@ import Notification from '../classes/Notification';
  */
 
 const nock = require('nock');
+const exampleAccessToken = 'ExampleAccessToken';
 
 // test putting notification key
 describe(BackendService.sendNotifyTokenAPI, () => {
@@ -20,7 +21,11 @@ describe(BackendService.sendNotifyTokenAPI, () => {
       .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userID))
       .reply(200, 'success');
 
-    await BackendService.sendNotifyTokenAPI(newUser.userID, 'ExponentPushToken[0000000000]');
+    await BackendService.sendNotifyTokenAPI(
+      newUser.userID,
+      'ExponentPushToken[0000000000]',
+      exampleAccessToken
+    );
   });
 
   it("should return code 401 if user id doesn't exist", async () => {
@@ -31,7 +36,11 @@ describe(BackendService.sendNotifyTokenAPI, () => {
       .reply(401, 'fail');
 
     await expect(
-      BackendService.sendNotifyTokenAPI(newUser.userID, 'ExponentPushToken[0000000000]')
+      BackendService.sendNotifyTokenAPI(
+        newUser.userID,
+        'ExponentPushToken[0000000000]',
+        exampleAccessToken
+      )
     ).rejects.toBe(errorMsg);
   });
 });

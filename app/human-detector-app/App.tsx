@@ -62,9 +62,9 @@ export default function App(): React.ReactElement {
   }
 
   // If logged in, make the user and put them into the app
-  const user = getUserFromIDToken(tokenResponse.idToken);
 
   // Translates IDToken to a user
+  const user = getUserFromIDToken(tokenResponse.idToken);
 
   // If the user is logged in return the stack with all the information
   return (

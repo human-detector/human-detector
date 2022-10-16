@@ -86,7 +86,7 @@ cd app/human-detector-app // enter the mobile app directry
 
 npm install //install dependencies
 
-KEYCLOAK_URL=<keycloakUrl> expo start //start the mobile application
+KEYCLOAK_URL=<keycloakUrl> BACKEND_URL="<backendUrl> CLIENT_ID=<clientId> npx expo start //start the mobile application
 ```
 
 

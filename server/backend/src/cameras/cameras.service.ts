@@ -24,6 +24,7 @@ export class CamerasService {
       { id: idCam },
       { populate: ['group.user'] },
     );
+
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }

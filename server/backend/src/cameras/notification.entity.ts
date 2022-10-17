@@ -17,6 +17,6 @@ export class Notification {
   @Property({ type: TimestampType })
   timestamp = Date();
 
-  @ManyToOne(() => Camera, { hidden: true })
+  @ManyToOne(() => Camera)
   camera!: Camera;
 }

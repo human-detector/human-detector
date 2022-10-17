@@ -1,5 +1,5 @@
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from cryptography.hazmat.primitives.serialization import load_ssh_private_key
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from os.path import expanduser
 import base64
 import io
@@ -16,7 +16,7 @@ _DEFAULT_KEY_LOC = expanduser("~") + "/.eyespy/key"
 def _load_key(filename = _DEFAULT_KEY_LOC):
     with open(filename, 'rb') as priv_file:
         priv_key = priv_file.read()
-        return load_ssh_private_key(priv_key, None)
+        return load_pem_private_key(priv_key, None)
 
 def _get_serial():
     if not _is_raspi():

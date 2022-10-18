@@ -8,12 +8,12 @@ import {
   TestStack,
   TEST_STACK_TIMEOUT,
 } from '../helpers/test-stack';
-import { EntityManager, EntityRepository } from '@mikro-orm/core';
-import { MikroORM } from '@mikro-orm/core';
+import { EntityDTO, EntityManager, EntityRepository } from '@mikro-orm/core';
 import { v4 } from 'uuid';
 import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
+import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
 
 const feature = loadFeature('test/features/send-notification.feature');
 
@@ -26,7 +26,7 @@ defineFeature(feature, (test) => {
   beforeAll(async () => {
     testStack = await buildTestStack({ imports: [CamerasModule] });
 
-    em = testStack.module.get<MikroORM>(MikroORM).em.fork();
+    em = testStack.module.get<EntityManager>(EntityManager);
     cameraRepository = em.getRepository(Camera);
 
     app = testStack.module.createNestApplication();
@@ -42,35 +42,31 @@ defineFeature(feature, (test) => {
   test('Sending without credentials', ({ given, when, then, and }) => {
     let cameraA: Camera;
     let sendRes: request.Response;
-    let beforeNotifications: Notification[];
+    let beforeNotifications: EntityDTO<Notification>[];
     let token: string;
 
     given('I have no credentials', () => {
       token = '';
     });
     and('Camera A has 3 notifications', async () => {
-      cameraA = new Camera('Camera-A', 'TODO');
+      const { camera } = createCameraWithKeyPair('Camera A');
+      cameraA = camera;
       cameraA.notifications.add(new Notification());
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
-      beforeNotifications = cameraA.notifications.getItems();
+      beforeNotifications = cameraA.notifications.toArray();
     });
     when('I try to send a notification for camera A', async () => {
-      sendRes = await request(app.getHttpServer())
-        .put(`/cameras/${cameraA.id}/notifications`)
-        .auth(token, { type: 'bearer' });
+      sendRes = await request(app.getHttpServer()).put(
+        `/cameras/${cameraA.id}/notifications`,
+      );
     });
     then("I receive an 'Unauthorized' error", () => {
       expect(sendRes.status).toBe(401);
     });
     and('Camera A has 3 notifications', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/cameras/${cameraA.id}/notifications`)
-        .auth(cameraA.token, { type: 'bearer' });
-      expect(res.status).toBe(200);
-      expect(res.header['content-type']).toMatch(/^application\/json/);
-      expect(res.body).toBe(beforeNotifications);
+      expect(cameraA.notifications.toArray()).toEqual(beforeNotifications);
     });
   });
 
@@ -82,31 +78,25 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      cameraA = new Camera('CameraA', 'TODO :)');
+      const { camera, keyPair } = createCameraWithKeyPair('CameraA');
+      cameraA = camera;
       cameraA.group = new Group('e');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
-      token = cameraA.token;
+      token = getCameraAuthToken(camera, keyPair.privateKey);
     });
-    and('Camera C is not registered', async () => {
-      await request(app.getHttpServer())
-        .get(requestURL)
-        .auth(token, { type: 'bearer' })
-        .expect(401);
+    and('Camera C is not registered', () => {
+      // expect(
+      //   cameraRepository.findOne({ id: cameraCId }),
+      // ).resolves.toBeUndefined();
     });
     when("I try to send a notification using camera C's ID", async () => {
       sendRes = await request(app.getHttpServer())
         .put(requestURL)
-        .auth(token, { type: 'bearer' });
+        .set('Authorization', token);
     });
-    then("I recieve an 'Unauthorized' error", () => {
-      expect(sendRes.status).toBe(401);
-    });
-    and('Camera C is not registered', async () => {
-      await request(app.getHttpServer())
-        .get(requestURL)
-        .auth(token, { type: 'bearer' })
-        .expect(401);
+    then("I recieve a 'Forbidden' error", () => {
+      expect(sendRes.status).toBe(403);
     });
   });
 
@@ -119,39 +109,36 @@ defineFeature(feature, (test) => {
     let cameraA: Camera;
     let cameraB: Camera;
     let token: string;
-    let beforeNotifications: Notification[];
+    let beforeNotifications: EntityDTO<Notification>[];
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      cameraA = new Camera('Camera-A', 'TODO!! :)');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
-      token = cameraA.token;
+      token = getCameraAuthToken(camera, keyPair.privateKey);
     });
     and('Camera B has 2 notifications', async () => {
-      cameraB = new Camera('Camera-B', 'TODO KEYCLOAK AAAAA');
+      const { camera } = createCameraWithKeyPair('Camera-B');
+      cameraB = camera;
       cameraB.notifications.add(new Notification(), new Notification());
       cameraB.group = new Group('b');
       cameraB.group.user = new User();
       await cameraRepository.persistAndFlush(cameraB);
-      beforeNotifications = cameraB.notifications.getItems();
+      beforeNotifications = cameraB.notifications.toArray();
     });
     when('I try to send a notification on behalf of camera B', async () => {
       sendRes = await request(app.getHttpServer())
         .put(`/cameras/${cameraB.id}/notifications`)
-        .auth(token, { type: 'bearer' });
+        .set('Authorization', token);
     });
-    then("I recieve an 'Unauthorized' error", () => {
-      expect(sendRes.status).toBe(401);
+    then("I recieve a 'Forbidden' error", () => {
+      expect(sendRes.status).toBe(403);
     });
     and('Camera B has 2 notifications', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/cameras/${cameraB.id}/notifications`)
-        .auth(cameraB.token, { type: 'bearer' });
-      expect(res.status).toBe(200);
-      expect(res.header['content-type']).toMatch(/^application\/json/);
-      expect(res.body).toBe(beforeNotifications);
+      expect(cameraB.notifications.toArray()).toEqual(beforeNotifications);
     });
   });
 
@@ -166,11 +153,12 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      cameraA = new Camera('Camera-A', 'TODO !!!!!!!');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
-      token = cameraA.token;
+      token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     and('Camera A has 1 notification', async () => {
       cameraA.notifications.add(new Notification());
@@ -179,18 +167,13 @@ defineFeature(feature, (test) => {
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
         .put(`/cameras/${cameraA.id}/notifications`)
-        .auth(token, { type: 'bearer' });
+        .set('Authorization', token);
     });
     then('The request succeeded', () => {
       expect(sendRes.status).toBe(200);
     });
     and('Camera A has 2 notifications', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/cameras/${cameraA.id}/notifications`)
-        .auth(token, { type: 'bearer' });
-      expect(res.status).toBe(200);
-      expect(res.header['content-type']).toMatch(/^application\/json/);
-      expect(res.body).toHaveLength(2);
+      expect(cameraA.notifications.toArray()).toHaveLength(2);
     });
   });
 });

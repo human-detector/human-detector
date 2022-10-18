@@ -75,7 +75,7 @@ describe(BackendService.getGroupListAPI, () => {
       .get(ServerConfig.getGroupsListUrlExtension(newUser.userID))
       .reply(200, JSON.stringify(groups));
 
-    const result = await BackendService.getGroupListAPI(newUser.userID);
+    const result = await BackendService.getGroupListAPI(newUser.userID, exampleAccessToken);
 
     expect(result).toEqual(groups);
   });
@@ -89,7 +89,10 @@ describe(BackendService.getNotificationHistoryAPI, () => {
       .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.userID))
       .reply(401, 'error');
 
-    const result = await BackendService.getNotificationHistoryAPI(newUser.userID);
+    const result = await BackendService.getNotificationHistoryAPI(
+      newUser.userID,
+      exampleAccessToken
+    );
 
     expect(result).toBe(null);
   });
@@ -106,7 +109,10 @@ describe(BackendService.getNotificationHistoryAPI, () => {
       .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.userID))
       .reply(200, JSON.stringify(notifHistory));
 
-    const result = await BackendService.getNotificationHistoryAPI(newUser.userID);
+    const result = await BackendService.getNotificationHistoryAPI(
+      newUser.userID,
+      exampleAccessToken
+    );
 
     expect(result).toEqual(notifHistory);
   });

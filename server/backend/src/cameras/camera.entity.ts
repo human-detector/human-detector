@@ -19,6 +19,7 @@ export class Camera {
   @Property()
   name!: string;
 
+  // PEM-encoded public key
   @Property()
   token!: string;
 

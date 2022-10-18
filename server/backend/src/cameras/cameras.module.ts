@@ -4,10 +4,11 @@ import { CamerasController } from './cameras.controller';
 import { CamerasService } from './cameras.service';
 import { Notification } from './notification.entity';
 import { Camera } from './camera.entity';
+import { CameraAuthGuard } from './camera-auth.guard';
 
 @Module({
   imports: [MikroOrmModule.forFeature([Camera, Notification])],
   controllers: [CamerasController],
-  providers: [CamerasService],
+  providers: [CameraAuthGuard, CamerasService],
 })
 export class CamerasModule {}

@@ -86,9 +86,7 @@ defineFeature(feature, (test) => {
       token = getCameraAuthToken(camera, keyPair.privateKey);
     });
     and('Camera C is not registered', () => {
-      // expect(
-      //   cameraRepository.findOne({ id: cameraCId }),
-      // ).resolves.toBeUndefined();
+      expect(cameraRepository.findOne({ id: cameraCId })).resolves.toBeNull();
     });
     when("I try to send a notification using camera C's ID", async () => {
       sendRes = await request(app.getHttpServer())

@@ -19,12 +19,16 @@ const BEARER = 'Bearer ';
  *          An array of Groups that are owned by the user with the userId.
  */
 
-export async function getGroupListAPI(userId: string): Promise<Group[] | null> {
+export async function getGroupListAPI(
+  userId: string,
+  userAccessToken: string
+): Promise<Group[] | null> {
   try {
     const apiLinkWithExtension: string =
       ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(userId);
     const config = {
       headers: {
+        Authorization: BEARER + userAccessToken,
         Accept: 'application/json',
       },
     };
@@ -83,12 +87,16 @@ export async function sendNotifyTokenAPI(
  * @returns null if error
  *          An array of notifications resembling notification history
  */
-export async function getNotificationHistoryAPI(userId: string): Promise<Notification[] | null> {
+export async function getNotificationHistoryAPI(
+  userId: string,
+  userAccessToken: string
+): Promise<Notification[] | null> {
   try {
     const apiLinkWithExtension: string =
       ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(userId);
     const config = {
       headers: {
+        Authorization: BEARER + userAccessToken,
         Accept: 'application/json',
       },
     };

@@ -47,11 +47,13 @@ defineFeature(
       let response: request.Response;
 
       given('I have credentials', async () => {
-        user = new User();
+        const { id, tokenSet } =
+          await testStack.kcContainer.createDummyUserAndLogIn('users');
+        user = await userRepository.findOneOrFail({ id });
         user.groups.add(new Group('group-a'));
         user.groups[0].cameras.add(new Camera('My camera :)', 'wajebawk'));
-        await userRepository.persistAndFlush(user);
-        token = 'bogus'; // FIXME: test with well-formed tokens once we get auth set up
+        await userRepository.flush();
+        token = tokenSet.access_token;
       });
       when('I request a list of my camera groups', async () => {
         response = await request(app.getHttpServer())
@@ -90,9 +92,14 @@ defineFeature(
       let response: request.Response;
 
       given("I have user A's credentials", async () => {
-        userB = new User();
-        await userRepository.persistAndFlush(userB);
-        userTokenA = 'wogus'; // FIXME: test with well-formed tokens
+        const userBLogin = await testStack.kcContainer.createDummyUserAndLogIn(
+          'users',
+        );
+        userB = await userRepository.findOneOrFail({ id: userBLogin.id });
+        const userALogin = await testStack.kcContainer.createDummyUserAndLogIn(
+          'users',
+        );
+        userTokenA = userALogin.tokenSet.access_token;
       });
       when("I request user B's camera groups", async () => {
         response = await request(app.getHttpServer())
@@ -114,8 +121,10 @@ defineFeature(
       let userTokenA: string;
       let response: request.Response;
 
-      given("I have user A's credentials", () => {
-        userTokenA = 'zogus'; // FIXME: test with well-formed tokens
+      given("I have user A's credentials", async () => {
+        const { tokenSet } =
+          await testStack.kcContainer.createDummyUserAndLogIn('users');
+        userTokenA = tokenSet.access_token;
       });
       when("I request user B's camera groups", async () => {
         response = await request(app.getHttpServer())
@@ -137,16 +146,22 @@ defineFeature(
       let token: string;
       let response: request.Response;
 
-      given("I have user A's expired credentials", () => {
-        token = 'amogus'; // FIXME: test with well-formed tokens
+      given("I have user A's expired credentials", async () => {
+        const { id, tokenSet } =
+          await testStack.kcContainer.createDummyUserAndLogIn('users');
+        token = tokenSet.access_token;
+
+        // This seems to be the only way to cause a user's credentials to expire without
+        // waiting the entire expiration duration.
+        await testStack.kcContainer.logUserOut('users', id);
       });
       when("I request user A's camera groups", async () => {
         response = await request(app.getHttpServer())
           .get(`/users/${userId}/groups`)
           .auth(token, { type: 'bearer' });
       });
-      then('I receive an unauthenticated error', () => {
-        expect(response.statusCode).toBe(401);
+      then('I receive an unauthorized error', () => {
+        expect(response.statusCode).toBe(403);
         expect(response.body).toMatchSnapshot();
       });
     });

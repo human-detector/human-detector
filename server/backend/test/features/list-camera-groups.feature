@@ -18,4 +18,4 @@ Feature: Listing a user's camera groups
   Scenario: User is attempting to view their camera groups with an expired token
     Given I have user A's expired credentials
     When I request user A's camera groups
-    Then I receive an unauthenticated error
+    Then I receive an unauthorized error

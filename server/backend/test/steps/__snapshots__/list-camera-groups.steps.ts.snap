@@ -2,21 +2,24 @@
 
 exports[`Listing a user's camera groups User A is attempting to list another user B's camera groups 1`] = `
 Object {
-  "message": "Forbidden",
+  "error": "Forbidden",
+  "message": "Forbidden resource",
   "statusCode": 403,
 }
 `;
 
 exports[`Listing a user's camera groups User A is attempting to list the camera groups of user B, a non-existent user 1`] = `
 Object {
-  "message": "Forbidden",
+  "error": "Forbidden",
+  "message": "Forbidden resource",
   "statusCode": 403,
 }
 `;
 
 exports[`Listing a user's camera groups User is attempting to view their camera groups with an expired token 1`] = `
 Object {
-  "message": "Unauthorized",
-  "statusCode": 401,
+  "error": "Forbidden",
+  "message": "Forbidden resource",
+  "statusCode": 403,
 }
 `;

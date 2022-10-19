@@ -167,6 +167,13 @@ export class StartedKeycloakContainer implements StartedTestContainer {
     return { id, tokenSet };
   }
 
+  /**
+   * Log the user out, ending any of their active sessions.
+   */
+  public async logUserOut(realm: string, id: string): Promise<void> {
+    await this.adminClient.users.logout({ realm, id });
+  }
+
   // AbstractStartedContainer (https://github.com/testcontainers/testcontainers-node/blob/a1ba007381db58d5374f46bcd7810687e559495b/src/modules/abstract-started-container.ts)
   // isn't exported from 'testcontainers', so we have to write the boilerplate ourselves. :(
 

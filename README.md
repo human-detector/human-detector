@@ -82,12 +82,33 @@ To run the app, you must have the expo cli installed on your machine. You also m
 npm install -g expo-cli // install the expo-cli if you haven't already for glpbal expo cli
 // or for convenience, after an npm install, use npx expo for local expo
 
+npm install -g eas-cli
+
 cd app/human-detector-app // enter the mobile app directry
 
 npm install //install dependencies
 
-KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> npx expo start //start the mobile application
+eas:build android // For android development
+eas:build ios // For iOS development
+
+KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> expo start --dev-client // Start the mobile application 
+
 ```
+
+You can also run the mobile application without EAS-CLI.  EAS will allow the use of react native modules that expo
+isn't able to use.  Therefore, running the mobile application without EAS-CLI should only be used when developing
+the UI for the mobile app.
+
+```
+
+npm install -g expo-cli // install the expo-cli if you haven't already for glpbal expo cli
+// or for convenience, after an npm install, use npx expo for local expo
+
+npm install
+
+KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> npx expo start // Start the mobile application without EAS-CLI
+```
+
 
 ## Testing the Backend
 

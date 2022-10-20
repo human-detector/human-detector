@@ -7,10 +7,24 @@ import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
 import { sendExpoNotifToken } from './src/notifications/notifTokenInit';
 import { getUserFromIDToken } from './src/auth/keyCloakAuth';
+import useBLE from './src/ble/bletest';
 
 const Stack = createNativeStackNavigator();
 
 export default function App(): React.ReactElement {
+  const { requestPermissions, scanForDevices, allDevices } = useBLE();
+
+  requestPermissions((isGranted: boolean) => {
+    if (isGranted) {
+      scanForDevices();
+    }
+  });
+
+  console.log(allDevices);
+  /*************************************************************************
+   * react-native-ble-plx test above this comment
+   ***************************************************************************/
+
   let isUserSignedIn = false;
   // Hooks
 

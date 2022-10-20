@@ -41,6 +41,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Build container dependencies
+        working-directory: ./server/
+        run: docker-compose build keycloak
       - name: Install dependencies
         working-directory: ./server/backend
         run: npm ci

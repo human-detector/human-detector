@@ -10,6 +10,12 @@ import { CamerasService } from './cameras.service';
 import { verify } from 'crypto';
 import { stringToBytes } from '../util';
 
+/**
+ * Require cameras to present their signed ID.
+ *
+ * Note: any route using this guard must have an ID parameter (e.g. '/cameras/:id/notifications')
+ * or every request will be rejected.
+ */
 @Injectable()
 export class CameraAuthGuard implements CanActivate {
   constructor(private cameraService: CamerasService) {}
@@ -18,7 +24,7 @@ export class CameraAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const id = request.params['id'];
     if (id === undefined) {
-      return true;
+      return false;
     }
     const signature = request.header('Authorization');
     if (signature === undefined) {

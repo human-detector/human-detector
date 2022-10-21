@@ -41,13 +41,13 @@ describe(CameraAuthGuard, () => {
     expect(mockCamerasService.getPublicKey).toBeCalledTimes(1);
   });
 
-  it('should approve requests without auth to endpoints with no camera ID', () => {
+  it('should reject any request to endpoints with no camera ID', () => {
     const mockCamerasService = createMock<CamerasService>();
     const cameraAuthGuard = new CameraAuthGuard(mockCamerasService);
     const mockExecutionContext = createMockHttpExecutionContext();
 
     expect(cameraAuthGuard.canActivate(mockExecutionContext)).resolves.toBe(
-      true,
+      false,
     );
   });
 

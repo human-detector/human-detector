@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { defineFeature, loadFeature } from 'jest-cucumber';
-import * as request from 'supertest';
+import request from 'supertest';
 import { Camera } from '../../src/cameras/camera.entity';
 import { Notification } from '../../src/cameras/notification.entity';
 import {
@@ -50,7 +50,7 @@ defineFeature(feature, (test) => {
     given('I have a valid ID', async () => {
       cameraA = new Camera('CameraA', 'test-token1');
       cameraA.group = new Group('test-group1');
-      cameraA.group.user = new User('test-user1');
+      cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
       token = cameraA.token;
     });
@@ -91,7 +91,7 @@ defineFeature(feature, (test) => {
     given("I have camera A's details", async () => {
       cameraA = new Camera('CameraA', 'test-token2A');
       cameraA.group = new Group('test-group2');
-      cameraA.group.user = new User('test-user2');
+      cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
     });
     and('camera A has 1 notification', async () => {
@@ -137,7 +137,7 @@ defineFeature(feature, (test) => {
       cameraA = new Camera('CameraA', 'test-token3');
       cameraA.notifications.add(new Notification());
       cameraA.group = new Group('test-group3');
-      cameraA.group.user = new User('test-user3');
+      cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
       beforeNotification = cameraA.notifications.getItems();
     });

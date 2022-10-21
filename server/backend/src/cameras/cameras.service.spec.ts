@@ -39,14 +39,13 @@ describe('CamerasService', () => {
         return null;
       },
     };
-    mockedCameraRepository.findOne.mockClear();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CamerasService,
         {
-          provide: getRepositoryToken(Camera),
-          useValue: mockedCameraRepository,
+          provide: getRepositoryToken(Notification),
+          useValue: mockedNotificationRepository,
         },
         {
           provide: getRepositoryToken(Camera),

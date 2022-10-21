@@ -89,6 +89,10 @@ export async function buildTestStack(
       }),
       MikroOrmModule.forRoot({
         ...mikroOrmOptions,
+        // Our modules only load entities that they manage repositories for, so most modules will
+        // be missing some entities if we use autoloading.
+        autoLoadEntities: false,
+        entities: ['./src/**/*.entity.ts'],
         dbName: dbContainer.getDatabase(),
         user: dbContainer.getUsername(),
         password: dbContainer.getPassword(),

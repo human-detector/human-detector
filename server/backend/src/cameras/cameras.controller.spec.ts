@@ -1,8 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  CanActivate,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CamerasController } from './cameras.controller';
 import { CamerasService } from './cameras.service';
 import { Notification } from './notification.entity';
+import { CameraAuthGuard } from './camera-auth.guard';
 
 const validCamID = '4df87db2-d185-4126-8570-28bec04c1b16';
 const invalidCamID = '9a988948-450d-4627-bf51-ee4a94f4d5bf';
@@ -20,11 +25,18 @@ describe('CamerasController', () => {
   let camerasController: CamerasController;
 
   beforeEach(async () => {
+    const mockCameraAuthGuard: CanActivate = {
+      canActivate: () => Promise.resolve(true),
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
           provide: CamerasService,
           useValue: mockCamerasService,
+        },
+        {
+          provide: CameraAuthGuard,
+          useValue: mockCameraAuthGuard,
         },
       ],
       controllers: [CamerasController],

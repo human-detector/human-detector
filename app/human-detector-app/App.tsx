@@ -12,13 +12,24 @@ import useBLE from './src/ble/bletest';
 const Stack = createNativeStackNavigator();
 
 export default function App(): React.ReactElement {
-  const { requestPermissions, scanForDevices, allDevices } = useBLE();
+  const {
+    requestPermissions,
+    connectToDevice,
+    scanForDevices,
+    currentDevice,
+    heartRate,
+    allDevices,
+  } = useBLE();
 
   requestPermissions((isGranted: boolean) => {
     if (isGranted) {
       scanForDevices();
     }
   });
+
+  if (allDevices.length !== 0) {
+    connectToDevice(allDevices[0]);
+  }
 
   console.log(allDevices);
   /*************************************************************************

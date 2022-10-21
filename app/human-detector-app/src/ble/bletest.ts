@@ -1,5 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
-import { BleManager, Device } from 'react-native-ble-plx';
+import { BleManager, Device, BleError, Characteristic } from 'react-native-ble-plx';
 import { useState } from 'react';
 
 type PermissionCallback = (result: boolean) => void;
@@ -8,12 +8,17 @@ const bleManager = new BleManager();
 
 interface BluetoothLowEnergyApi {
   requestPermissions(callback: PermissionCallback): Promise<void>;
+  connectToDevice(device: Device): Promise<void>;
   scanForDevices(): void;
+  currentDevice: Device | null;
+  heartRate: number;
   allDevices: Device[];
 }
 
 export default function useBLE(): BluetoothLowEnergyApi {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
+  const [currentDevice, setConnectedDevice] = useState<Device | null>(null);
+  const [heartRate, setHeartRate] = useState<number>(0);
 
   const requestPermissions = async (callback: PermissionCallback) => {
     if (Platform.OS === 'android') {
@@ -53,9 +58,43 @@ export default function useBLE(): BluetoothLowEnergyApi {
     });
   };
 
+  const connectToDevice = async (device: Device) => {
+    try {
+      const deviceConnection = await bleManager.connectToDevice(device.id);
+      setConnectedDevice(deviceConnection);
+      bleManager.stopDeviceScan();
+    } catch (error) {
+      console.log('ERROR WHEN CONNECTING', error);
+    }
+  };
+
+  const startStreamingData = async (device: Device) => {
+    if (device) {
+      device.monitorCharacteristicForService('UUID', 'CAMERA_CHARACTERISTIC', () => {});
+    } else {
+      console.error('NO DEVICE CONNECTED');
+    }
+  };
+
+  const onHeartRateUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    if (characteristic?.value) {
+      console.error('No Characteristic Found');
+    }
+
+    const rawData = characteristic?.value;
+    console.log(rawData);
+  };
+
   return {
     requestPermissions,
+    connectToDevice,
     scanForDevices,
+    currentDevice,
+    heartRate,
     allDevices,
   };
 }

@@ -90,3 +90,22 @@ export function getUserFromIDToken(idToken: string): User {
 
   return user;
 }
+
+export async function refreshKeycloakToken(
+  tokenResponse: AuthSession.TokenResponse,
+  discovery: AuthSession.DiscoveryDocument
+): Promise<AuthSession.TokenResponse> {
+  try {
+    const config: AuthSession.TokenRequestConfig = {
+      clientId,
+      scopes: ['openid'],
+    };
+
+    const newTokenResponse = await tokenResponse.refreshAsync(config, discovery);
+
+    return newTokenResponse;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}

@@ -1,6 +1,7 @@
 # This is a proof of concept - this should not appear in main!
 
 import dbus
+import dbus.mainloop.glib
 import dbusBleInterface
 from gi.repository import GLib
 MainLoop = GLib.MainLoop
@@ -40,12 +41,12 @@ class EyeSpyService(dbusBleInterface.Service):
 class EyeSpyWifiCharacteristic(dbusBleInterface.Characteristic):
     EYESPY_WIFI_UUID = "7a1673f9-55cb-4f40-b624-561ad8afb8e2"
 
-    def __init__(self, bus, index):
+    def __init__(self, bus, index, service):
         dbusBleInterface.Characteristic.__init__(
-            bus, index,
+            self, bus,
             self.EYESPY_WIFI_UUID,
             ['encrypt-write'],
-            self, index
+            service, index
         )
     
     def WriteValue(self, value):
@@ -55,12 +56,12 @@ class EyeSpyWifiCharacteristic(dbusBleInterface.Characteristic):
 class EyeSpyConnStatusCharacteristic(dbusBleInterface.Characteristic):
     EYESPY_CONN_UUID = "136670fb-f95b-4ee8-bc3b-81eadb234268"
     
-    def __init__(self, bus, index):
+    def __init__(self, bus, index, service):
         dbusBleInterface.Characteristic.__init__(
-            bus, index,
+            self, bus,
             self.EYESPY_CONN_UUID,
             ['notify'],
-            self, index
+            service, index
         )
     
     def StartNotify(self):
@@ -71,12 +72,12 @@ class EyeSpyConnStatusCharacteristic(dbusBleInterface.Characteristic):
 
 class EyeSpySerialCharacteristic(dbusBleInterface.Characteristic):
     EYESPY_SERIAL_UUID = "8b83fee2-373c-46a5-a782-1db9118431d9"
-    def __init__(self, bus, index):
+    def __init__(self, bus, index, service):
         dbusBleInterface.Characteristic.__init__(
-            bus, index,
+            self, bus,
             self.EYESPY_SERIAL_UUID,
             ['encrypt-read'],
-            self, index
+            service, index
         )
     
     def ReadValue(self):

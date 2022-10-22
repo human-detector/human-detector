@@ -26,7 +26,7 @@ export default function App(): React.ReactElement {
   if (tokenResponse != null) {
     // TODO: check if token is expired
     if (tokenResponse.shouldRefresh()) {
-      //TODO: refresh token and change isUserSignedIn
+      // TODO: refresh token and change isUserSignedIn
     }
   }
 

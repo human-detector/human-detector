@@ -62,7 +62,7 @@ class Application(dbus.service.Object):
         print('GetManagedObjects')
         
         for service in self.services:
-            response[self.get_path()] = service.get_properties()
+            response[service.get_path()] = service.get_properties()
             chrcs = service.get_characteristics()
             for chrc in chrcs:
                 response[chrc.get_path()] = chrc.get_properties()

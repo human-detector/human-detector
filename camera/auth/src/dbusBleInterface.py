@@ -54,6 +54,10 @@ class Service(dbus.service.Object):
             "Primary": dbus.Boolean(primary),
             "Characteristics": dbus.Array([], signature='o')
         }
+        dbus.service.Object.__init__(self, bus, self.path)
+
+    def get_path(self):
+        return self.path
 
     def add_characteristic(self, char):
         self.characteristics.append(char)

@@ -78,7 +78,7 @@ class Service(dbus.service.Object):
         print('GetManagedObjects')
 
         response[self.get_path()] = self.get_properties()
-        chrcs = self.get_characteristics()
+        chrcs = self.characteristics
         for chrc in chrcs:
             response[chrc.get_path()] = chrc.get_properties()
             descs = chrc.get_descriptors()
@@ -102,6 +102,9 @@ class Characteristic(dbus.service.Object):
 
     def get_properties(self):
         return { BLUEZ_GATT_CHARACTERISTIC: self.props }
+
+    def get_descriptors(self):
+        return self.descriptors
 
     def get_path(self):
         return dbus.ObjectPath(self.path)

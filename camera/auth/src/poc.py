@@ -39,15 +39,19 @@ def main():
         if dbusBleInterface.BLUEZ_GATT_MANAGER in props.keys():
             bluez_service = obj
 
-    bluez_props = dbus.Interface(bluez_service, DBUS_PROPS)
-    gatt_manager = dbus.Interface(bluez_service, BLUEZ_GATT_MANAGER)
-    ad_manager = dbus.Interface(bluez_service, BLUEZ_LE_AD_MANAGER)
+    bluez_obj = bus.get_object(BLUEZ_SERVICE, bluez_service)
+    bluez_props = dbus.Interface(bluez_obj, DBUS_PROPS)
+    gatt_manager = dbus.Interface(bluez_obj, BLUEZ_GATT_MANAGER)
+    ad_manager = dbus.Interface(bluez_obj, BLUEZ_LE_AD_MANAGER)
 
     bluez_props.Set(BLUEZ_ADAPTER, "Powered", dbus.Boolean(1))
 
     eyespy_ad = EyeSpyAdvertisement(bus)
     ad_manager.RegisterAdvertisement(
-        eyespy_ad.get_path(), {}
+        eyespy_ad.get_path(), {},
         reply_handler = register_ad_callback,
         error_handler = [register_ad_error],
     )
+
+if __name__ == "__main__":
+    main()

@@ -56,6 +56,9 @@ class Service(dbus.service.Object):
         }
         dbus.service.Object.__init__(self, bus, self.path)
 
+    def get_properties(self):
+        return { BLUEZ_GATT_SERVICE: self.props }
+
     def get_path(self):
         return dbus.ObjectPath(self.path)
 
@@ -96,6 +99,9 @@ class Characteristic(dbus.service.Object):
             "Descriptors": dbus.Array([], signature='o')
         }
         dbus.service.Object.__init__(self, bus, self.path)
+
+    def get_properties(self):
+        return { BLUEZ_GATT_CHARACTERISTIC: self.props }
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -148,6 +154,9 @@ class CharacteristicDescriptor(dbus.service.Object):
         }
         dbus.service.Object.__init__(self, bus, self.path)
 
+    def get_properties(self):
+        return { BLUEZ_GATT_DESCRIPTOR: self.props }
+
     @dbus.service.method(DBUS_PROPS, in_signature="s", out_signature="a{sv}")
     def GetAll(self, interface):
         if interface != BLUEZ_GATT_DESCRIPTOR:
@@ -183,7 +192,7 @@ class Advertisement(dbus.service.Object):
         properties["LocalName"] = dbus.String(self.local_name)
         properties["ManufacturerData"] = dbus.Dictionary(self.manufacturer_data, signature="qv")
         properties["IncludeTxPower"] = dbus.Boolean(True)
-        return properties
+        return { BLUEZ_LE_AD: properties }
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -201,7 +210,7 @@ class Advertisement(dbus.service.Object):
     def GetAll(self, interface):
         if interface != BLUEZ_LE_AD:
             raise InvalidArgsException()
-        return self.get_properties()
+        return self.get_properties()[BLUEZ_LE_AD]
 
     @dbus.service.method(BLUEZ_LE_AD, in_signature="", out_signature="")
     def Release(self):

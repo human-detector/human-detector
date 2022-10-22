@@ -47,7 +47,7 @@ class FailedException(dbus.exceptions.DBusException):
 
 class Service(dbus.service.Object):
     def __init__(self, bus, uuid, index, primary):
-        self.path = EYESPY_PATH + "service" + index
+        self.path = EYESPY_PATH + "service" + str(index)
         self.characteristics = []
         self.props = {
             "UUID": dbus.String(uuid),
@@ -82,7 +82,7 @@ class Service(dbus.service.Object):
 
 class Characteristic(dbus.service.Object):
     def __init__(self, bus, uuid, flags, service, index):
-        self.path = EYESPY_PATH + "characteristic" + index
+        self.path = EYESPY_PATH + "characteristic" + str(index)
         self.descriptors = []
         self.props = {
             "UUID": dbus.String(uuid),
@@ -136,7 +136,7 @@ class Characteristic(dbus.service.Object):
 
 class CharacteristicDescriptor(dbus.service.Object):
     def __init__(self, bus, uuid, char, flags, index):
-        self.path = EYESPY_PATH + "descriptor" + index
+        self.path = EYESPY_PATH + "descriptor" + str(index)
         self.props = {
             "UUID": dbus.String(uuid),
             "Characteristic": dbus.ObjectPath(char.get_path()),

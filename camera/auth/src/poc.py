@@ -2,6 +2,9 @@
 
 import dbus
 import dbusBleInterface
+import gobject
+
+mainloop = None
 
 DBUS_OBJ_MAN = "org.freedesktop.DBus.ObjectManager"
 DBUS_PROPS = "org.freedesktop.DBus.Properties"
@@ -10,7 +13,11 @@ BLUEZ_ADAPTER = "org.bluez.Adapter1"
 BLUEZ_LE_AD_MANAGER = "org.bluez.LEAdvertisingManager1"
 BLUEZ_GATT_MANAGER = "org.bluez.GattManager1"
 
-EYESPY_SERVICE_UUID = "4539d44c-75bb-4fbd-9d95-6cdf49d4ef2b"
+def register_service_callback():
+    print("Service registered")
+
+def register_service_error(error):
+    print("Service register error: " + str(error))
 
 def register_ad_callback():
     print("Advertisement registered")
@@ -18,40 +25,114 @@ def register_ad_callback():
 def register_ad_error(error):
     print("Failed to register advertisement: " + str(error))
 
+class EyeSpyService(dbusBleInterface.Service):
+    EYESPY_SERVICE_UUID = "4539d44c-75bb-4fbd-9d95-6cdf49d4ef2b"
+    
+    def __init__(self, bus, index):
+        dbusBleInterface.Service.__init__(
+            self, bus, index, self.EYESPY_SERVICE_UUID, True)
+        self.add_characteristic(EyeSpyWifiCharacteristic(bus, 0, self))
+        self.add_characteristic(EyeSpyConnStatusCharacteristic(bus, 1, self))
+        self.add_characteristic(EyeSpySerialCharacteristic(bus, 2, self))
+
+class EyeSpyWifiCharacteristic(dbusBleInterface.Characteristic):
+    EYESPY_WIFI_UUID = "7a1673f9-55cb-4f40-b624-561ad8afb8e2"
+
+    def __init__(self, bus, index):
+        dbusBleInterface.Characteristic.__init__(
+            bus, index,
+            self.EYESPY_WIFI_UUID,
+            ['encrypt-write'],
+            self, index
+        )
+    
+    def WriteValue(self, value):
+        print("Writing val!")
+        print(value)
+
+class EyeSpyConnStatusCharacteristic(dbusBleInterface.Characteristic):
+    EYESPY_CONN_UUID = "136670fb-f95b-4ee8-bc3b-81eadb234268"
+    
+    def __init__(self, bus, index):
+        dbusBleInterface.Characteristic.__init__(
+            bus, index,
+            self.EYESPY_CONN_UUID,
+            ['notify'],
+            self, index
+        )
+    
+    def StartNotify(self):
+        print("Start notification")
+    
+    def StopNotify(self):
+        print("Stop notification")
+
+class EyeSpySerialCharacteristic(dbusBleInterface.Characteristic):
+    EYESPY_SERIAL_UUID = "8b83fee2-373c-46a5-a782-1db9118431d9"
+    def __init__(self, bus, index):
+        dbusBleInterface.Characteristic.__init__(
+            bus, index,
+            self.EYESPY_SERIAL_UUID,
+            ['encrypt-read'],
+            self, index
+        )
+    
+    def ReadValue(self):
+        print("reading value")
+        string = "This is totally a serial"
+        return dbus.types.ByteArray(string)
+
 class EyeSpyAdvertisement(dbusBleInterface.Advertisement):
     def __init__(self, bus):
         dbusBleInterface.Advertisement.__init__(self, bus)
         self.set_manufacturer_data(
             0xFFFF,
-            [0x70, 0x74],
+            [0x20, 0x46],
         )
 
-        self.add_service_uuid(EYESPY_SERVICE_UUID)
+        self.add_service_uuid(EyeSpyService.EYESPY_SERVICE_UUID)
         self.set_local_name("Eyespy Camera")
 
 def main():
+    global mainloop
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
     bus = dbus.SystemBus()
-    bluez_service = None
-    obj_man = dbus.Interface(bus.get_object(BLUEZ_SERVICE, "/"), DBUS_OBJ_MAN)
-    objects = obj_man.GetManagedObjects()
+
+    bluez_adapter = None
+    obj_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE, "/"), DBUS_OBJ_MAN)
+    objects = obj_manager.GetManagedObjects()
 
     for obj, props in objects.items():
         if dbusBleInterface.BLUEZ_GATT_MANAGER in props.keys():
-            bluez_service = obj
+            bluez_adapter = obj
 
-    bluez_obj = bus.get_object(BLUEZ_SERVICE, bluez_service)
-    bluez_props = dbus.Interface(bluez_obj, DBUS_PROPS)
-    gatt_manager = dbus.Interface(bluez_obj, BLUEZ_GATT_MANAGER)
-    ad_manager = dbus.Interface(bluez_obj, BLUEZ_LE_AD_MANAGER)
+    bluez_service = bus.get_object(BLUEZ_SERVICE, bluez_adapter)
+    bluez_props = dbus.Interface(bluez_service, DBUS_PROPS)
+    gatt_manager = dbus.Interface(bluez_service, BLUEZ_GATT_MANAGER)
+    ad_manager = dbus.Interface(bluez_service, BLUEZ_LE_AD_MANAGER)
 
+    mainloop = gobject.MainLoop()
+
+    # Make sure bluetooth is powered up
     bluez_props.Set(BLUEZ_ADAPTER, "Powered", dbus.Boolean(1))
 
     eyespy_ad = EyeSpyAdvertisement(bus)
+    eyespy_service = EyeSpyService(bus, 0)
+
+    gatt_manager.RegisterService(
+        eyespy_service.get_path(), {},
+        reply_handler= register_service_callback,
+        error_handler= register_service_error,
+    )
+
     ad_manager.RegisterAdvertisement(
         eyespy_ad.get_path(), {},
         reply_handler = register_ad_callback,
-        error_handler = [register_ad_error],
+        error_handler = register_ad_error,
     )
+
+    mainloop.run()
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,5 @@
 import dbus
+import dbus.service
 
 BLUEZ_SERVICE = "org.bluez"
 

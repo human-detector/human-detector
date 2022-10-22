@@ -88,10 +88,6 @@ class EyeSpySerialCharacteristic(dbusBleInterface.Characteristic):
 class EyeSpyAdvertisement(dbusBleInterface.Advertisement):
     def __init__(self, bus, index):
         dbusBleInterface.Advertisement.__init__(self, bus, index)
-        self.set_manufacturer_data(
-            { 0xFFFF: [0x20, 0x46] },
-        )
-
         self.add_service_uuid(EyeSpyService.EYESPY_SERVICE_UUID)
 
 def main():

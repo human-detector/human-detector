@@ -33,7 +33,7 @@ class EyeSpyService(dbusBleInterface.Service):
     
     def __init__(self, bus, index):
         dbusBleInterface.Service.__init__(
-            self, bus, index, self.EYESPY_SERVICE_UUID, True)
+            self, bus, self.EYESPY_SERVICE_UUID, index, True)
         self.add_characteristic(EyeSpyWifiCharacteristic(bus, 0, self))
         self.add_characteristic(EyeSpyConnStatusCharacteristic(bus, 1, self))
         self.add_characteristic(EyeSpySerialCharacteristic(bus, 2, self))

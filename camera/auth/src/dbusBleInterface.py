@@ -97,46 +97,46 @@ class Characteristic(dbus.service.Object):
         }
         dbus.service.Object.__init__(self, bus, self.path)
 
-        def get_path(self):
-            return self.path
+    def get_path(self):
+        return self.path
 
-        def add_descriptor(self, descriptor):
-            self.descriptors.append(descriptor)
-            self.props["Descriptors"].append(descriptor.get_path())
+    def add_descriptor(self, descriptor):
+        self.descriptors.append(descriptor)
+        self.props["Descriptors"].append(descriptor.get_path())
 
-        @dbus.service.method(DBUS_PROPS, in_signature='s', out_signature='a{sv}')
-        def GetAll(self, interface):
-            if interface != BLUEZ_GATT_CHARACTERISTIC:
-                raise InvalidArgsException()
-            return self.props
-        
-        @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC,
-                             out_signature='ay')
-        def ReadValue(self):
-            print('Default ReadValue called')
-            raise NotSupportedException()
-        
-        @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC,
-                             in_signature='ay')
-        def WriteValue(self, write):
-            print('Default WriteValue called')
-            raise NotSupportedException()
-        
-        @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC)
-        def StartNotify(self):
-            print('Default StartNotify called')
-            raise NotSupportedException()
-        
-        @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC)
-        def StopNotify(self):
-            print('Default StopNotify called')
-            raise NotSupportedException
-        
-        @dbus.service.signal(DBUS_PROPS,
-                             signature='sa{sv}as')
-        def PropertiesChanged(self, interface, changed, invalidated):
-            print('PropertiesChanged called')
-            pass
+    @dbus.service.method(DBUS_PROPS, in_signature='s', out_signature='a{sv}')
+    def GetAll(self, interface):
+        if interface != BLUEZ_GATT_CHARACTERISTIC:
+            raise InvalidArgsException()
+        return self.props
+    
+    @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC,
+                            out_signature='ay')
+    def ReadValue(self):
+        print('Default ReadValue called')
+        raise NotSupportedException()
+    
+    @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC,
+                            in_signature='ay')
+    def WriteValue(self, write):
+        print('Default WriteValue called')
+        raise NotSupportedException()
+    
+    @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC)
+    def StartNotify(self):
+        print('Default StartNotify called')
+        raise NotSupportedException()
+    
+    @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC)
+    def StopNotify(self):
+        print('Default StopNotify called')
+        raise NotSupportedException
+    
+    @dbus.service.signal(DBUS_PROPS,
+                         signature='sa{sv}as')
+    def PropertiesChanged(self, interface, changed, invalidated):
+        print('PropertiesChanged called')
+        pass
 
 class CharacteristicDescriptor(dbus.service.Object):
     def __init__(self, bus, uuid, char, flags, index):

@@ -2,7 +2,9 @@
 
 import dbus
 import dbusBleInterface
-import gobject
+from gi.repository import GLib
+MainLoop = GLib.MainLoop
+
 
 mainloop = None
 
@@ -112,7 +114,7 @@ def main():
     gatt_manager = dbus.Interface(bluez_service, BLUEZ_GATT_MANAGER)
     ad_manager = dbus.Interface(bluez_service, BLUEZ_LE_AD_MANAGER)
 
-    mainloop = gobject.MainLoop()
+    mainloop = MainLoop()
 
     # Make sure bluetooth is powered up
     bluez_props.Set(BLUEZ_ADAPTER, "Powered", dbus.Boolean(1))

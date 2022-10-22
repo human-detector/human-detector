@@ -57,7 +57,7 @@ class Service(dbus.service.Object):
         dbus.service.Object.__init__(self, bus, self.path)
 
     def get_path(self):
-        return self.path
+        return dbus.ObjectPath(self.path)
 
     def add_characteristic(self, char):
         self.characteristics.append(char)
@@ -90,7 +90,7 @@ class Characteristic(dbus.service.Object):
         self.descriptors = []
         self.props = {
             "UUID": dbus.String(uuid),
-            "Service": dbus.ObjectPath(service.get_path()),
+            "Service": service.get_path(),
             "Notifying": dbus.Boolean(False),
             "Flags": dbus.Array(flags, signature='s'),
             "Descriptors": dbus.Array([], signature='o')
@@ -98,7 +98,7 @@ class Characteristic(dbus.service.Object):
         dbus.service.Object.__init__(self, bus, self.path)
 
     def get_path(self):
-        return self.path
+        return dbus.ObjectPath(self.path)
 
     def add_descriptor(self, descriptor):
         self.descriptors.append(descriptor)
@@ -143,7 +143,7 @@ class CharacteristicDescriptor(dbus.service.Object):
         self.path = EYESPY_PATH + "descriptor" + str(index)
         self.props = {
             "UUID": dbus.String(uuid),
-            "Characteristic": dbus.ObjectPath(char.get_path()),
+            "Characteristic": char.get_path(),
             "Flags": dbus.Array(flags)
         }
         dbus.service.Object.__init__(self, bus, self.path)

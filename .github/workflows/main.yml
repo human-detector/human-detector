@@ -59,7 +59,7 @@ jobs:
           node-version: 16
       - name: Build container dependencies
         working-directory: ./server/
-        run: docker-compose build keycloak
+        run: docker compose build keycloak
       - name: Install dependencies
         working-directory: ./server/backend
         run: npm ci

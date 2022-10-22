@@ -20,7 +20,7 @@ def register_ad_error(error):
 
 class EyeSpyAdvertisement(dbusBleInterface.Advertisement):
     def __init__(self, bus):
-        super.__init__(self, bus)
+        dbusBleInterface.Advertisement.__init__(self, bus)
         self.set_manufacturer_data(
             0xFFFF,
             [0x70, 0x74],

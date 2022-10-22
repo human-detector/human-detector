@@ -156,7 +156,7 @@ class CharacteristicDescriptor(dbus.service.Object):
         raise NotSupportedException()
     
     @dbus.service.method(BLUEZ_GATT_DESCRIPTOR, in_signature="ay")
-    def WriteValue(self):
+    def WriteValue(self, value):
         print("Default WriteValue called")
         raise NotSupportedException()
 

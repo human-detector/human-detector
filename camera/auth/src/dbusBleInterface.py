@@ -42,6 +42,37 @@ class FailedException(dbus.exceptions.DBusException):
     _dbus_error_name = 'org.bluez.Error.Failed'
 
 #
+# Object Manager Application
+#
+class Application(dbus.service.Object):
+    def __init__(self, bus):
+        self.path = "/"
+        self.services = []
+        dbus.service.Object.__init__(self, bus, self.path)
+    
+    def get_path(self):
+        return dbus.ObjectPath(self.path)
+    
+    def add_service(self, service):
+        self.services.append(service)
+
+    @dbus.service.method(DBUS_OBJ_MAN, out_signature='a{oa{sa{sv}}}')
+    def GetManagedObjects(self):
+        response = {}
+        print('GetManagedObjects')
+        
+        for service in self.services:
+            response[self.get_path()] = service.get_properties()
+            chrcs = service.get_characteristics()
+            for chrc in chrcs:
+                response[chrc.get_path()] = chrc.get_properties()
+                descs = chrc.get_descriptors()
+                for desc in descs:
+                    response[desc.get_path()] = desc.get_properties()
+
+        return response
+
+#
 # BlueZ GATT service
 #
 
@@ -59,6 +90,9 @@ class Service(dbus.service.Object):
     def get_properties(self):
         return { BLUEZ_GATT_SERVICE: self.props }
 
+    def get_characteristics(self):
+        return self.characteristics
+
     def get_path(self):
         return dbus.ObjectPath(self.path)
 
@@ -71,25 +105,10 @@ class Service(dbus.service.Object):
         if interface != BLUEZ_GATT_SERVICE:
             raise InvalidArgsException()
         return self.props
-    
-    @dbus.service.method(DBUS_OBJ_MAN, out_signature='a{oa{sa{sv}}}')
-    def GetManagedObjects(self):
-        response = {}
-        print('GetManagedObjects')
-
-        response[self.get_path()] = self.get_properties()
-        chrcs = self.characteristics
-        for chrc in chrcs:
-            response[chrc.get_path()] = chrc.get_properties()
-            descs = chrc.get_descriptors()
-            for desc in descs:
-                response[desc.get_path()] = desc.get_properties()
-
-        return response
 
 class Characteristic(dbus.service.Object):
     def __init__(self, bus, uuid, flags, service, index):
-        self.path = EYESPY_PATH + "characteristic" + str(index)
+        self.path = service.get_path() + "/char" + str(index)
         self.descriptors = []
         self.props = {
             "UUID": uuid,
@@ -149,7 +168,7 @@ class Characteristic(dbus.service.Object):
 
 class CharacteristicDescriptor(dbus.service.Object):
     def __init__(self, bus, uuid, char, flags, index):
-        self.path = EYESPY_PATH + "descriptor" + str(index)
+        self.path = char.get_path() + "/desc" + str(index)
         self.props = {
             "UUID": dbus.String(uuid),
             "Characteristic": char.get_path(),
@@ -181,8 +200,8 @@ class CharacteristicDescriptor(dbus.service.Object):
 #
 
 class Advertisement(dbus.service.Object):
-    def __init__(self, bus):
-        self.path = EYESPY_PATH + "advertisement0"
+    def __init__(self, bus, index):
+        self.path = EYESPY_PATH + "advertisement" + str(index)
         self.service_uuids = []
         self.manufacturer_data = dict()
         self.local_name = None

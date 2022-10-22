@@ -107,7 +107,7 @@ def main():
     objects = obj_manager.GetManagedObjects()
 
     for obj, props in objects.items():
-        if dbusBleInterface.BLUEZ_GATT_MANAGER in props.keys():
+        if BLUEZ_GATT_MANAGER in props.keys():
             bluez_adapter = obj
 
     bluez_service = bus.get_object(BLUEZ_SERVICE, bluez_adapter)
@@ -120,11 +120,12 @@ def main():
     # Make sure bluetooth is powered up
     bluez_props.Set(BLUEZ_ADAPTER, "Powered", dbus.Boolean(1))
 
-    eyespy_ad = EyeSpyAdvertisement(bus)
-    eyespy_service = EyeSpyService(bus, 0)
+    eyespy_ad = EyeSpyAdvertisement(bus, 0)
+    app = dbusBleInterface.Application(bus)
+    app.add_service(EyeSpyService(bus, 0))
 
-    gatt_manager.RegisterService(
-        eyespy_service.get_path(), {},
+    gatt_manager.RegisterApplication(
+        app.get_path(), {},
         reply_handler= register_service_callback,
         error_handler= register_service_error,
     )

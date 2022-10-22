@@ -200,30 +200,28 @@ class CharacteristicDescriptor(dbus.service.Object):
 #
 
 class Advertisement(dbus.service.Object):
-    def __init__(self, bus, index):
+    def __init__(self, bus, index, type = "peripheral"):
         self.path = EYESPY_PATH + "advertisement" + str(index)
-        self.service_uuids = []
-        self.manufacturer_data = dict()
+        self.props = {
+            "Type": type,
+            "ServiceUUIDs": dbus.Array([], signature="s"),
+            #"SolicitUUIDs": dbus.Array([], signature="s"),
+            #"IncludeTxPower": dbus.Boolean(True),
+        }
         self.local_name = None
         dbus.service.Object.__init__(self, bus, self.path)
 
     def get_properties(self):
-        properties = dict()
-        properties["Type"] = dbus.String("peripheral")
-        properties["ServiceUUIDs"] = dbus.Array(self.service_uuids, signature="s")
-        properties["LocalName"] = dbus.String(self.local_name)
-        properties["ManufacturerData"] = dbus.Dictionary(self.manufacturer_data, signature="qv")
-        properties["IncludeTxPower"] = dbus.Boolean(True)
-        return { BLUEZ_LE_AD: properties }
+        return { BLUEZ_LE_AD: self.props }
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
 
     def add_service_uuid(self, uuid):
-        self.service_uuids.append(uuid)
+        self.props["ServiceUUIDs"].append(dbus.String(uuid))
 
-    def set_manufacturer_data(self, manufacturer, data):
-        self.manufacturer_data[manufacturer] = data
+    def set_manufacturer_data(self, data):
+        self.props["ManufacturerData"] = data
 
     def set_local_name(self, name):
         self.local_name = dbus.String(name)

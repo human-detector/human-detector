@@ -65,7 +65,7 @@ export async function buildTestStack(
     .withNetworkAliases('db')
     .start();
 
-  const kcContainer = await new KeycloakContainer('server_keycloak:latest')
+  const kcContainer = await new KeycloakContainer('server-keycloak:latest')
     .withNetworkMode(network.getName())
     .withEnv('SYNC_USERS_DB_HOST', 'db')
     .withEnv('SYNC_USERS_DB_NAME', dbContainer.getDatabase())

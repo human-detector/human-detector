@@ -91,25 +91,28 @@ KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> npx exp
 
 ## Testing the Backend
 
-Running tests for the backend requires installing `node` and `npm`.
-It may work with older versions, but it is confirmed working on NodeJS 16.5.1 LTS.
-Once you have `node` and `npm` installed, navigate to `server/backend` and follow
-the instructions in the README for testing.
+### Prerequisites
+- [Node LTS](https://nodejs.org/en/download/)
+- [Docker](https://docs.docker.com/get-docker/) with Compose v2
+
+Docker Desktop should get you a compatible version of Compose. If you're
+Docker through your package manager, make sure you get Compose v2
+(`docker compose` will show a help message if you have it).
 
 ### Manual integration tests
 
 For full integration tests (like with the mobile app and camera), you can spawn
-a full test stack using [Docker](https://docs.docker.com/get-docker/).
+a full test stack using [Docker Compose](https://docs.docker.com/compose/).
 
 Some useful commands:
 
 - Build the containers for each component
   ```sh
-  $ docker-compose build
+  $ docker compose build
   ```
 - Run the test stack
   ```sh
-  $ docker-compose --env-file dev.env up
+  $ docker compose --env-file dev.env up
   ```
 - List running containers
   ```sh
@@ -119,7 +122,7 @@ Some useful commands:
   ```sh
   $ docker exec -it ${POSTGRES_CONTAINER_NAME} psql -U ${DB_USER} ${DB_NAME}
   ```
-- Clean up the resources created by `docker-compose`
+- Clean up the resources created by Compose:
   ```sh
-  $ docker-compose down
+  $ docker compose down
   ```

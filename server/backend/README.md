@@ -31,7 +31,7 @@ $ npm run start:prod
   ```
 - Build the Keycloak container:
   ```bash
-  $ docker-compose build keycloak
+  $ docker compose build keycloak
   ```
 
 ### Running

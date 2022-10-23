@@ -49,7 +49,7 @@ class EyeSpyWifiCharacteristic(dbusBleInterface.Characteristic):
             service, index
         )
     
-    def WriteValue(self, value):
+    def WriteValue(self, value, options):
         print("Writing val!")
         print(value)
 
@@ -80,14 +80,14 @@ class EyeSpySerialCharacteristic(dbusBleInterface.Characteristic):
             service, index
         )
     
-    def ReadValue(self):
+    def ReadValue(self, options):
         print("reading value")
         string = "This is totally a serial"
-        return dbus.types.ByteArray(string)
+        return string.encode("ASCII")
 
 class EyeSpyAdvertisement(dbusBleInterface.Advertisement):
     def __init__(self, bus, index):
-        dbusBleInterface.Advertisement.__init__(self, bus, index)
+        dbusBleInterface.Advertisement.__init__(self, bus, index, "EyeSpy Camera")
         self.add_service_uuid(EyeSpyService.EYESPY_SERVICE_UUID)
 
 def main():

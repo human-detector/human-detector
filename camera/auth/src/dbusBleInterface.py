@@ -12,7 +12,7 @@ BLUEZ_GATT_MANAGER = "org.bluez.GattManager1"
 BLUEZ_LE_AD = "org.bluez.LEAdvertisement1"
 
 BLUEZ_GATT_SERVICE = "org.bluez.GattService1"
-BLUEZ_GATT_CHARACTERISTIC = "org.bluez.Characteristic1"
+BLUEZ_GATT_CHARACTERISTIC = "org.bluez.GattCharacteristic1"
 BLUEZ_GATT_DESCRIPTOR = "org.bluez.GattDescriptor1"
 
 DBUS_OBJ_MAN = "org.freedesktop.DBus.ObjectManager"
@@ -139,14 +139,15 @@ class Characteristic(dbus.service.Object):
         return self.props
     
     @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC,
-                            out_signature='ay')
-    def ReadValue(self):
+                         in_signature="a{sv}",
+                         out_signature='ay')
+    def ReadValue(self, options):
         print('Default ReadValue called')
         raise NotSupportedException()
     
     @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC,
-                            in_signature='ay')
-    def WriteValue(self, write):
+                         in_signature='aya{sv}')
+    def WriteValue(self, write, options):
         print('Default WriteValue called')
         raise NotSupportedException()
     
@@ -200,12 +201,13 @@ class CharacteristicDescriptor(dbus.service.Object):
 #
 
 class Advertisement(dbus.service.Object):
-    def __init__(self, bus, index, type = "peripheral"):
+    def __init__(self, bus, index, name, type = "peripheral"):
         self.path = EYESPY_PATH + "advertisement" + str(index)
         self.props = {
             "Type": type,
             "ServiceUUIDs": dbus.Array([], signature="s"),
-            "IncludeTxPower": dbus.Boolean(False),
+            "Includes": dbus.Array(["tx-power"], signature='s'),
+            "LocalName": name,
         }
         self.local_name = None
         dbus.service.Object.__init__(self, bus, self.path)

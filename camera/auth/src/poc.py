@@ -45,7 +45,7 @@ class EyeSpyWifiCharacteristic(dbusBleInterface.Characteristic):
         dbusBleInterface.Characteristic.__init__(
             self, bus,
             self.EYESPY_WIFI_UUID,
-            ['encrypt-write'],
+            ['write'],
             service, index
         )
     
@@ -76,7 +76,7 @@ class EyeSpySerialCharacteristic(dbusBleInterface.Characteristic):
         dbusBleInterface.Characteristic.__init__(
             self, bus,
             self.EYESPY_SERIAL_UUID,
-            ['encrypt-read'],
+            ['read'],
             service, index
         )
     

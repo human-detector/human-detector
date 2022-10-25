@@ -2,57 +2,11 @@
 
 This project is made up of three projects - Mobile app, Server, and Camera services. Testing instructions for all three are provided below.
 
-## Testing Camera Project
+## Camera Services
 
-This contains all the services which will run on the Raspberry Pi. This currently just includes the camera service which tries to detect people.
+The camera is made up of two services. One handles authentication and bluetooth communications, while the other detects people and sends notifications.
 
-```
-cd camera
-# install opencv, behave, and requests
-make install
-# run unit tests
-make test
-# run behavior tests
-make bdd
-```
-
-These tests assume that `python3` is installed and that both `python3` and `pip3` both are valid commands.
-
-## Deploying to Raspberry Pi
-
-Create an SD card with Raspian Lite 64-bit. Then run the below on the Pi:
-
-```
-# Update everything on the pi to latest
-sudo apt update && sudo apt upgrade
-# Install required packages
-sudo apt install git ffmpeg
-
-# Optionally install virtualenv if the Pi is used for other projects
-sudo apt install virtualenv
-
-# Download project
-git clone https://github.com/tucker-moore/human-detector.git
-cd human-detector/camera
-
-# Optionally use virtualenv to not mix Python dependencies with other projects
-virtualenv .env
-source .env/bin/activate # This needs to be ran everytime you login to the Pi!
-
-# Install python requirements
-make pi-install
-
-# Run detector
-python src/main.py
-```
-
-### Requirements
-
-The below are installed when running `make install`:
-
-- Opencv-Python: OpenCV can read images and camera streams. Contains lots of computer vision functionality
-- Requests: HTTPS request library
-- Behave: Behavior tests
+For more details, go to the [Camera Readme!](./camera/README.md)
 
 ## Mobile Application Tests
 

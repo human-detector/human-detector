@@ -54,7 +54,7 @@ class WifiManager:
          # Delete all old connections for wifi
         connections = NetworkManager.Settings.ListConnections()
         for conn in connections:
-            if conn.GetSettings()['type'] == '802-11-wireless':
+            if conn.GetSettings()['connection']['type'] == '802-11-wireless':
                 conn.Delete()
 
     def connect_enterprise(self, ssid, user, passkey):
@@ -89,7 +89,7 @@ class WifiManager:
         )
     
     def connect_psk(self, ssid, passkey):
-        self._delete_old_config(ssid)
+        self._delete_old_config()
 
         new_connection = {
             '802-11-wireless': {

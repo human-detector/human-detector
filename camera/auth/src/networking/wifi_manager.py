@@ -10,7 +10,7 @@ class SecType(Enum):
 class WifiManager:
     def __init__(self):
         # The manager relies on NetworkManager, make sure it is running!
-        self._run("systemctl start NetworkManager.service")
+        self._run_proc("systemctl start NetworkManager.service")
         self.dev = self._get_wifi_adapter()
         if self.dev is None:
             print("No wifi devices found!")

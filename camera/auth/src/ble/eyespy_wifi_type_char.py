@@ -1,10 +1,8 @@
-import json
-
-from networking.wifi_manager import SecType
+from networking.wifi_manager import SecType, WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
+from .dbus_interface.dbus_bluez_errors import *
+import json
 import dbus
-from networking import WifiManager
-import dbus_interface.dbus_bluez_errors as BluezErrors
 
 class EyeSpyWifiTypeCharacteristic(Characteristic):
     EYESPY_WIFI_UUID = "b0ae3b34-5428-4d16-8654-515f41dff777"
@@ -24,16 +22,16 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
         try:
             dict = json.loads(str_val)
         except json.JSONDecodeError:
-            raise BluezErrors.InvalidArgsException()
+            raise InvalidArgsException()
         
         if "ssid" not in dict:
-            raise BluezErrors.InvalidArgsException()
+            raise InvalidArgsException()
         
         (ap, type)  = self.wifi_manager.get_wifi_security(dict["ssid"])
 
         if ap is None:
             self.type = SecType.UNSUPPORTED
-            raise BluezErrors.FailedException()
+            raise FailedException()
 
         self.type = type
     

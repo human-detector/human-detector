@@ -9,6 +9,20 @@ from gi.repository import GLib
 from networking.wifi_manager import WifiManager
 MainLoop = GLib.MainLoop
 
+def register_gatt_cb():
+    print("Service registered")
+
+def register_gatt_cb_error(error):
+    print("Error registering service")
+    exit(-1)
+
+def register_ad_cb():
+    print("Advertisement registered")
+
+def register_ad_cb(error):
+    print("Error registering ad")
+    exit(-1)
+
 class BluezManager():
 
     def __init__(self, wifi_manager):

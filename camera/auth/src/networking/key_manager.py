@@ -1,6 +1,6 @@
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 import cryptography.hazmat.primitives.serialization as Serialization
-from os.path import expanduser
+from os.path import expanduser, exists
 import base64
 import uuid
 import io
@@ -16,11 +16,15 @@ def _is_raspi():
 _DEFAULT_KEY_LOC = expanduser("~/.eyespy/key")
 _DEFAULT_UUID_LOC = expanduser("~/.eyespy/uuid")
 def _load_key(filename = _DEFAULT_KEY_LOC):
+    if not exists(filename):
+        return None
     with open(filename, 'rb') as priv_file:
         priv_key = priv_file.read()
         return Serialization.load_ssh_private_key(priv_key, None)
 
 def _load_uuid(filename = _DEFAULT_UUID_LOC):
+    if not exists(filename):
+        return None
     with open(filename, 'r') as uuid_file:
         return uuid_file.buffer.read()
 

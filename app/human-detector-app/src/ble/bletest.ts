@@ -46,7 +46,7 @@ export default function useBLE(): BluetoothLowEnergyApi {
       if (error) {
         console.log(error);
       }
-      if (device && device.name?.includes(' ')) {
+      if (device) {
         // Add Device
         setAllDevices((prevState) => {
           if (!isDuplicateDevice(prevState, device)) {
@@ -57,6 +57,11 @@ export default function useBLE(): BluetoothLowEnergyApi {
       }
     });
   };
+
+  async function getCameraInformationFromDevice(device: Device) {
+    // Get EyeSpy serial characteristic
+    const characteristic = await device.characteristicsForService('8b83fee2-373c-46a5-a782-1db9118431d9');
+  }
 
   const connectToDevice = async (device: Device) => {
     try {

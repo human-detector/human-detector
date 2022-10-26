@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
+import BluetoothScreen from './screens/BluetoothScreen';
 import { sendExpoNotifToken } from './src/notifications/notifTokenInit';
 import { getUserFromIDToken } from './src/auth/keyCloakAuth';
 import useBLE from './src/ble/bletest';
@@ -12,30 +13,6 @@ import useBLE from './src/ble/bletest';
 const Stack = createNativeStackNavigator();
 
 export default function App(): React.ReactElement {
-  const {
-    requestPermissions,
-    connectToDevice,
-    scanForDevices,
-    currentDevice,
-    heartRate,
-    allDevices,
-  } = useBLE();
-
-  requestPermissions((isGranted: boolean) => {
-    if (isGranted) {
-      scanForDevices();
-    }
-  });
-
-  if (allDevices.length !== 0) {
-    connectToDevice(allDevices[0]);
-  }
-
-  console.log(allDevices);
-  /*************************************************************************
-   * react-native-ble-plx test above this comment
-   ***************************************************************************/
-
   let isUserSignedIn = false;
   // Hooks
 
@@ -63,6 +40,26 @@ export default function App(): React.ReactElement {
   // If the user isn't logged in
   if (!isUserSignedIn) {
     // Open the login screen
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Bluetooth"
+            component={BluetoothScreen}
+            options={{
+              title: 'Connect Camera',
+              headerStyle: {
+                backgroundColor: '#1E90FF',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+            />
+        </Stack.Navigator>
+      </NavigationContainer>
+    )
     return (
       <NavigationContainer>
         <Stack.Navigator>

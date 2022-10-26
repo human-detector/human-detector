@@ -50,15 +50,15 @@ class WifiManager:
     def is_connected(self):
         return self.dev.state == NetworkManager.NM_DEVICE_STATE_ACTIVATED
 
-    def _delete_old_config(self, ssid):
-         # Delete old connection
+    def _delete_old_config(self):
+         # Delete all old connections for wifi
         connections = NetworkManager.Settings.ListConnections()
-        connections = dict([(conn.GetSettings()['connection']['id'], conn) for conn in connections])
-        if ssid in connections:
-            connections[ssid].Delete()
+        for conn in connections:
+            if conn.GetSettings()['type'] == '802-11-wireless':
+                conn.Delete()
 
     def connect_enterprise(self, ssid, user, passkey):
-        self._delete_old_config(ssid)
+        self._delete_old_config()
 
         new_connection = {
             '802-11-wireless': {

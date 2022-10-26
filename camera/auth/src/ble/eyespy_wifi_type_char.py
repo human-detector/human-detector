@@ -31,6 +31,8 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
             self.json += str_val
     
     def ReadValue(self, options):
+        self.state = ReadState.VALUE_READ
+        
         try:
             dict = json.loads(self.json)
         except json.JSONDecodeError:

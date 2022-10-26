@@ -32,16 +32,16 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
     
     def ReadValue(self, options):
         self.state = ReadState.VALUE_READ
-        
+
         try:
             dict = json.loads(self.json)
         except json.JSONDecodeError:
             raise InvalidArgsException()
         
-        if "ssid" not in dict:
+        if "SSID" not in dict:
             raise InvalidArgsException()
         
-        (ap, type)  = self.wifi_manager.get_wifi_security(dict["ssid"])
+        (ap, type)  = self.wifi_manager.get_wifi_security(dict["SSID"])
 
         if ap is None:
             self.type = SecType.UNSUPPORTED
@@ -49,5 +49,5 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
 
         self.type = type
         return json.dumps({
-            "type": self.type.name
+            "Type": self.type.name
         }).encode("ascii")

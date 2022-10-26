@@ -69,7 +69,7 @@ class Keys():
 
         # Make sure eyespy directory exists
         makedirs("/home/pi/.eyespy", exist_ok=True)
-        with open(_DEFAULT_KEY_LOC, 'w') as file:
+        with open(_DEFAULT_KEY_LOC, 'wb') as file:
             file.write(priv_bytes)
         with open(_DEFAULT_UUID_LOC, 'w') as file:
             file.write(self.uuid)

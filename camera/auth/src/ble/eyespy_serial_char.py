@@ -27,7 +27,7 @@ class EyeSpySerialCharacteristic(Characteristic):
                 "PubKey": new_keys.get_priv_key().public_key().public_bytes(
                     Serialization.Encoding.PEM,
                     Serialization.PublicFormat.SubjectPublicKeyInfo
-                )
+                ).decode()
             })
         except Exception as err:
             print (err.with_traceback())

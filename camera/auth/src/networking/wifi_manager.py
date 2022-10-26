@@ -1,6 +1,7 @@
 from enum import Enum, auto
 import subprocess
 import NetworkManager
+import uuid
 
 class SecType(Enum):
     KEY_802_1X = auto()
@@ -49,16 +50,66 @@ class WifiManager:
     def is_connected(self):
         return self.dev.state == NetworkManager.NM_DEVICE_STATE_ACTIVATED
 
-    def _connect_enterprise(self, ap, user, passkey):
-        pass        
+    def _delete_old_config(self, ssid):
+         # Delete old connection
+        connections = NetworkManager.Settings.ListConnections()
+        connections = dict([(conn.GetSettings()['connection']['id'], conn) for conn in connections])
+        if ssid in connections:
+            connections[ssid].Delete()
 
-    def connect(self, ssid, passkey):
-        (ap, wpa_type) = self._get_wifi_security(ssid, passkey)
+    def connect_enterprise(self, ssid, user, passkey):
+        self._delete_old_config(ssid)
 
-        if ap is None:
-            raise Exception("Failed to find Network")
+        new_connection = {
+            '802-11-wireless': {
+                'mode': 'infrastructure',
+                'security': '802-11-wireless-security',
+                'ssid': ssid
+            },
+            '802-11-wireless-security': {
+                'key-mgmt': 'wpa-eap'
+            },
+            '802-1x': { 
+                'eap': ['peap'],
+                'identity': user,
+                'password': passkey,
+                'phase2-auth': 'mschapv2'
+            },
+            'connection': {
+                'id': ssid,
+                'type': '802-11-wireless',
+                'uuid': str(uuid.uuid4())
+            },
+            'ipv4': {'method': 'auto'},
+            'ipv6': {'method': 'auto'}
+        }
+
+        (path, conn) = NetworkManager.AddAndActivateConnection(
+            new_connection, self.dev, "/"
+        )
+    
+    def connect_psk(self, ssid, passkey):
+        self._delete_old_config(ssid)
+
+        new_connection = {
+            '802-11-wireless': {
+                'mode': 'infrastructure',
+                'security': '802-11-wireless-security',
+                'ssid': ssid
+            },
+            '802-11-wireless-security': {
+                'key-mgmt': 'wpa-psk',
+                'psk': passkey
+            },
+            'connection': {
+                'id': ssid,
+                'type': '802-11-wireless',
+                'uuid': str(uuid.uuid4())
+            },
+            'ipv4': {'method': 'auto'},
+            'ipv6': {'method': 'auto'}
+        }
         
-        if wpa_type == SecType.UNSUPPORTED:
-            raise Exception("Unsupported security type!")
-        
-
+        (path, conn) = NetworkManager.AddAndActivateConnection(
+            new_connection, self.dev, "/"
+        )

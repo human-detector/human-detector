@@ -10,8 +10,6 @@ class SecType(Enum):
 
 class WifiManager:
     def __init__(self):
-        # The manager relies on NetworkManager, make sure it is running!
-        self._run_proc("systemctl start NetworkManager.service")
         self.dev = self._get_wifi_adapter()
         if self.dev is None:
             print("No wifi devices found!")
@@ -21,16 +19,7 @@ class WifiManager:
         for dev in NetworkManager.Device.all():
             if dev.DeviceType == NetworkManager.NM_DEVICE_TYPE_WIFI:
                 return dev
-        return None
-
-    def _run_proc(self, command: str):
-        proc = subprocess.run(command.split(), capture_output=True)
-        if proc.returncode != 0:
-            # TODO: Better error behavior
-            print("Failed to run {}", command)
-            print(proc.stderr)
-            exit(-1)
-        return proc    
+        return None    
 
     def get_wifi_security(self, ssid):
         for ap in self.dev.GetAllAccessPoints():
@@ -47,6 +36,9 @@ class WifiManager:
         
         return (None, SecType.UNSUPPORTED)
 
+    def get_status(self):
+        state = self.dev.
+        if (state == NetworkManager.NM_DEVICE_STATE_)
     def is_connected(self):
         return self.dev.state == NetworkManager.NM_DEVICE_STATE_ACTIVATED
 

@@ -1,3 +1,13 @@
+
+# The manager relies on NetworkManager, make sure it is running before importing!
+from asyncio import subprocess
+import subprocess
+ret = subprocess.run(["systemctl", "start", "NetworkManager.service"], capture_output=True)
+if ret.returncode != 0:
+    print("Failed to enable NetworkManager!")
+    print("stderr: {}", ret.stderr)
+    exit(-1)
+
 import dbus
 import dbus.mainloop.glib
 import os

@@ -30,5 +30,5 @@ class EyeSpySerialCharacteristic(Characteristic):
                 )
             })
         except Exception as err:
-            print (err)
+            print (err.with_traceback())
         return out_str.encode("ascii")

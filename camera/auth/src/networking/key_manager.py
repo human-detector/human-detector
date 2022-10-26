@@ -14,8 +14,8 @@ def _is_raspi():
     except Exception: pass
     return False
 
-_DEFAULT_KEY_LOC = expanduser("~/.eyespy/key")
-_DEFAULT_UUID_LOC = expanduser("~/.eyespy/uuid")
+_DEFAULT_KEY_LOC = "/home/pi/.eyespy/key"
+_DEFAULT_UUID_LOC = "/home/pi/.eyespy/uuid"
 def _load_key(filename = _DEFAULT_KEY_LOC):
     if not exists(filename):
         return None
@@ -68,10 +68,10 @@ class Keys():
         )
 
         # Make sure eyespy directory exists
-        makedirs("~/.eyespy", exist_ok=True)
+        makedirs("/home/pi/.eyespy", exist_ok=True)
         with open(_DEFAULT_KEY_LOC, 'w') as file:
             file.write(priv_bytes)
-        with open(_DEFAULT_UUID_LOC) as file:
+        with open(_DEFAULT_UUID_LOC, 'w') as file:
             file.write(self.uuid)
 
 

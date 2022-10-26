@@ -1,8 +1,12 @@
+from enum import Enum, auto
 from networking.wifi_manager import SecType, WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_errors import *
 import json
-import dbus
+
+class ReadState(Enum):
+    VALUE_READ = auto()
+    NEW_VALUE = auto()
 
 class EyeSpyWifiTypeCharacteristic(Characteristic):
     EYESPY_WIFI_UUID = "b0ae3b34-5428-4d16-8654-515f41dff777"
@@ -15,12 +19,20 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
             service, index
         )
         self.wifi_manager = wifi_manager
-        self.type = SecType.UNSUPPORTED
+        self.state = ReadState.VALUE_READ
+        self.json = None
     
-    def WriteValue(self, value: dbus.ByteArray, options):
-        str_val = value.decode("ascii")
+    def WriteValue(self, value, options):
+        str_val = bytes(value).decode("ascii")
+        if self.state == ReadState.VALUE_READ:
+            self.state = ReadState.NEW_VALUE
+            self.json = str_val
+        else:
+            self.json += str_val
+    
+    def ReadValue(self, options):
         try:
-            dict = json.loads(str_val)
+            dict = json.loads(self.json)
         except json.JSONDecodeError:
             raise InvalidArgsException()
         
@@ -34,8 +46,6 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
             raise FailedException()
 
         self.type = type
-    
-    def ReadValue(self, options):
         return json.dumps({
             "type": self.type.name
         }).encode("ascii")

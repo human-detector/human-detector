@@ -32,6 +32,12 @@ def _get_serial():
         return serial.read().rstrip('\x00')
 
 class Keys():
+    @staticmethod
+    def create_random_key():
+        key = Ed25519PrivateKey.generate()
+        id = str(uuid.uuid4())
+        return Keys(key, id)
+
     def __init__(self, priv_key = None, id = None):
         self.priv_key: Ed25519PrivateKey = _load_key() if priv_key is None else priv_key
         self.uuid = _load_uuid() if id is None else id
@@ -65,9 +71,7 @@ class Keys():
 class KeyManager():
     @staticmethod
     def create_random_key(serial):
-        key = Ed25519PrivateKey.generate()
-        id = str(uuid.uuid4())
-        return KeyManager(Keys(key, id), serial)
+        return KeyManager(Keys.create_random_key(), serial)
 
     def __init__(self, keys = None, serial = None):
         self.keys = keys if keys is not None else Keys()

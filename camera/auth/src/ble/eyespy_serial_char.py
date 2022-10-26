@@ -16,6 +16,8 @@ class EyeSpySerialCharacteristic(Characteristic):
         self.key_manager = key_manager
     
     def ReadValue(self, options):
+        # TODO: Do not create new keys when trying to connect
+        # This could end up real bad
         new_keys = Keys.create_random_key()
         self.key_manager.set_keys(new_keys)
         new_keys.persist()

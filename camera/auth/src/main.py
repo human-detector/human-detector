@@ -5,6 +5,7 @@ import ble.dbus_interface.dbus_bluez_names as BluezNames
 from ble import EyeSpyAdvertisement, EyeSpyService
 from ble.dbus_interface.dbus_bluez_interface import Application
 from gi.repository import GLib
+from networking.key_manager import KeyManager
 
 from networking.wifi_manager import WifiManager
 MainLoop = GLib.MainLoop
@@ -25,7 +26,7 @@ def register_ad_cb_error(error):
 
 class BluezManager():
 
-    def __init__(self, wifi_manager):
+    def __init__(self, wifi_manager, key_manager):
         self.bus = dbus.SystemBus()
         adapter = self.get_ble_adapter_path()
         
@@ -39,7 +40,7 @@ class BluezManager():
         # Create advertisement and EyeSpy services which phone talks to
         self.eyespy_ad = EyeSpyAdvertisement(self.bus, 0)
         self.app = Application(self.bus) # GATT requires an application to manage the service
-        self.app.add_service(EyeSpyService(self.bus, 0, wifi_manager))
+        self.app.add_service(EyeSpyService(self.bus, 0, wifi_manager, key_manager))
 
     def start_ble(self):
         # Turn on bluetooth adapter
@@ -50,7 +51,7 @@ class BluezManager():
             reply_handler = register_gatt_cb,
             error_handler = register_gatt_cb_error,
         )
-        
+
         self.ad_manager.RegisterAdvertisement(
             self.eyespy_ad.get_path(), {},
             reply_handler = register_ad_cb,
@@ -88,7 +89,7 @@ def main():
         print ("Must be ran as root!")
         exit(-1)
 
-    manager = BluezManager(WifiManager())
+    manager = BluezManager(WifiManager(), KeyManager())
     manager.start_ble()
 
     mainloop.run()

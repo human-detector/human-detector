@@ -19,7 +19,7 @@ def register_gatt_cb_error(error):
 def register_ad_cb():
     print("Advertisement registered")
 
-def register_ad_cb(error):
+def register_ad_cb_error(error):
     print("Error registering ad")
     exit(-1)
 
@@ -44,8 +44,18 @@ class BluezManager():
     def start_ble(self):
         # Turn on bluetooth adapter
         self.adapter_props.Set(BluezNames.BLUEZ_ADAPTER, "Powered", dbus.Boolean(1))
-        self.gatt_manager.RegisterApplication(self.app.get_path(), {}, byte_arrays=True)
-        self.ad_manager.RegisterAdvertisement(self.eyespy_ad.get_path(), {})
+        self.gatt_manager.RegisterApplication(
+            self.app.get_path(), {},
+            byte_arrays=True,
+            reply_handler = register_gatt_cb,
+            error_handler = register_gatt_cb_error,
+        )
+        
+        self.ad_manager.RegisterAdvertisement(
+            self.eyespy_ad.get_path(), {},
+            reply_handler = register_ad_cb,
+            error_handler = register_ad_cb_error,
+        )
 
     def stop_blue(self):
         # Unregister ads and services

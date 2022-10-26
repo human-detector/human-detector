@@ -36,10 +36,10 @@ class WifiManager:
             if ap.Ssid != ssid:
                 continue
 
-            if ap.WpaFlags | NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X:
+            if ap.RsnFlags | NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X:
                 return (ap, SecType.KEY_802_1X) # Enterprise/Edu networks
 
-            if ap.WpaFlags | NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_PSK:
+            if ap.RsnFlags | NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_PSK:
                 return (ap, SecType.KEY_PSK) # WPA2 user+passkey
 
             return (ap, SecType.UNSUPPORTED)

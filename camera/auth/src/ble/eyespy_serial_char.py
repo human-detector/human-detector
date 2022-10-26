@@ -18,14 +18,17 @@ class EyeSpySerialCharacteristic(Characteristic):
     def ReadValue(self, options):
         # TODO: Do not create new keys when trying to connect
         # This could end up real bad
-        new_keys = Keys.create_random_key()
-        self.key_manager.set_keys(new_keys)
-        new_keys.persist()
-        out_str = json.dumps({
-            "Serial": self.key_manager.get_serial(),
-            "PubKey": new_keys.get_priv_key().public_key().public_bytes(
-                Serialization.Encoding.PEM,
-                Serialization.PublicFormat.SubjectPublicKeyInfo
-            )
-        })
+        try:
+            new_keys = Keys.create_random_key()
+            self.key_manager.set_keys(new_keys)
+            new_keys.persist()
+            out_str = json.dumps({
+                "Serial": self.key_manager.get_serial(),
+                "PubKey": new_keys.get_priv_key().public_key().public_bytes(
+                    Serialization.Encoding.PEM,
+                    Serialization.PublicFormat.SubjectPublicKeyInfo
+                )
+            })
+        except Exception as err:
+            print (err)
         return out_str.encode("ascii")

@@ -1,6 +1,7 @@
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 import cryptography.hazmat.primitives.serialization as Serialization
 from os.path import expanduser, exists
+from os import makedirs
 import base64
 import uuid
 import io
@@ -66,6 +67,8 @@ class Keys():
             Serialization.NoEncryption()
         )
 
+        # Make sure eyespy directory exists
+        makedirs("~/.eyespy", exist_ok=True)
         with open(_DEFAULT_KEY_LOC, 'w') as file:
             file.write(priv_bytes)
         with open(_DEFAULT_UUID_LOC) as file:

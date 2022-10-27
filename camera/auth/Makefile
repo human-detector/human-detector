@@ -6,3 +6,6 @@ install:
 
 pi-install:
 	pip install -r requirements.txt
+
+lint:
+	python3 -m pylint src

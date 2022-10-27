@@ -3,6 +3,7 @@ BluezManager manages all BLE aspects of the Eyespy camera
 Before importing this module, make sure NetworkManager is started!
 """
 
+import sys
 import dbus
 import dbus.mainloop.glib
 import ble.dbus_interface.dbus_bluez_names as BluezNames
@@ -19,7 +20,7 @@ def register_gatt_cb_error(error):
     """Service registration error callback"""
     print("Error registering service")
     print(error)
-    exit(-1)
+    sys.exit(-1)
 
 def register_ad_cb():
     """Advertisement registration success callback"""
@@ -29,7 +30,7 @@ def register_ad_cb_error(error):
     """Advertisement registration error callback"""
     print("Error registering ad")
     print(error)
-    exit(-1)
+    sys.exit(-1)
 
 class BluezManager():
     """
@@ -100,3 +101,5 @@ class BluezManager():
         for obj, props in objects.items():
             if BluezNames.BLUEZ_GATT_MANAGER in props.keys():
                 return obj
+
+        return None

@@ -2,6 +2,7 @@
 Bootstrap script which makes sure NetworkManager is started before instantiating BluezManager
 """
 
+import sys
 import os
 import subprocess
 import dbus
@@ -17,24 +18,24 @@ def main():
     if ret.returncode != 0:
         print("Failed to enable NetworkManager!")
         print("stderr: {}", ret.stderr)
-        exit(-1)
+        sys.exit(-1)
 
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     if ret.returncode != 0:
         print("Failed to enable NetworkManager!")
         print("stderr: {}", ret.stderr)
-        exit(-1)
+        sys.exit(-1)
 
     main_loop = MainLoop()
 
     if os.geteuid() != 0:
         print ("Must be ran as root!")
-        exit(-1)
+        sys.exit(-1)
 
     # NetworkManager must be started before importing
     # Otherwise the NetworkManager dbus package dies trying to talk to NetworkManager
-    # pylint: disable=import-outside-toplevel
+    # pylint: disable=import-outside-toplevel,no-name-in-module
     from bluez_manager import BluezManager
     manager = BluezManager.create_manager()
     manager.start_ble()

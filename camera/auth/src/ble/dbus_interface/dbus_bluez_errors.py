@@ -1,3 +1,8 @@
+"""
+BlueZ Exceptions
+"""
+#pylint: disable=missing-class-docstring
+
 import dbus.exceptions
 
 #

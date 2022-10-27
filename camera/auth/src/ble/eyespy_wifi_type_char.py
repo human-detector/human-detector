@@ -5,7 +5,7 @@ EyeSpy Wifi Security Type Characteristics
 import json
 from networking.wifi_manager import WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
-from .dbus_interface.dbus_bluez_errors import InvalidArgsException, FailedException
+from .dbus_interface.dbus_bluez_errors import FailedException
 
 class EyeSpyWifiTypeCharacteristic(Characteristic):
     """
@@ -48,15 +48,17 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
         try:
             ssid_dict = json.loads(self.json)
         except json.JSONDecodeError as exc:
-            raise InvalidArgsException() from exc
+            raise FailedException() from exc
 
         if "SSID" not in ssid_dict:
-            raise InvalidArgsException()
+            raise FailedException()
 
         (access_point, sec_type)  = self.wifi_manager.get_wifi_security(ssid_dict["SSID"])
 
         if access_point is None:
-            raise FailedException()
+            return json.dumps({
+                "Type": "No Network Found"
+            }).encode("ascii")
 
         return json.dumps({
             "Type": sec_type.name

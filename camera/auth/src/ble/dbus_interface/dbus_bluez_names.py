@@ -1,3 +1,7 @@
+"""
+DBus interface names and paths
+"""
+
 DBUS_OBJ_MAN = "org.freedesktop.DBus.ObjectManager" # DBus Object Manager Interface
 DBUS_PROPS = "org.freedesktop.DBus.Properties"      # DBus Properties interface
 

@@ -6,13 +6,6 @@ import useBLE from '../src/ble/bletest';
 let bool = false;
 
 export default function BluetoothScreen(): React.ReactElement {
-    
-    // Make list of all bluetooth devices
-    // Subscribe
-    const unsubscribe = NetInfo.addEventListener(state => {
-      console.log('Connection type', state.type);
-      console.log('Is connected?', state.isConnected);
-    });
 
     const {
         requestPermissions,

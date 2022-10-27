@@ -7,6 +7,9 @@ from networking import Keys, KeyManager
 import json
 
 class EyeSpySerialCharacteristic(Characteristic):
+    """
+    Characteristic which generates a private key and returns it
+    """
     EYESPY_SERIAL_UUID = "8b83fee2-373c-46a5-a782-1db9118431d9"
     def __init__(self, bus, index, service, key_manager: KeyManager, wifi_manager: WifiManager):
         Characteristic.__init__(
@@ -19,6 +22,13 @@ class EyeSpySerialCharacteristic(Characteristic):
         self.wifi_manager = wifi_manager
     
     def ReadValue(self, options):
+        """
+        Returns a JSON of the following format:
+        {
+            "Serial": "Serial number",
+            "PubKey": PEM PKGI public key
+        }
+        """
         # Prohibit reads when the camera is trying to connect
         # Reads generate new keys and persist them, which is *bad* when trying to connect
         if self.wifi_manager.get_state[0] == DeviceState.Connecting:

@@ -3,6 +3,13 @@ from .dbus_interface.dbus_bluez_names import BLUEZ_GATT_CHARACTERISTIC
 import json
 
 class EyeSpyConnStatusCharacteristic(Characteristic):
+    """
+    Sends notifications of the format:
+    {
+        "State": Value according to networking.wifi_manager.DeviceState
+        "Reason": Value from NetworkManager which corresponds to NMDeviceStateReason
+    }
+    """
     EYESPY_CONN_UUID = "136670fb-f95b-4ee8-bc3b-81eadb234268"
     
     def __init__(self, bus, index, service, wifi_manager):

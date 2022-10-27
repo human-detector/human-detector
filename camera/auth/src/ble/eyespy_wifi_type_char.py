@@ -9,6 +9,9 @@ class ReadState(Enum):
     NEW_VALUE = auto()
 
 class EyeSpyWifiTypeCharacteristic(Characteristic):
+    """
+    Allows phone to discover wifi security type
+    """
     EYESPY_WIFI_UUID = "b0ae3b34-5428-4d16-8654-515f41dff777"
 
     def __init__(self, bus, index, service, wifi_manager: WifiManager):
@@ -23,6 +26,12 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
         self.json = None
     
     def WriteValue(self, value, options):
+        """
+        Expects a JSON of the following format
+        {
+            "SSID": "<Network SSID>"
+        }
+        """
         str_val = bytes(value).decode("ascii")
         if self.state == ReadState.VALUE_READ:
             self.state = ReadState.NEW_VALUE
@@ -31,6 +40,12 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
             self.json += str_val
     
     def ReadValue(self, options):
+        """
+        Returns a JSON of the following format
+        {
+            "Type": "KEY_PSK" or "KEY_802_1X"
+        }
+        """
         self.state = ReadState.VALUE_READ
 
         try:

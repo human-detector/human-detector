@@ -112,7 +112,7 @@ class Characteristic(dbus.service.Object):
     
     @dbus.service.method(BLUEZ_GATT_CHARACTERISTIC,
                          in_signature='aya{sv}')
-    def WriteValue(self, write, options):
+    def WriteValue(self, value, options):
         print('Default WriteValue called')
         raise NotSupportedException()
     

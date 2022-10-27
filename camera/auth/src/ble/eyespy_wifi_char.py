@@ -1,13 +1,11 @@
-import traceback
+"""
+EyeSpy Connect to Wifi Characteristic
+"""
+
+import json
 from networking.wifi_manager import SecType, WifiManager
 from .dbus_interface.dbus_bluez_errors import InvalidArgsException
 from .dbus_interface.dbus_bluez_interface import Characteristic
-from enum import Enum, auto
-import json
-
-class ReadState(Enum):
-    VALUE_READ = auto()
-    NEW_VALUE = auto()
 
 class EyeSpyWifiCharacteristic(Characteristic):
     """
@@ -23,10 +21,9 @@ class EyeSpyWifiCharacteristic(Characteristic):
             ['write'],
             service, index
         )
-        self.state = ReadState.VALUE_READ
         self.json = ""
         self.wifi_manager = wifi_manager
-    
+
     def WriteValue(self, value, options):
         """
         Expects a JSON with the following format:
@@ -37,35 +34,40 @@ class EyeSpyWifiCharacteristic(Characteristic):
             "UUID": "Camera UUID from backend"
         }
         """
+
         str_val = bytes(value).decode("ascii")
         if str_val.startswith("{\""):
-            self.state == ReadState.NEW_VALUE
             self.json = str_val
         else:
             self.json += str_val
-        
+
         try:
-            dict = json.loads(self.json)
+            net_details = json.loads(self.json)
         except ValueError:
             # Not a full JSON yet
             return
 
         # Needs SSID, UUID, Passkey, and User if applicable
-        if "SSID" not in dict or "UUID" not in dict or "Pass" not in dict:
+        if "SSID" not in net_details or "UUID" not in net_details or "Pass" not in net_details:
             raise InvalidArgsException
-        
-        (ap, type) = self.wifi_manager.get_wifi_security(dict["SSID"])
 
-        if type == SecType.UNSUPPORTED or ap is None:
+        (access_point, sec_type) = self.wifi_manager.get_wifi_security(net_details["SSID"])
+
+        if sec_type == SecType.UNSUPPORTED or access_point is None:
             raise InvalidArgsException
-        
-        if type == SecType.KEY_802_1X:
-            if "User" not in dict:
+
+        if sec_type == SecType.KEY_802_1X:
+            if "User" not in net_details:
                 raise InvalidArgsException
-            self.wifi_manager.connect_enterprise(dict["SSID"], dict["User"], dict["Pass"])
-        elif type == SecType.KEY_PSK:
-            self.wifi_manager.connect_psk(dict["SSID"], dict["Pass"])
 
-        
-    
-        
+            self.wifi_manager.connect_enterprise(
+                net_details["SSID"],
+                net_details["User"],
+                net_details["Pass"]
+            )
+
+        elif sec_type == SecType.KEY_PSK:
+            self.wifi_manager.connect_psk(
+                net_details["SSID"],
+                net_details["Pass"]
+            )

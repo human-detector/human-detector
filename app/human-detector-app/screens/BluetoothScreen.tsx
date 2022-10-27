@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { View, Text, ScrollView, Button, Alert } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
 import useBLE from '../src/ble/bletest';
 
 let bool = false;
@@ -31,11 +30,6 @@ export default function BluetoothScreen(): React.ReactElement {
         console.log(currentDevice);
         getCameraSerialFromBLE(currentDevice);
       }
-
-      NetInfo.fetch().then(state => {
-        console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected);
-      })
 
     return (
     <View>

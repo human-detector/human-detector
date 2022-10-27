@@ -1,6 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import { BleManager, Device, BleError, Characteristic } from 'react-native-ble-plx';
-import NetInfo from "@react-native-community/netinfo";
 import { useState } from 'react';
 
 type PermissionCallback = (result: boolean) => void;

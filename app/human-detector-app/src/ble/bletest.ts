@@ -1,6 +1,8 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import { BleManager, Device, BleError, Characteristic } from 'react-native-ble-plx';
 import { useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
+import * as CryptoJS from 'crypto-js';
 
 type PermissionCallback = (result: boolean) => void;
 
@@ -13,6 +15,7 @@ interface BluetoothLowEnergyApi {
   currentDevice: Device | null;
   allDevices: Device[];
   getCameraSerialFromBLE(device: Device): Promise<void>;
+  writeCameraWifi(device: Device, password: string, userUUID: string): Promise<void>
 }
 
 // Set EyeSpy BLE UUID's
@@ -93,25 +96,34 @@ export default function useBLE(): BluetoothLowEnergyApi {
    * This method will write to the write to EyeSpy Wifi to write
    * @param device 
    */
-  const writeCameraWifi = async (device: Device): Promise<void> => {
+  const writeCameraWifi = async (device: Device, password: string, cameraUUID: string): Promise<void> => {
     try {
       const deviceDiscovered = await device.discoverAllServicesAndCharacteristics();
+      const networkState = await NetInfo.fetch();
       const wifiDetails = {
-        "SSID": ss
+        "SSID": networkState.details?.ssid,
+        "User": "TestUSER",
+        "Pass": password,
+        "UUID": cameraUUID
       }
-      console.log(await deviceDiscovered.writeCharacteristicWithResponseForService(EYESPYBLESERVICEUUID, EYESPYWIFIUUID));
+      const base64WifiDetails = btoa(JSON.stringify(wifiDetails));
+      console.log(base64WifiDetails);
+      console.log(await deviceDiscovered.writeCharacteristicWithResponseForService(EYESPYBLESERVICEUUID, EYESPYWIFIUUID, base64WifiDetails));
     }
     catch(error) {
       console.log('Error in writeCameraWifi()', error);
+      error
     }
   }
 
   /**
-   * This method will check the EyeSpy Connection notification.
+   * This method will check the EyeSpy Connection notification.  It will say
+   * if the camera has connected to the wifi connection or not.
    * @param device 
    */
   const checkCameraNotification = async (device: Device): Promise<void> => {
-
+    const deviceDiscovered = await device.discoverAllServicesAndCharacteristics();
+    deviceDiscovered.monitorCharacteristicForService(EYESPYBLESERVICEUUID, EYESPYCONNECTIONUUID, () => {})
   }
 
   const connectToDevice = async (device: Device) => {
@@ -154,5 +166,6 @@ export default function useBLE(): BluetoothLowEnergyApi {
     currentDevice,
     allDevices,
     getCameraSerialFromBLE,
+    writeCameraWifi,
   };
 }

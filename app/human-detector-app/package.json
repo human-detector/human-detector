@@ -57,7 +57,8 @@
     "react-native-screens": "~3.15.0",
     "react-native-web": "~0.18.7",
     "zod": "^3.19.1",
-    "@expo/prebuild-config": "^5.0.1"
+    "@expo/prebuild-config": "^5.0.1",
+    "expo-build-properties": "~0.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

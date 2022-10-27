@@ -14,6 +14,14 @@ class WifiManager:
         if self.dev is None:
             print("No wifi devices found!")
             exit(-1)
+        
+        self.dev.OnStateChanged(self.state_changed)
+
+    def state_changed(new_state, old_state, reason):
+        print("State change!")
+        print(new_state)
+        print(old_state)
+        print(reason)
 
     def _get_wifi_adapter(self):
         for dev in NetworkManager.Device.all():

@@ -21,7 +21,7 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
             return
         
         dict = json.dumps({
-            "State": new_state[0],
+            "State": new_state[0].value,
             "Reason": new_state[1]
         }).encode("ascii")
 

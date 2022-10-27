@@ -1,32 +1,41 @@
+"""
+Wifi Manager
+"""
+
+import uuid
+import sys
 from enum import Enum, auto
 import NetworkManager
-import uuid
 
 class DeviceState(Enum):
-    InternalError = 0
-    Disconnected = 1
-    Connecting = 2
-    Success = 3
-    Fail = 4
+    """Internal network state"""
+    INTERNAL_ERROR = 0
+    DISCONNECTED = 1
+    CONNECTING = 2
+    SUCCESS = 3
+    FAIL = 4
 
 class SecType(Enum):
+    """Wifi Security Type"""
     KEY_802_1X = auto()
     KEY_PSK = auto()
     UNSUPPORTED = auto()
 
 class WifiManager:
+    """Monitors connection status and connects to Enterprise and WPA2-PSK networks"""
     def __init__(self):
         self.dev = self._get_wifi_adapter()
         if self.dev is None:
             print("No wifi devices found!")
-            exit(-1)
-        
-        self.state = (DeviceState.Disconnected, 0)
+            sys.exit(-1)
+
+        self.state = (DeviceState.DISCONNECTED, 0)
         self.status_callbacks = []
         self.dev.OnStateChanged(self.state_changed_callback)
 
-    # Update device state on callback
-    def state_changed_callback(self, nm, interface, **kwargs):
+    # pylint: disable=unused-argument
+    def state_changed_callback(self, net_manager, interface, **kwargs):
+        """Network Manager callback when network state changes"""
         new_state = kwargs['new_state']
         reason = kwargs['reason']
         self.state = (self._get_state_val(new_state), reason)
@@ -35,63 +44,72 @@ class WifiManager:
 
         for callback in self.status_callbacks:
             callback(self.state)
-    
-    # Register callbacks for when state changes
+
     def register_state_callback(self, callback):
+        """Register callbacks which are called when wifi state changes"""
         self.status_callbacks.append(callback)
 
     def get_state(self):
+        """Get current state of wifi adapter"""
         return self.state
 
     # Convert internal NetworkManager state into an output state for the phone
     def _get_state_val(self, state):
-        if (state == NetworkManager.NM_DEVICE_STATE_UNAVAILABLE or
-            state == NetworkManager.NM_DEVICE_STATE_UNMANAGED or
-            state == NetworkManager.NM_DEVICE_STATE_UNAVAILABLE):
-            return DeviceState.InternalError
-        
-        if state == NetworkManager.NM_DEVICE_STATE_DISCONNECTED:
-            return DeviceState.Disconnected
-        
-        if state == NetworkManager.NM_DEVICE_STATE_FAILED:
-            return DeviceState.Fail
-        
-        return DeviceState.Connecting
+        if state in (NetworkManager.NM_DEVICE_STATE_UNAVAILABLE,
+                     NetworkManager.NM_DEVICE_STATE_UNMANAGED,
+                     NetworkManager.NM_DEVICE_STATE_UNAVAILABLE):
+            return DeviceState.INTERNAL_ERROR
 
-    # Get wifi adapter from NetworkManager 
+        if state == NetworkManager.NM_DEVICE_STATE_DISCONNECTED:
+            return DeviceState.DISCONNECTED
+
+        if state == NetworkManager.NM_DEVICE_STATE_FAILED:
+            return DeviceState.FAIL
+
+        return DeviceState.CONNECTING
+
     def _get_wifi_adapter(self):
+        """Get wifi adapter from NetworkManager"""
         for dev in NetworkManager.Device.all():
             if dev.DeviceType == NetworkManager.NM_DEVICE_TYPE_WIFI:
                 return dev
-        return None    
+        return None
 
-    # Supports 802_1X (Enterprise) and WPA2_PSK (Personal WPA2)
     def get_wifi_security(self, ssid):
-        for ap in self.dev.GetAllAccessPoints():
-            if ap.Ssid != ssid:
+        """
+        Get the wifi security type and access point for a given SSID
+        Currently supports 802_1X (Enterprise) and WPA2_PSK (Personal WPA2)
+        If the SSID is not found, the tuple (None, SecType.UNSUPPORTED) is returned
+        """
+        for access_point in self.dev.GetAllAccessPoints():
+            if access_point.Ssid != ssid:
                 continue
 
-            if ap.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X:
-                return (ap, SecType.KEY_802_1X) # Enterprise/Edu networks
+            if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X:
+                return (access_point, SecType.KEY_802_1X) # Enterprise/Edu networks
 
-            if ap.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_PSK:
-                return (ap, SecType.KEY_PSK) # WPA2 user+passkey
+            if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_PSK:
+                return (access_point, SecType.KEY_PSK) # WPA2 user+passkey
 
-            return (ap, SecType.UNSUPPORTED)
-        
+            return (access_point, SecType.UNSUPPORTED)
+
         return (None, SecType.UNSUPPORTED)
 
     def is_connected(self):
+        """Returns whether device is connected to a network or not"""
         return self.dev.state == NetworkManager.NM_DEVICE_STATE_ACTIVATED
 
-    # Delete all old wifi connections so they do not interefere
     def _delete_old_config(self):
+        """Delete all old wifi connections so they do not interefere"""
+
+        #pylint: disable=no-member
         connections = NetworkManager.Settings.ListConnections()
         for conn in connections:
             if conn.GetSettings()['connection']['type'] == '802-11-wireless':
                 conn.Delete()
 
     def connect_enterprise(self, ssid, user, passkey):
+        """Connect to an Enterprise 802-1X network with ssid, username, and password"""
         self._delete_old_config()
 
         new_connection = {
@@ -103,7 +121,7 @@ class WifiManager:
             '802-11-wireless-security': {
                 'key-mgmt': 'wpa-eap'
             },
-            '802-1x': { 
+            '802-1x': {
                 'eap': ['peap'],
                 'identity': user,
                 'password': passkey,
@@ -118,11 +136,13 @@ class WifiManager:
             'ipv6': {'method': 'auto'}
         }
 
-        (path, conn) = NetworkManager.NetworkManager.AddAndActivateConnection(
+        #pylint: disable=no-member
+        NetworkManager.NetworkManager.AddAndActivateConnection(
             new_connection, self.dev, "/"
         )
-    
+
     def connect_psk(self, ssid, passkey):
+        """Connnect to a WPA-PSK network with SSID and password"""
         self._delete_old_config()
 
         new_connection = {
@@ -143,7 +163,8 @@ class WifiManager:
             'ipv4': {'method': 'auto'},
             'ipv6': {'method': 'auto'}
         }
-        
-        (path, conn) = NetworkManager.NetworkManager.AddAndActivateConnection(
+
+        #pylint: disable=no-member
+        NetworkManager.NetworkManager.AddAndActivateConnection(
             new_connection, self.dev, "/"
         )

@@ -1,7 +1,4 @@
-import * as React from 'react';
-import renderer from 'react-test-renderer';
-import User, { authenticateLogin, loginUser, getUserNotifPerm, isSnoozeOn } from '../classes/User';
-import { apiLink, loginUrlExtension } from '../config/ServerConfig';
+import User, { isSnoozeOn } from '../classes/User';
 
 // isSnoozeOn()
 // critical values: snooze on, snooze off

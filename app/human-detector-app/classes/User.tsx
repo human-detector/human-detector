@@ -1,5 +1,5 @@
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
+// FIXME: re-evaluate methods and remove these
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class User {
   username: string;

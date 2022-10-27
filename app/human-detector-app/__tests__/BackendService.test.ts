@@ -1,3 +1,5 @@
+import nock from 'nock';
+import { AxiosError } from 'axios';
 import * as BackendService from '../services/backendService';
 import * as ServerConfig from '../config/ServerConfig';
 import User from '../classes/User';
@@ -5,19 +7,13 @@ import Group from '../classes/Group';
 import Camera from '../classes/Camera';
 import Notification from '../classes/Notification';
 
-/**
- * This file is to take care of tests on methods that will be used
- * to reach our REST API backend endpoints.
- */
-
-const nock = require('nock');
 const exampleAccessToken = 'ExampleAccessToken';
 
 // test putting notification key
 describe(BackendService.sendNotifyTokenAPI, () => {
   it('should return code 200 for successful token sending', async () => {
     const newUser: User = new User('tucker', '987654', true);
-    const scope = nock(ServerConfig.apiLink)
+    nock(ServerConfig.apiLink)
       .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userID))
       .reply(200, 'success');
 
@@ -29,9 +25,8 @@ describe(BackendService.sendNotifyTokenAPI, () => {
   });
 
   it("should return code 401 if user id doesn't exist", async () => {
-    const errorMsg = 'Request failed with status code 401';
     const newUser: User = new User('tucker', '987654', true);
-    const scope = nock(ServerConfig.apiLink)
+    nock(ServerConfig.apiLink)
       .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userID))
       .reply(401, 'fail');
 
@@ -41,7 +36,7 @@ describe(BackendService.sendNotifyTokenAPI, () => {
         'ExponentPushToken[0000000000]',
         exampleAccessToken
       )
-    ).rejects.toBe(errorMsg);
+    ).rejects.toThrow(AxiosError);
   });
 });
 
@@ -49,11 +44,11 @@ describe(BackendService.getGroupListAPI, () => {
   const newUser: User = new User('bigheadgeorge', '0', true);
 
   it('should return null if there is an error', async () => {
-    const scope = nock(ServerConfig.apiLink)
+    nock(ServerConfig.apiLink)
       .get(ServerConfig.getGroupsListUrlExtension(newUser.userID))
       .reply(401, 'error');
 
-    const result = await BackendService.getGroupListAPI(newUser.userID);
+    const result = await BackendService.getGroupListAPI(newUser.userID, exampleAccessToken);
 
     expect(result).toBe(null);
   });
@@ -71,7 +66,7 @@ describe(BackendService.getGroupListAPI, () => {
     groups.push(groupObj);
     groups.push(groupObj2);
 
-    const scope = nock(ServerConfig.apiLink)
+    nock(ServerConfig.apiLink)
       .get(ServerConfig.getGroupsListUrlExtension(newUser.userID))
       .reply(200, JSON.stringify(groups));
 
@@ -85,7 +80,7 @@ describe(BackendService.getNotificationHistoryAPI, () => {
   const newUser: User = new User('bigheadgeorge', '1234565', true);
 
   it('should return null if there is an error', async () => {
-    const scope = nock(ServerConfig.apiLink)
+    nock(ServerConfig.apiLink)
       .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.userID))
       .reply(401, 'error');
 
@@ -105,7 +100,7 @@ describe(BackendService.getNotificationHistoryAPI, () => {
 
     const notifHistory: Notification[] = [notif1, notif2];
 
-    const scope = nock(ServerConfig.apiLink)
+    nock(ServerConfig.apiLink)
       .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.userID))
       .reply(200, JSON.stringify(notifHistory));
 

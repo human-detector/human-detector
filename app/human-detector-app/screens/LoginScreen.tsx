@@ -1,6 +1,12 @@
+import { TokenResponse } from 'expo-auth-session';
 import * as React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import KeyCloakButton from '../components/KeyCloakButton';
+
+interface Props {
+  // Called when the authentication flow completes and we've received a token set
+  onTokenResponse(response: TokenResponse): void;
+}
 
 /**
  * Screen will automatically open to log in to KeyCloak.
@@ -9,19 +15,10 @@ import KeyCloakButton from '../components/KeyCloakButton';
  *
  * @returns LoginScreen component
  */
-export default function LoginScreen({ setTokenResponse }): React.ReactElement {
+export default function LoginScreen({ onTokenResponse }: Props): React.ReactElement {
   return (
     <View>
-      <KeyCloakButton setTokenResponse={setTokenResponse} />
+      <KeyCloakButton onTokenResponse={onTokenResponse} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    // paddingTop: 40,
-    // paddingHorizontal: 20
-  },
-});

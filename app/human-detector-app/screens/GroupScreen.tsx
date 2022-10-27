@@ -1,62 +1,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Camera from '../classes/Camera';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Group from '../classes/Group';
-
-export default function GroupMenu({ navigation }: Props): React.ReactElement {
-  const groupOne: Group = new Group("AAAAAA's Group", '99');
-  const groupTwo: Group = new Group("BBBBB's Group", '725');
-  const groupThree: Group = new Group("CCCCC's Group", '400');
-
-  const [listOfCameras, setListOfCameras] = useState([groupOne, groupTwo, groupThree]);
-
-  const pressHandler = () => {
-    navigation.navigate('Cameras');
-    console.log(typeof navigation);
-  };
-
-  return (
-    <View style={styles.container}>
-      <ScrollView>
-        {listOfCameras.map((item) => (
-          <View key={item.groupId}>
-            <TouchableOpacity style={styles.menuItem} onPress={pressHandler}>
-              <Text style={styles.menuButtonText}> {item.groupName} </Text>
-              <CameraSettingsButton cameraId={item.groupId} />
-            </TouchableOpacity>
-          </View>
-        ))}
-
-        <View key="add-button">
-          <TouchableOpacity
-            style={[styles.menuItem, styles.addButtonItem]}
-            onPress={() => {
-              const cameraList: Camera[] = [...listOfCameras];
-              // adding camera here test
-              cameraList.push(new Camera('test', 'test', 'test'));
-              setListOfCameras(cameraList);
-            }}
-          >
-            <Text style={styles.addButtonText}> + </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
-
-    /*
-     * Instead of doing FlatList, I might want to change this to a scrollable view
-     */
-    //   <SafeAreaView style={styles.container}>
-    //     <FlatList
-    //         data={listOfCameras}
-    //         renderItem={renderItem}
-    //     />
-    //   </SafeAreaView>
-    //
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -105,6 +52,59 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
 });
+
+// FIXME: Define the route params object (first param to the 'NativeStackScreenProps' type) in one central file
+//        so each component can use it. The dummy object here is a placeholder to pass typechecking.
+export default function GroupScreen({
+  navigation,
+}: NativeStackScreenProps<{ Group: undefined; Cameras: undefined }, 'Group'>): React.ReactElement {
+  const groupOne: Group = new Group("AAAAAA's Group", '99');
+  const groupTwo: Group = new Group("BBBBB's Group", '725');
+  const groupThree: Group = new Group("CCCCC's Group", '400');
+
+  const [listOfGroups, setListOfGroups] = useState([groupOne, groupTwo, groupThree]);
+
+  const pressHandler = () => {
+    navigation.navigate('Cameras');
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+        {listOfGroups.map((item) => (
+          <View key={item.groupId}>
+            <TouchableOpacity style={styles.menuItem} onPress={pressHandler}>
+              <Text style={styles.menuButtonText}> {item.groupName} </Text>
+              <CameraSettingsButton cameraId={item.groupId} />
+            </TouchableOpacity>
+          </View>
+        ))}
+
+        <View key="add-button">
+          <TouchableOpacity
+            style={[styles.menuItem, styles.addButtonItem]}
+            onPress={() =>
+              setListOfGroups((oldGroups) => [...oldGroups, new Group('test', 'test')])
+            }
+          >
+            <Text style={styles.addButtonText}> + </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
+
+    /*
+     * Instead of doing FlatList, I might want to change this to a scrollable view
+     */
+    //   <SafeAreaView style={styles.container}>
+    //     <FlatList
+    //         data={listOfCameras}
+    //         renderItem={renderItem}
+    //     />
+    //   </SafeAreaView>
+    //
+  );
+}
 
 export function GroupOnPress() {
   return (

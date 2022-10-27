@@ -1,8 +1,5 @@
 import { loadFeature, defineFeature } from 'jest-cucumber';
 import User, { getUserNotifPerm, isSnoozeOn } from '../../../classes/User';
-import { apiLink } from '../../../config/ServerConfig';
-
-const nock = require('nock');
 
 const feature = loadFeature('__tests__/__features__/PushNotification.feature');
 

@@ -1,3 +1,7 @@
+// FIXME: re-evaluate methods and stuff
+/* eslint-disable class-methods-use-this */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// eslint-disable-next-line import/no-cycle
 import Group from './Group';
 
 export default class Camera {
@@ -20,12 +24,12 @@ export default class Camera {
   }
 
   renameCamera(name: string): Camera {
-    //P1
+    // P1
     return new Camera('0', 'name', 'ID');
   }
 
   isCameraOnline(): boolean {
-    //P0
+    // P0
     return true;
   }
 }

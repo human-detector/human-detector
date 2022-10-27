@@ -1,6 +1,3 @@
-import * as React from 'react';
-import renderer from 'react-test-renderer';
-import { Alert, Button } from 'react-native';
 import Group, { renameGroup, addToGroup } from '../classes/Group';
 import Camera from '../classes/Camera';
 
@@ -24,7 +21,7 @@ it('renameGroup() Test 3: return group with unchanged name (over the character l
   // character limit 30
   const groupObj: Group = new Group('Group 1', 'ID');
   expect(renameGroup('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', groupObj).groupName).toBe(
-    groupObj.groupObj
+    groupObj.groupName
   );
 });
 

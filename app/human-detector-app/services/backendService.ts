@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { z } from 'zod';
 import Group from '../classes/Group';
 import Notification from '../classes/Notification';
 import * as ServerUrl from '../config/ServerConfig';
@@ -36,7 +35,7 @@ export async function getGroupListAPI(
     const response = await axios.get(apiLinkWithExtension, config);
     return response.data;
   } catch (error) {
-    console.error(`Error in getGroupListAPI status code: ${error.message}`);
+    console.error(`Error in getGroupListAPI status code:`, error);
     return null;
   }
 }
@@ -66,16 +65,17 @@ export async function sendNotifyTokenAPI(
     const apiLinkWithExtension: string =
       ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(userIdFromLogin);
 
-    const response = await axios.put(
+    await axios.put(
       apiLinkWithExtension,
       {
         expoToken: expoTokenFromLogin,
       },
       config
     );
+    return undefined;
   } catch (error) {
-    console.error(`Error in sendNotifyAPI status code ${error.message}`);
-    return Promise.reject(error.message);
+    console.error(`Error in sendNotifyAPI status code:`, error);
+    return Promise.reject(error);
   }
   // no error: return void
 }
@@ -104,7 +104,7 @@ export async function getNotificationHistoryAPI(
     const response = await axios.get(apiLinkWithExtension, config);
     return response.data;
   } catch (error) {
-    console.error(`Error in getNotificationHistoryAPI status code: ${error.message}`);
+    console.error(`Error in getNotificationHistoryAPI status code:`, error);
     return null;
   }
 }

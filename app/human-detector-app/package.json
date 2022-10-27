@@ -26,7 +26,6 @@
     "@expo/ngrok": "^2.5.0",
     "@expo/vector-icons": "^13.0.0",
     "@react-keycloak/native": "^0.6.2",
-    "@react-native-community/netinfo": "8.2.0",
     "@react-navigation/bottom-tabs": "^6.0.5",
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.1.0",

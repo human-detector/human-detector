@@ -1,5 +1,6 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import { BleManager, Device, BleError, Characteristic } from 'react-native-ble-plx';
+import NetInfo from "@react-native-community/netinfo";
 import { useState } from 'react';
 
 type PermissionCallback = (result: boolean) => void;
@@ -11,15 +12,29 @@ interface BluetoothLowEnergyApi {
   connectToDevice(device: Device): Promise<void>;
   scanForDevices(): void;
   currentDevice: Device | null;
-  heartRate: number;
   allDevices: Device[];
+  getCameraSerialFromBLE(device: Device): Promise<void>;
 }
+
+// Set EyeSpy BLE UUID's
+const EYESPYBLESERVICEUUID = '4539d44c-75bb-4fbd-9d95-6cdf49d4ef2b';
+const EYESPYWIFIUUID = '7a1673f9-55cb-4f40-b624-561ad8afb8e2';
+const EYESPYSERIALUUID = '8b83fee2-373c-46a5-a782-1db9118431d9';
+const EYESPYCONNECTIONUUID = '136670fb-f95b-4ee8-bc3b-81eadb234268';
 
 export default function useBLE(): BluetoothLowEnergyApi {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [currentDevice, setConnectedDevice] = useState<Device | null>(null);
-  const [heartRate, setHeartRate] = useState<number>(0);
+  // const [heartRate, setHeartRate] = useState<number>(0);
 
+  const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
+  devices.findIndex((device) => nextDevice.id === device.id) > -1;
+
+  /**
+   * requestPermissions will ask the user to allow location permission
+   * on their device
+   * @param callback 
+   */
   const requestPermissions = async (callback: PermissionCallback) => {
     if (Platform.OS === 'android') {
       const grantedStatus = await PermissionsAndroid.request(
@@ -38,11 +53,12 @@ export default function useBLE(): BluetoothLowEnergyApi {
     }
   };
 
-  const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
-    devices.findIndex((device) => nextDevice.id === device.id) > -1;
-
+  /**
+   * scanForDevices will start scanning for BLE connections.  It will make it so it only
+   * scans for our specific devices.  It will also add it to a list which can be displayed to the user.
+   */
   const scanForDevices = () => {
-    bleManager.startDeviceScan(null, null, (error, device) => {
+    bleManager.startDeviceScan([EYESPYBLESERVICEUUID], null, (error, device) => {
       if (error) {
         console.log(error);
       }
@@ -58,14 +74,50 @@ export default function useBLE(): BluetoothLowEnergyApi {
     });
   };
 
-  async function getCameraInformationFromDevice(device: Device) {
+
+  /**
+   * getCameraSerialFromBLE will read the Eyespy Serial
+   * @param device 
+   */
+  const getCameraSerialFromBLE = async (device: Device) => {
     // Get EyeSpy serial characteristic
-    const characteristic = await device.characteristicsForService('8b83fee2-373c-46a5-a782-1db9118431d9');
+    try {
+      const deviceDiscovered = await device.discoverAllServicesAndCharacteristics();
+      console.log(await deviceDiscovered.readCharacteristicForService(EYESPYBLESERVICEUUID, EYESPYSERIALUUID));
+    }
+    catch (error) {
+      console.log('NO DEVICE CONNECTED', error);
+    }
+  }
+
+  /**
+   * This method will write to the write to EyeSpy Wifi to write
+   * @param device 
+   */
+  const writeCameraWifi = async (device: Device): Promise<void> => {
+    try {
+      const deviceDiscovered = await device.discoverAllServicesAndCharacteristics();
+      const wifiDetails = {
+        "SSID": ss
+      }
+      console.log(await deviceDiscovered.writeCharacteristicWithResponseForService(EYESPYBLESERVICEUUID, EYESPYWIFIUUID));
+    }
+    catch(error) {
+      console.log('Error in writeCameraWifi()', error);
+    }
+  }
+
+  /**
+   * This method will check the EyeSpy Connection notification.
+   * @param device 
+   */
+  const checkCameraNotification = async (device: Device): Promise<void> => {
+
   }
 
   const connectToDevice = async (device: Device) => {
     try {
-      const deviceConnection = await bleManager.connectToDevice(device.id);
+      const deviceConnection = await device.connect();
       setConnectedDevice(deviceConnection);
       bleManager.stopDeviceScan();
     } catch (error) {
@@ -73,33 +125,35 @@ export default function useBLE(): BluetoothLowEnergyApi {
     }
   };
 
-  const startStreamingData = async (device: Device) => {
-    if (device) {
-      device.monitorCharacteristicForService('UUID', 'CAMERA_CHARACTERISTIC', () => {});
-    } else {
-      console.error('NO DEVICE CONNECTED');
-    }
-  };
 
-  const onHeartRateUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
-    if (error) {
-      console.error(error);
-      return;
-    }
-    if (characteristic?.value) {
-      console.error('No Characteristic Found');
-    }
 
-    const rawData = characteristic?.value;
-    console.log(rawData);
-  };
+  // const startStreamingData = async (device: Device) => {
+  //   if (device) {
+  //     device.monitorCharacteristicForService('UUID', 'CAMERA_CHARACTERISTIC', () => {});
+  //   } else {
+  //     console.error('NO DEVICE CONNECTED');
+  //   }
+  // };
+
+  // const onHeartRateUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
+  //   if (error) {
+  //     console.error(error);
+  //     return;
+  //   }
+  //   if (characteristic?.value) {
+  //     console.error('No Characteristic Found');
+  //   }
+
+    // const rawData = characteristic?.value;
+    // console.log(rawData);
+  // };
 
   return {
     requestPermissions,
     connectToDevice,
     scanForDevices,
     currentDevice,
-    heartRate,
     allDevices,
+    getCameraSerialFromBLE,
   };
 }

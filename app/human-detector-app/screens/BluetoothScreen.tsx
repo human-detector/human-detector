@@ -1,27 +1,48 @@
 import * as React from 'react';
 import { View, Text, ScrollView, Button, Alert } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import useBLE from '../src/ble/bletest';
+
+let bool = false;
 
 export default function BluetoothScreen(): React.ReactElement {
     
     // Make list of all bluetooth devices
+    // Subscribe
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Connection type', state.type);
+      console.log('Is connected?', state.isConnected);
+    });
 
     const {
         requestPermissions,
         connectToDevice,
         scanForDevices,
         currentDevice,
-        heartRate,
         allDevices,
+        getCameraSerialFromBLE,
       } = useBLE();
     
       requestPermissions((isGranted: boolean) => {
         if (isGranted) {
-          scanForDevices();
+          if(!bool) {
+            scanForDevices();
+            bool = true;
+          }
         }
       });
     
       console.log(allDevices);
+
+      if(currentDevice) {
+        console.log(currentDevice);
+        getCameraSerialFromBLE(currentDevice);
+      }
+
+      NetInfo.fetch().then(state => {
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected);
+      })
 
     return (
     <View>
@@ -30,7 +51,9 @@ export default function BluetoothScreen(): React.ReactElement {
                 <View key={item.id}>
                     <Button 
                     title={item.id}
-                    onPress={() => Alert.alert('Connection Successful')}/>
+                    onPress={() => {
+                      connectToDevice(item);
+                      }}/>
                 </View>
             ))}
         </ScrollView>

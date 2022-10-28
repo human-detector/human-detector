@@ -21,7 +21,10 @@ export class Camera {
 
   // PEM-encoded public key
   @Property()
-  token!: string;
+  publicKey!: string;
+
+  @Property()
+  serial!: string;
 
   @ManyToOne(() => Group)
   group: Group;
@@ -29,8 +32,9 @@ export class Camera {
   @OneToMany(() => Notification, (notification) => notification.camera)
   notifications = new Collection<Notification>(this);
 
-  constructor(name: string, token: string) {
+  constructor(name: string, publicKey: string, serial: string) {
     this.name = name;
-    this.token = token;
+    this.publicKey = publicKey;
+    this.serial = serial;
   }
 }

@@ -5,6 +5,7 @@ import { NotFoundError } from '../errors.types';
 import { Camera } from '../cameras/camera.entity'
 import { Group } from '../groups/group.entity';
 import { User } from './user.entity';
+import { RegisterCameraBody } from './users.controller';
 
 @Injectable()
 export class UsersService {
@@ -36,16 +37,12 @@ export class UsersService {
    * 
    * @param userId the user's ID.
    * @param groupId the group ID.
-   * @param name New camera's name
-   * @param pubKey New camera's public key
-   * @param serial New camera's serial
+   * @param ncameraDetails the name, serial, and public key of a new camera.
    */
-  public async putCamera(
+  public async registerCamera(
     userId: string,
     groupId: string,
-    name: string,
-    pubKey: string,
-    serial: string
+    cameraDetails: RegisterCameraBody,
   ): Promise<Camera> {
     const group = await this.groupRepository.findOne(
       { id: groupId },
@@ -60,7 +57,12 @@ export class UsersService {
       throw new UnauthorizedException();
     }
 
-    const newCamera = new Camera(name, pubKey, serial);
+    const newCamera = new Camera(
+      cameraDetails.name,
+      cameraDetails.publicKey,
+      cameraDetails.serial
+    );
+
     group.cameras.add(newCamera);
     await this.groupRepository.flush();
 

@@ -22,7 +22,13 @@ export type GetGroupsOutput = {
   }[];
 }[];
 
-export type PutCameraResponse = {
+export type RegisterCameraBody = {
+  publicKey: string;
+  serial: string;
+  name: string;
+}
+
+export type RegisterCameraResponse = {
   id: string;
 }
 
@@ -56,23 +62,17 @@ export class UsersController {
   async putCamera(
     @Param('uid') userId: string,
     @Param('gid') groupId: string,
-    @Body('publicKey') publicKey: string,
-    @Body('serial') cameraSerial: string,
-    @Body('name') cameraName: string
-  ): Promise<PutCameraResponse> {
-    if (publicKey === undefined || 
-      cameraSerial === undefined ||
-      cameraName === undefined) {
+    @Body() body: RegisterCameraBody 
+  ): Promise<RegisterCameraResponse> {
+    if (Object.values(body).includes(undefined)) {
       throw new BadRequestException();
     }
 
     try {
-      const camera = await this.usersService.putCamera(
+      const camera = await this.usersService.registerCamera(
         userId,
         groupId,
-        publicKey,
-        cameraSerial,
-        cameraName
+        body
       );
 
       return {

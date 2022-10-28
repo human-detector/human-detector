@@ -1,18 +1,22 @@
-import responses
+"""
+Network Request Tests
+"""
+
+import time
+import math
 import unittest
+import responses
 from src.networking.heartbeat import Heartbeat
 from src.networking.net_requests import NetRequests
 from src.networking.key_manager import KeyManager
 from src.networking.net_config import NetConfig
-import time
-import math
 
 class TestNetRequests(unittest.TestCase):
     def setUp(self) -> None:
         self.key = KeyManager.create_random_key("111")
         self.net = NetRequests(self.key)
         return super().setUp()
-    
+
     def test_second_conversion(self):
         milli1 = NetRequests.seconds_to_milliseconds(2.046)
         milli2 = NetRequests.seconds_to_milliseconds(0.254)
@@ -32,7 +36,7 @@ class TestNetRequests(unittest.TestCase):
         heartbeat_delay = 0.1
 
         resp = responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_keys().get_uuid()),
+            NetConfig.get_heartbeat_url(self.key.get_uuid()),
             headers={
                 "Content-Type": "application/json",
                 "Authorization": self.key.get_auth_token()
@@ -43,13 +47,13 @@ class TestNetRequests(unittest.TestCase):
         time.sleep(heartbeat_delay * call_count)
         heartbeat.stop()
         self.assertTrue(resp.call_count == call_count)
-    
+
     @responses.activate
     def test_heartbeat_request(self):
         cur_time = time.time()
 
         responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_keys().get_uuid()),
+            NetConfig.get_heartbeat_url(self.key.get_uuid()),
             headers={
                 "Content-Type": "application/json",
                 "Authorization": self.key.get_auth_token()
@@ -63,13 +67,12 @@ class TestNetRequests(unittest.TestCase):
         self.assertTrue(response.status_code == 200)
         self.assertTrue(success)
 
-    
     @responses.activate
     def test_heartbeat_request_fail(self):
         cur_time = time.time()
 
         responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_keys().get_uuid()),
+            NetConfig.get_heartbeat_url(self.key.get_uuid()),
             headers={
                 "Content-Type": "application/json",
                 "Authorization": self.key.get_auth_token()
@@ -83,14 +86,14 @@ class TestNetRequests(unittest.TestCase):
         success, response = self.net.send_heartbeat(cur_time)
         self.assertTrue(response.status_code == 401)
         self.assertFalse(success)
-        
+
     @responses.activate
     def test_heartbeat_fail(self):
         call_count = 5
         heartbeat_delay = 0.1
 
         responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_keys().get_uuid()),
+            NetConfig.get_heartbeat_url(self.key.get_uuid()),
             headers={
                 "Content-Type": "application/json",
                 "Authorization": self.key.get_auth_token()

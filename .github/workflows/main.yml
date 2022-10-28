@@ -20,6 +20,9 @@ jobs:
       - name: Run tests
         working-directory: ./camera/auth
         run: make test
+      - name: Run lint
+        working-directory: ./camera/auth
+        run: make lint
 
   pi-detector-tests:
     runs-on: ubuntu-latest

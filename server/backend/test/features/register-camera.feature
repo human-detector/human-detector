@@ -21,17 +21,17 @@ Feature: Register a camera to a user
     When I register the camera through the app with a non-existant Group
     Then I receive a not found error
   
-  Scenario: User is attempting to register a camera with no Serial
+  Scenario: User is attempting to register a camera with no serial
     Given I have user A's credentials
-    When I register the camera through the app with no Serial
+    When I register the camera through the app with no serial
     Then I receive a bad request error
 
-  Scenario: User is attempting to register a camera with no UUID
+  Scenario: User is attempting to register a camera with no name
     Given I have user A's credentials
-    When I register the camera through the app with no UUID
+    When I register the camera through the app with no name
     Then I receive a bad request error
 
-  Scenario: User is attempting to register a camera with no Public Key
+  Scenario: User is attempting to register a camera with no public key
     Given I have user A's credentials
-    When I register the camera through the app with no Public Key
+    When I register the camera through the app with no public key
     Then I receive a bad request error

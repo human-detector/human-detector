@@ -54,7 +54,7 @@ export class UsersService {
     }
 
     if (group.user.id !== userId) {
-      throw new UnauthorizedException();
+      throw new NotFoundError(`User with ID "${userId}" does not exist.`);
     }
 
     const newCamera = new Camera(

@@ -39,7 +39,13 @@ export class UsersService {
    * @param pubKey New camera's public key
    * @param serial New camera's serial
    */
-  public async putCamera(userId: string, groupId: string, name: string, pubKey: string, serial: string): Promise<Camera> {
+  public async putCamera(
+    userId: string,
+    groupId: string,
+    name: string,
+    pubKey: string,
+    serial: string
+  ): Promise<Camera> {
     
     return null;
   }

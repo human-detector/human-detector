@@ -13,6 +13,7 @@ import { MikroORM } from '@mikro-orm/core';
 import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
+import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
 
 const feature = loadFeature('test/features/get-notifications.feature');
 
@@ -48,11 +49,12 @@ defineFeature(feature, (test) => {
     let token: string;
 
     given('I have a valid ID', async () => {
-      cameraA = new Camera('CameraA', 'test-token1');
-      cameraA.group = new Group('test-group1');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      cameraA = camera;
+      cameraA.group = new Group('group');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
-      token = cameraA.token;
+      token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     and('the ID has 2 notifications associated with it', async () => {
       cameraA.notifications.add(new Notification());
@@ -62,18 +64,14 @@ defineFeature(feature, (test) => {
     when('I request to get the notifications', async () => {
       getRes = await request(app.getHttpServer())
         .get(`/cameras/${cameraA.id}/notifications`)
-        .auth(token, { type: 'bearer' });
+        .set('Authorization', token);
     });
     then('the request will go through', () => {
       expect(getRes.status).toBe(200);
     });
     and('I will receive a Notification array of 2', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/cameras/${cameraA.id}/notifications`)
-        .auth(token, { type: 'bearer' });
-      expect(res.status).toBe(200);
-      expect(res.header['content-type']).toMatch(/^application\/json/);
-      expect(res.body).toHaveLength(2);
+      expect(getRes.header['content-type']).toMatch(/^application\/json/);
+      expect(getRes.body).toHaveLength(2);
     });
   });
 
@@ -89,8 +87,9 @@ defineFeature(feature, (test) => {
     let tokenB: string;
 
     given("I have camera A's details", async () => {
-      cameraA = new Camera('CameraA', 'test-token2A');
-      cameraA.group = new Group('test-group2');
+      const { camera } = createCameraWithKeyPair('Camera-A');
+      cameraA = camera;
+      cameraA.group = new Group('GroopA');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
     });
@@ -99,23 +98,23 @@ defineFeature(feature, (test) => {
       await cameraRepository.flush();
     });
     and('camera B is registered', async () => {
-      cameraB = new Camera('CameraB', 'test-token2B');
-      tokenB = cameraB.token;
-      await request(app.getHttpServer())
-        .get(`/cameras/${cameraB.id}/notifications`)
-        .auth(tokenB, { type: 'bearer' })
-        .expect(200);
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-B');
+      cameraB = camera;
+      cameraB.group = new Group('GroopB');
+      cameraB.group.user = new User();
+      await cameraRepository.persistAndFlush(cameraB);
+      tokenB = getCameraAuthToken(cameraB, keyPair.privateKey);
     });
     when(
       "I request to get the notifications from camera A with camera B's token",
       async () => {
         getRes = await request(app.getHttpServer())
           .get(`/cameras/${cameraA.id}/notifications`)
-          .auth(tokenB, { type: 'bearer' });
+          .set('Authorization', tokenB);
       },
     );
-    then("the request will receive an 'Unauthorized' error", () => {
-      expect(getRes.status).toBe(401);
+    then("the request will receive a 'Forbidden' error", () => {
+      expect(getRes.status).toBe(403);
     });
   });
 
@@ -127,34 +126,29 @@ defineFeature(feature, (test) => {
   }) => {
     let cameraA: Camera;
     let getRes: request.Response;
-    let beforeNotification: Notification[];
-    let token: string;
+    let fakeToken: string;
 
     given('I have no credentials', () => {
-      token = '';
+      fakeToken = '';
     });
     and('camera A has 1 notification attributed to it', async () => {
-      cameraA = new Camera('CameraA', 'test-token3');
-      cameraA.notifications.add(new Notification());
-      cameraA.group = new Group('test-group3');
+      const { camera } = createCameraWithKeyPair('Camera-A');
+      cameraA = camera;
+      cameraA.group = new Group('g');
       cameraA.group.user = new User();
+      cameraA.notifications.add(new Notification());
       await cameraRepository.persistAndFlush(cameraA);
-      beforeNotification = cameraA.notifications.getItems();
     });
     when('I try to get the notification from camera A', async () => {
       getRes = await request(app.getHttpServer())
         .get(`/cameras/${cameraA.id}/notifications`)
-        .auth(token, { type: 'bearer' });
+        .set('Authorization', fakeToken);
     });
-    then("I will receive an 'Unauthorized' error", () => {
-      expect(getRes.status).toBe(401);
+    then("I will receive a 'Forbidden' error", () => {
+      expect(getRes.status).toBe(403);
     });
     and('Camera A will have the same notification as before', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/cameras/${cameraA.id}/notifications`)
-        .auth(cameraA.token, { type: 'bearer' });
-      expect(res.status).toBe(200);
-      expect(res.body).toBe(beforeNotification);
+      expect(cameraA.notifications.toArray().length).toEqual(1);
     });
   });
 
@@ -167,20 +161,20 @@ defineFeature(feature, (test) => {
     let token: string;
     let id: string;
 
-    given('I have no credentials', () => {
+    given('I have no registered credentials', () => {
       token = '';
-      id = '';
+      id = 'test-id';
     });
     when(
       'I try to get notifications from a camera that is not registered',
       async () => {
         res = await request(app.getHttpServer())
           .get(`/cameras/${id}/notifications`)
-          .auth(token, { type: 'bearer' });
+          .set('Authorization', token);
       },
     );
-    then("I will receive a 'Not Found' error", () => {
-      expect(res.status).toBe(404);
+    then("I will receive a 'Forbidden' error", () => {
+      expect(res.status).toBe(403);
     });
   });
 });

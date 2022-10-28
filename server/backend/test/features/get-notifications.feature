@@ -12,16 +12,16 @@ Scenario: Using an ID I do not have access to with 1 notification to get
 	And camera A has 1 notification
 	And camera B is registered
 	When I request to get the notifications from camera A with camera B's token
-	Then the request will receive an 'Unauthorized' error
+	Then the request will receive a 'Forbidden' error
 
 Scenario: Trying to get notifications from a camera with 1 notification without any credentials
 	Given I have no credentials
 	And camera A has 1 notification attributed to it
 	When I try to get the notification from camera A
-	Then I will receive an 'Unauthorized' error
+	Then I will receive a 'Forbidden' error
 	And Camera A will have the same notification as before
 
 Scenario: Trying to get notifications from a camera that is not registered
-	Given I have no credentials
+	Given I have no registered credentials
 	When I try to get notifications from a camera that is not registered
-	Then I will receive a 'Not Found' error
+	Then I will receive a 'Forbidden' error

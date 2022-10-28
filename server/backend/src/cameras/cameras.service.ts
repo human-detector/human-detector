@@ -18,8 +18,12 @@ export class CamerasService {
     private notificationRepository: EntityRepository<Notification>,
   ) {}
 
+  /**
+   * Sends a notification to the user's phone and adds it to the
+   * collection of notifications the user has.
+   * @param idCam
+   */
   public async sendNotification(idCam: string): Promise<boolean> {
-    /* TODO: verify that ID refers to a valid camera and add a notification to DB */
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
       { populate: ['group.user'] },
@@ -55,11 +59,13 @@ export class CamerasService {
     return true;
   }
 
+  /**
+   * Gets a user's notification collection
+   * @param idCam
+   */
   public async getNotifications(
     idCam: string,
   ): Promise<Collection<Notification>> {
-    /* TODO: verify ID, get the notifications */
-
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
       { populate: ['notifications'] },
@@ -67,7 +73,6 @@ export class CamerasService {
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
-    //const notifications = await this.notificationRepository.find({ id: idCam });
     return cam.notifications;
   }
 

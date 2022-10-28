@@ -22,7 +22,7 @@ Feature: Sending a notification
 
   Scenario: Sending a notification with valid credentials
     Given I have camera A's credentials
-    And Camera A has 1 notification
+    And Camera A has 0 notifications
     When I try to send a notification on behalf of camera A
     Then The request succeeded
-    And Camera A has 2 notifications
+    And Camera A has 1 notification

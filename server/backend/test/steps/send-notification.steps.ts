@@ -14,7 +14,6 @@ import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
-import { getSystemErrorMap } from 'util';
 
 const feature = loadFeature('test/features/send-notification.feature');
 
@@ -72,7 +71,9 @@ defineFeature(feature, (test) => {
       expect(sendRes.status).toBe(401);
     });
     and('Camera A has 3 notifications', async () => {
-      expect(cameraA.notifications.toArray()).toEqual(beforeNotifications);
+      expect(cameraA.notifications.toArray().length).toEqual(
+        beforeNotifications.length,
+      );
     });
   });
 
@@ -144,7 +145,9 @@ defineFeature(feature, (test) => {
       expect(sendRes.status).toBe(403);
     });
     and('Camera B has 2 notifications', async () => {
-      expect(cameraB.notifications.toArray()).toEqual(beforeNotifications);
+      expect(cameraB.notifications.toArray().length).toEqual(
+        beforeNotifications.length,
+      );
     });
   });
 
@@ -167,9 +170,12 @@ defineFeature(feature, (test) => {
       await cameraRepository.persistAndFlush(cameraA);
       token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
-    and('Camera A has 1 notification', async () => {
-      cameraA.notifications.add(new Notification());
-      await cameraRepository.flush();
+    and('Camera A has 0 notifications', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/cameras/${cameraA.id}/notifications`)
+        .set('Authorization', token);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveLength(0);
     });
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
@@ -180,8 +186,12 @@ defineFeature(feature, (test) => {
     then('The request succeeded', () => {
       expect(sendRes.status).toBe(200);
     });
-    and('Camera A has 2 notifications', async () => {
-      expect(cameraA.notifications.toArray()).toHaveLength(2);
+    and('Camera A has 1 notification', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/cameras/${cameraA.id}/notifications`)
+        .set('Authorization', token);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveLength(1);
     });
   });
 });

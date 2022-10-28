@@ -23,9 +23,9 @@ export type GetGroupsOutput = {
 }[];
 
 export type RegisterCameraBody = {
-  publicKey: string;
-  serial: string;
-  name: string;
+  publicKey?: string;
+  serial?: string;
+  name?: string;
 }
 
 export type RegisterCameraResponse = {

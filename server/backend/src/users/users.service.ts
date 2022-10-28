@@ -2,6 +2,7 @@ import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
+import { Camera } from '../cameras/camera.entity'
 import { Group } from '../groups/group.entity';
 import { User } from './user.entity';
 
@@ -27,6 +28,11 @@ export class UsersService {
       throw new NotFoundError(`User with ID "${userId}" does not exist.`);
     }
     return user.groups;
+  }
+
+  public async putCamera(userId: string, groupId: string, name: string, pubKey: string, serial: string): Promise<Camera> {
+    
+    return null;
   }
 
   /**

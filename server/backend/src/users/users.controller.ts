@@ -21,6 +21,10 @@ export type GetGroupsOutput = {
   }[];
 }[];
 
+export type PutCameraResponse = {
+  id: string;
+}
+
 @Controller('users')
 @UseGuards(JwtIdentityGuard)
 export class UsersController {
@@ -45,6 +49,17 @@ export class UsersController {
         throw error;
       }
     }
+  }
+
+  @Put(':uid/groups/:gid/cameras')
+  async putCamera(
+    @Param('uid') userId: string,
+    @Param('gid') groupId: string,
+    @Body('publicKey') publicKey: string,
+    @Body('serial') cameraSerial: string,
+    @Body('name') cameraName: string
+  ): Promise<PutCameraResponse> {
+    return null;
   }
 
   @Put(':id/notifyToken')

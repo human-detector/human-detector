@@ -88,7 +88,7 @@ describe('CamerasService', () => {
     it("should return the camera's public key for valid cameras", () => {
       const camera = new Camera('bogus', 'my-public-key');
       mockedCameraRepository.findOne.mockResolvedValueOnce(camera);
-      expect(camerasService.getPublicKey('')).resolves.toBe(camera.token);
+      expect(camerasService.getPublicKey('')).resolves.toBe(camera.publicKey);
     });
 
     it('should throw a NotFoundError for invalid camera IDs', () => {

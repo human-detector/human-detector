@@ -1,8 +1,18 @@
 import * as React from 'react';
-import { View, Text, ScrollView, Button, Alert } from 'react-native';
-import useBLE from '../src/ble/bletest';
+import { View, ScrollView, Button } from 'react-native';
+import useBLE from '../../src/ble/bleConnect';
+import { getCameraSerialFromBLE, writeCameraWifi } from '../../src/ble/bleServices';
 
 let bool = false;
+
+/**
+ * This screen will start scanning on the device for bluetooth devices.
+ * It will display a list of th ebluetooth devices that can be detected from the app.  The
+ * visible cameras will be specific to EyeSpy cameras.
+ * Clicking on a button will connect the mobile app to the bluetooth device, and then navigate to
+ * the EnterCameraRegionInfoScreen.
+ * @returns 
+ */
 
 export default function BluetoothScreen(): React.ReactElement {
 
@@ -12,7 +22,6 @@ export default function BluetoothScreen(): React.ReactElement {
         scanForDevices,
         currentDevice,
         allDevices,
-        getCameraSerialFromBLE,
       } = useBLE();
     
       requestPermissions((isGranted: boolean) => {
@@ -27,6 +36,7 @@ export default function BluetoothScreen(): React.ReactElement {
       console.log(allDevices);
 
       if(currentDevice) {
+        writeCameraWifi(currentDevice, "TestPass", "TestUUID");
         console.log(currentDevice);
         getCameraSerialFromBLE(currentDevice);
       }

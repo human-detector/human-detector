@@ -5,10 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
-import BluetoothScreen from './screens/BluetoothScreen';
+import BluetoothScreen from './screens/CameraRegistration/BluetoothScreen';
 import { sendExpoNotifToken } from './src/notifications/notifTokenInit';
 import { getUserFromIDToken } from './src/auth/keyCloakAuth';
-import useBLE from './src/ble/bletest';
+import useBLE from './src/ble/bleConnect';
 
 const Stack = createNativeStackNavigator();
 

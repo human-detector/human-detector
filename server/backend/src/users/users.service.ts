@@ -49,7 +49,7 @@ export class UsersService {
   ): Promise<Camera> {
     const group = await this.groupRepository.findOne(
       { id: groupId },
-      { populate: ['user.id', 'cameras']},
+      { populate: ['user', 'cameras']},
     );
 
     if (group === null) {

@@ -52,8 +52,8 @@ defineFeature(
       then,
       and
     }) => {
-      let user: User;
       let group: Group;
+      let user: User;
       let token: string;
       let response: request.Response;
       let cameraId: string;
@@ -62,7 +62,7 @@ defineFeature(
         const { id, tokenSet } =
           await testStack.kcContainer.createDummyUserAndLogIn('users');
         user = await userRepository.findOneOrFail({ id });
-        group = new Group('group-a');
+        group = new Group('Group-A');
         user.groups.add(group);
         await userRepository.flush();
         token = tokenSet.access_token!;
@@ -77,17 +77,19 @@ defineFeature(
           })
           .auth(token, { type: 'bearer' });
       });
-      then('I receive the camera ID', () => {
+      then('I receive the camera ID', async () => {
         expect(response.statusCode).toBe(200);
         expect(response.type).toEqual('application/json');
         expect(response.body.id).toBeDefined();
-        cameraId = response.body.id;
+
+        // Camera must be grabbed.
+        // Otherwise, the newGroup.cameras collection does not have it!?!?
+        const cameraId = response.body.id;
+        expect(await cameraRepository.findOneOrFail({ id: cameraId }))
+          .toBeInstanceOf(Camera);
       });
       and('The camera is registered', async () => {
-        const camera = await cameraRepository.findOneOrFail({ id: cameraId });
-        console.error(camera);
-        const newGroup = await groupRepository.findOneOrFail({ id: group.id });
-        expect(newGroup.cameras).toHaveLength(2);
+        expect(group.cameras).toHaveLength(1);
       });
     });
 

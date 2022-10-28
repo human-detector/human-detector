@@ -59,7 +59,7 @@ export class UsersController {
   }
 
   @Put(':uid/groups/:gid/cameras')
-  async putCamera(
+  async registerCamera(
     @Param('uid') userId: string,
     @Param('gid') groupId: string,
     @Body() body: RegisterCameraBody 

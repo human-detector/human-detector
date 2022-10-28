@@ -5,7 +5,8 @@ EyeSpy serial number and public key Characteristic
 import json
 import cryptography.hazmat.primitives.serialization as Serialization
 from networking import Keys
-from networking.wifi_manager import DeviceState
+from networking.key_manager import KeyManager
+from networking.wifi_manager import DeviceState, WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_errors import NotPermittedException
 
@@ -25,8 +26,8 @@ class EyeSpySerialCharacteristic(Characteristic):
             index   = kwargs["index"]
         )
 
-        self.key_manager = kwargs["key_manager"]
-        self.wifi_manager = kwargs["wifi_manager"]
+        self.key_manager: KeyManager = kwargs["key_manager"]
+        self.wifi_manager: WifiManager = kwargs["wifi_manager"]
 
     def ReadValue(self, options):
         """
@@ -43,12 +44,10 @@ class EyeSpySerialCharacteristic(Characteristic):
         if self.wifi_manager.get_state()[0] == DeviceState.CONNECTING:
             raise NotPermittedException()
 
-        new_keys = Keys.create_random_key()
-        self.key_manager.set_keys(new_keys)
-        new_keys.persist()
+        self.key_manager.gen_keys()
         out_str = json.dumps({
             "Serial": self.key_manager.get_serial(),
-            "PubKey": new_keys.get_priv_key().public_key().public_bytes(
+            "PubKey": self.key_manager.get_public_key().public_bytes(
                 Serialization.Encoding.PEM,
                 Serialization.PublicFormat.SubjectPublicKeyInfo
             ).decode()

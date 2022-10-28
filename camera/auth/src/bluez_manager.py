@@ -5,7 +5,6 @@ Before importing this module, make sure NetworkManager is started!
 
 import sys
 import dbus
-import dbus.mainloop.glib
 import ble.dbus_interface.dbus_bluez_names as BluezNames
 from ble import EyeSpyAdvertisement, EyeSpyService
 from ble.dbus_interface.dbus_bluez_interface import Application

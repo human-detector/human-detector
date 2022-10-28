@@ -6,6 +6,7 @@ import sys
 import os
 import subprocess
 import dbus
+import dbus.mainloop.glib
 from gi.repository import GLib
 MainLoop = GLib.MainLoop
 

@@ -44,9 +44,6 @@ class Application(dbus.service.Object):
             chrcs = service.get_characteristics()
             for chrc in chrcs:
                 response[chrc.get_path()] = chrc.get_properties()
-                descs = chrc.get_descriptors()
-                for desc in descs:
-                    response[desc.get_path()] = desc.get_properties()
 
         return response
 

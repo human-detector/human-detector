@@ -95,6 +95,10 @@ class KeyManager():
         """Get serial number of Raspberry Pi"""
         return self.serial
 
+    def get_public_key(self):
+        """Get the public part of the private/public key pair"""
+        return self.keys.get_priv_key().public_key()
+
     def get_auth_token(self):
         """Get authentication token from Keys object"""
         return self.keys.get_auth_token()

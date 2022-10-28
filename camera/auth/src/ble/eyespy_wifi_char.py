@@ -24,7 +24,7 @@ class EyeSpyWifiCharacteristic(Characteristic):
             index   = kwargs["index"]
         )
 
-        self.json = ""
+        self.json_str = ""
         self.wifi_manager = kwargs["wifi_manager"]
 
     def WriteValue(self, value, options):
@@ -38,14 +38,14 @@ class EyeSpyWifiCharacteristic(Characteristic):
         }
         """
 
-        str_val = bytes(value).decode("ascii")
-        if str_val.startswith("{\""):
-            self.json = str_val
+        json_val = bytes(value).decode("ascii")
+        if json_val.startswith("{\""):
+            self.json_str = json_val
         else:
-            self.json += str_val
+            self.json_str += json_val
 
         try:
-            net_details = json.loads(self.json)
+            net_details = json.loads(self.json_str)
         except ValueError:
             # Not a full JSON yet
             return

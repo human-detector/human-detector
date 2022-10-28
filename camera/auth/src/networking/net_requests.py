@@ -29,7 +29,7 @@ class NetRequests:
 
     def send_heartbeat(self, time):
         """Send a heartbeat to the server with current timestamp"""
-        url = NetConfig.get_heartbeat_url(self.key_manager.get_keys().get_uuid())
+        url = NetConfig.get_heartbeat_url(self.key_manager.get_uuid())
 
         headers = {
             "Accept": "application/json",

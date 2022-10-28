@@ -14,10 +14,15 @@ class EyeSpyService(Service):
     """
     EYESPY_SERVICE_UUID = "4539d44c-75bb-4fbd-9d95-6cdf49d4ef2b"
 
-    def __init__(self, bus, index, wifi_manager, key_manager):
+    def __init__(self, bus, index, wifi, key):
         Service.__init__(
             self, bus, self.EYESPY_SERVICE_UUID, index, True)
-        self.add_characteristic(EyeSpyWifiCharacteristic(bus, 0, self, wifi_manager))
-        self.add_characteristic(EyeSpyConnStatusCharacteristic(bus, 1, self, wifi_manager))
-        self.add_characteristic(EyeSpySerialCharacteristic(bus, 2, self, key_manager, wifi_manager))
-        self.add_characteristic(EyeSpyWifiTypeCharacteristic(bus, 3, self, wifi_manager))
+        self.add_characteristic(
+            EyeSpyWifiCharacteristic(bus=bus, index=0, service=self, wifi_manager=wifi))
+        self.add_characteristic(
+            EyeSpyConnStatusCharacteristic(bus=bus, index=1, service=self, wifi_manager=wifi))
+        self.add_characteristic(
+            EyeSpySerialCharacteristic(bus=bus, index=2, service=self,
+                                       key_manager=key, wifi_manager=wifi))
+        self.add_characteristic(
+            EyeSpyWifiTypeCharacteristic(bus=bus, index=3, service=self, wifi_manager=wifi))

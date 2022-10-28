@@ -94,16 +94,16 @@ class Service(dbus.service.Object):
 class Characteristic(dbus.service.Object):
     """BlueZ Characteristic which acts as an endpoint another BLE devices can access"""
 
-    def __init__(self, bus, uuid, flags, service, index):
-        self.path = service.get_path() + "/char" + str(index)
+    def __init__(self, service, **kwargs):
+        self.path = service.get_path() + "/char" + str(kwargs["index"])
         self.props = {
-            "UUID": uuid,
+            "UUID": kwargs["uuid"],
             "Service": service.get_path(),
             "Notifying": False,
-            "Flags": flags,
+            "Flags": kwargs["flags"],
             "Descriptors": dbus.Array([], signature='o')
         }
-        dbus.service.Object.__init__(self, bus, self.path)
+        dbus.service.Object.__init__(self, kwargs["bus"], self.path)
 
     def get_properties(self):
         """Get BlueZ characteristic properties"""

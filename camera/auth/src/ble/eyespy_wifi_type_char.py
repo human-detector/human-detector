@@ -3,7 +3,6 @@ EyeSpy Wifi Security Type Characteristics
 """
 
 import json
-from networking.wifi_manager import WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_errors import FailedException
 
@@ -14,15 +13,18 @@ class EyeSpyWifiTypeCharacteristic(Characteristic):
 
     EYESPY_WIFI_UUID = "b0ae3b34-5428-4d16-8654-515f41dff777"
 
-    def __init__(self, bus, index, service, wifi_manager: WifiManager):
+    def __init__(self, **kwargs):
         Characteristic.__init__(
-            self, bus,
-            self.EYESPY_WIFI_UUID,
-            ['read', 'write'],
-            service, index
+            self,
+            service = kwargs["service"],
+            bus     = kwargs["bus"],
+            uuid    = self.EYESPY_WIFI_UUID,
+            flags   = ['read', 'write'],
+            index   = kwargs["index"]
         )
-        self.wifi_manager = wifi_manager
-        self.json = None
+
+        self.wifi_manager = kwargs["wifi_manager"]
+        self.json = ""
 
     def WriteValue(self, value, options):
         """

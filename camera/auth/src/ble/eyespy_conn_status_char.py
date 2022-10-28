@@ -17,16 +17,18 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
 
     EYESPY_CONN_UUID = "136670fb-f95b-4ee8-bc3b-81eadb234268"
 
-    def __init__(self, bus, index, service, wifi_manager):
+    def __init__(self, **kwargs):
         Characteristic.__init__(
-            self, bus,
-            self.EYESPY_CONN_UUID,
-            ['notify'],
-            service, index
+            self,
+            service = kwargs["service"],
+            bus     = kwargs["bus"],
+            uuid    = self.EYESPY_CONN_UUID,
+            flags   = ['notify'],
+            index   = kwargs["index"]
         )
         self.is_notifying = False
-        self.wifi_manager = wifi_manager
-        wifi_manager.register_state_callback(self.state_change_callback)
+        self.wifi_manager = kwargs["wifi_manager"]
+        self.wifi_manager.register_state_callback(self.state_change_callback)
 
     def state_change_callback(self, new_state):
         """

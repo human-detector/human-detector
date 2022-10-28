@@ -3,7 +3,7 @@ EyeSpy Connect to Wifi Characteristic
 """
 
 import json
-from networking.wifi_manager import SecType, WifiManager
+from networking.wifi_manager import SecType
 from .dbus_interface.dbus_bluez_errors import InvalidArgsException
 from .dbus_interface.dbus_bluez_interface import Characteristic
 
@@ -14,15 +14,18 @@ class EyeSpyWifiCharacteristic(Characteristic):
 
     EYESPY_WIFI_UUID = "7a1673f9-55cb-4f40-b624-561ad8afb8e2"
 
-    def __init__(self, bus, index, service, wifi_manager: WifiManager):
+    def __init__(self, service, **kwargs):
         Characteristic.__init__(
-            self, bus,
-            self.EYESPY_WIFI_UUID,
-            ['write'],
-            service, index
+            self,
+            service = service,
+            bus     = kwargs["bus"],
+            uuid    = self.EYESPY_WIFI_UUID,
+            flags   = ['write'],
+            index   = kwargs["index"]
         )
+
         self.json = ""
-        self.wifi_manager = wifi_manager
+        self.wifi_manager = kwargs["wifi_manager"]
 
     def WriteValue(self, value, options):
         """

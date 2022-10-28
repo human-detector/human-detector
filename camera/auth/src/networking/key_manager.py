@@ -84,7 +84,7 @@ class KeyManager():
         """
         self.keys = Keys.create_random_key()
         self.keys.persist()
-    
+
     def get_uuid(self):
         """
         Return UUID from keys

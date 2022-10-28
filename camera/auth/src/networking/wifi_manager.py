@@ -40,7 +40,7 @@ class WifiManager:
         reason = kwargs['reason']
         self.state = (self._get_state_val(new_state), reason)
 
-        print("State change!\n{}\n", self.state[0].name, self.state[1])
+        print("State change! ", self.state[0].name)
 
         for callback in self.status_callbacks:
             callback(self.state)
@@ -65,6 +65,9 @@ class WifiManager:
 
         if state == NetworkManager.NM_DEVICE_STATE_FAILED:
             return DeviceState.FAIL
+
+        if state == NetworkManager.NM_DEVICE_STATE_ACTIVATED:
+            return DeviceState.SUCCESS
 
         return DeviceState.CONNECTING
 

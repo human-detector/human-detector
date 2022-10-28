@@ -56,17 +56,20 @@ export default function App(): React.ReactElement {
               },
             }}
           >
-            {() => <LoginScreen onTokenResponse={setTokenResponse} />}
+            {() => (
+              <LoginScreen
+                onTokenResponse={(response) => {
+                  // Translates IDToken to a user
+                  setUser(getUserFromIDToken(response.idToken!));
+                  setTokenResponse(response);
+                }}
+              />
+            )}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     );
   }
-
-  // If logged in, make the user and put them into the app
-
-  // Translates IDToken to a user
-  setUser(getUserFromIDToken(tokenResponse!.idToken!));
 
   // If the user is logged in return the stack with all the information
   return (

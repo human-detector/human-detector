@@ -19,7 +19,7 @@ Feature: Register a camera to a user
   Scenario: User is attempting to register a camera to a non-existant Group
     Given I have user A's credentials
     When I register the camera through the app with a non-existant Group
-    Then I receive a not found error
+    Then I receive an unauthorized error
   
   Scenario: User is attempting to register a camera with no serial
     Given I have user A's credentials

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -59,7 +60,31 @@ export class UsersController {
     @Body('serial') cameraSerial: string,
     @Body('name') cameraName: string
   ): Promise<PutCameraResponse> {
-    return null;
+    if (publicKey === undefined || 
+      cameraSerial === undefined ||
+      cameraName === undefined) {
+      throw new BadRequestException();
+    }
+
+    try {
+      const camera = await this.usersService.putCamera(
+        userId,
+        groupId,
+        publicKey,
+        cameraSerial,
+        cameraName
+      );
+
+      return {
+        id: camera.id
+      };
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
   }
 
   @Put(':id/notifyToken')

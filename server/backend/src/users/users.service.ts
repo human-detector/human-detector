@@ -1,6 +1,6 @@
 import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
 import { Camera } from '../cameras/camera.entity'
 import { Group } from '../groups/group.entity';
@@ -10,6 +10,7 @@ import { User } from './user.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: EntityRepository<User>,
+    @InjectRepository(Group) private groupRepository: EntityRepository<Group>,
   ) {}
 
   /**
@@ -46,8 +47,24 @@ export class UsersService {
     pubKey: string,
     serial: string
   ): Promise<Camera> {
-    
-    return null;
+    const group = await this.groupRepository.findOne(
+      { id: groupId },
+      { populate: ['user.id', 'cameras']},
+    );
+
+    if (group === null) {
+      throw new NotFoundError(`Group with ID "${groupId}" does not exist.`);
+    }
+
+    if (group.user.id !== userId) {
+      throw new UnauthorizedException();
+    }
+
+    const newCamera = new Camera(name, pubKey, serial);
+    group.cameras.add(newCamera);
+    await this.groupRepository.flush();
+
+    return newCamera;
   }
 
   /**

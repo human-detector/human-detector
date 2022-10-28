@@ -5,7 +5,7 @@ create table "user" ("id" uuid not null, "expo_token" varchar(255) null, constra
 
 create table "group" ("id" uuid not null, "name" varchar(255) not null, "user_id" uuid not null, constraint "group_pkey" primary key ("id"));
 
-create table "camera" ("id" uuid not null, "name" varchar(255) not null, "token" varchar(255) not null, "group_id" uuid not null, constraint "camera_pkey" primary key ("id"));
+create table "camera" ("id" uuid not null, "name" varchar(255) not null, "publicKey" varchar(255) not null, "serial" varchar(255) not null, "group_id" uuid not null, constraint "camera_pkey" primary key ("id"));
 
 create table "notification" ("id" uuid not null, "timestamp" timestamptz(0) not null, "camera_id" uuid not null, constraint "notification_pkey" primary key ("id"));
 

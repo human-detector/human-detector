@@ -11,6 +11,7 @@ import {
   TEST_STACK_TIMEOUT,
 } from '../helpers/test-stack';
 import { UsersModule } from '../../src/users/users.module';
+import { Camera } from '../../src/cameras/camera.entity';
 
 defineFeature(
   loadFeature('test/features/register-camera.feature'),
@@ -18,12 +19,22 @@ defineFeature(
     let app: INestApplication;
     let testStack: TestStack;
     let userRepository: EntityRepository<User>;
+    let groupRepository: EntityRepository<Group>;
+    let cameraRepository: EntityRepository<Camera>;
 
     beforeAll(async () => {
       testStack = await buildTestStack({ imports: [UsersModule] });
       userRepository = testStack.module
         .get<MikroORM>(MikroORM)
         .em.getRepository(User);
+      
+      groupRepository = testStack.module
+        .get<MikroORM>(MikroORM)
+        .em.getRepository(Group);
+
+      cameraRepository = testStack.module
+        .get<MikroORM>(MikroORM)
+        .em.getRepository(Camera);
 
       app = testStack.module.createNestApplication();
       await app.init();
@@ -45,6 +56,7 @@ defineFeature(
       let group: Group;
       let token: string;
       let response: request.Response;
+      let cameraId: string;
 
       given('I have credentials', async () => {
         const { id, tokenSet } =
@@ -59,19 +71,23 @@ defineFeature(
         response = await request(app.getHttpServer())
           .put(`/users/${user.id}/groups/${group.id}/cameras`)
           .send({
-            'name': 'New Camera',
-            'publicKey': 'Definitely a key',
-            'serial': 'Definitely a serial'
+            'name': 'Camera-B',
+            'publicKey': 'Key-B',
+            'serial': 'Serial-B'
           })
           .auth(token, { type: 'bearer' });
       });
       then('I receive the camera ID', () => {
-          expect(response.statusCode).toBe(200);
-          expect(response.type).toEqual('application/json');
-          expect(response.body.id).toBeDefined();
+        expect(response.statusCode).toBe(200);
+        expect(response.type).toEqual('application/json');
+        expect(response.body.id).toBeDefined();
+        cameraId = response.body.id;
       });
-      and('The camera is registered', () => {
-          expect(user.groups[0].cameras.length).toBe(1);
+      and('The camera is registered', async () => {
+        const camera = await cameraRepository.findOneOrFail({ id: cameraId });
+        console.error(camera);
+        const newGroup = await groupRepository.findOneOrFail({ id: group.id });
+        expect(newGroup.cameras).toHaveLength(2);
       });
     });
 
@@ -99,6 +115,11 @@ defineFeature(
       when("I register the camera to user B", async () => {
         response = await request(app.getHttpServer())
           .put(`/users/${userB.id}/groups/${groupId}/cameras`)
+          .send({
+            'name': 'Camera-A',
+            'publicKey': 'Key-A',
+            'serial': 'Serial-A'
+          })
           .auth(userTokenA, { type: 'bearer' });
       });
       then('I receive an unauthorized error', () => {
@@ -125,6 +146,11 @@ defineFeature(
       when("I register the camera to user B", async () => {
         response = await request(app.getHttpServer())
           .put(`/users/${userIdB}/groups/${groupId}/cameras`)
+          .send({
+            'name': 'Camera-A',
+            'publicKey': 'Key-A',
+            'serial': 'Serial-A'
+          })
           .auth(userTokenA, { type: 'bearer' });
       });
       then('I receive an unauthorized error', () => {
@@ -152,10 +178,15 @@ defineFeature(
       when("I register the camera through the app with a non-existant Group", async () => {
         response = await request(app.getHttpServer())
           .put(`/users/${user.id}/groups/${groupId}/cameras`)
+          .send({
+            'name': 'Camera-A',
+            'publicKey': 'Key-A',
+            'serial': 'Serial-A'
+          })
           .auth(token, { type: 'bearer' });
       });
-      then('I receive a not found error', () => {
-        expect(response.statusCode).toBe(404);
+      then('I receive an unauthorized error', () => {
+        expect(response.statusCode).toBe(403);
         expect(response.body).toMatchSnapshot();
       });
     });

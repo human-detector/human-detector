@@ -30,6 +30,15 @@ export class UsersService {
     return user.groups;
   }
 
+  /**
+   * Register a camera to the given user and group
+   * 
+   * @param userId the user's ID.
+   * @param groupId the group ID.
+   * @param name New camera's name
+   * @param pubKey New camera's public key
+   * @param serial New camera's serial
+   */
   public async putCamera(userId: string, groupId: string, name: string, pubKey: string, serial: string): Promise<Camera> {
     
     return null;

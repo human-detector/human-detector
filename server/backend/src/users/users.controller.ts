@@ -64,7 +64,9 @@ export class UsersController {
     @Param('gid') groupId: string,
     @Body() body: RegisterCameraBody 
   ): Promise<RegisterCameraResponse> {
-    if (Object.values(body).includes(undefined)) {
+    if (body.name === undefined ||
+      body.publicKey === undefined ||
+      body.serial === undefined) {
       throw new BadRequestException();
     }
 

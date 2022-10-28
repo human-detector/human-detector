@@ -39,7 +39,6 @@ class EyeSpySerialCharacteristic(Characteristic):
 
         # Prohibit reads when the camera is trying to connect
         # Reads generate new keys and persist them, which is *bad* when trying to connect
-        #pylint: disable=no-member
         if self.wifi_manager.get_state()[0] == DeviceState.CONNECTING:
             raise NotPermittedException()
 

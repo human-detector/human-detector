@@ -4,7 +4,6 @@ EyeSpy serial number and public key Characteristic
 
 import json
 import cryptography.hazmat.primitives.serialization as Serialization
-from networking import Keys
 from networking.key_manager import KeyManager
 from networking.wifi_manager import DeviceState, WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic

@@ -1,110 +1,113 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import Group from '../classes/Group';
 import Notification from '../classes/Notification';
+import User from '../classes/User';
 import * as ServerUrl from '../config/ServerConfig';
+import TokenManager from '../src/auth/tokenManager';
 
 /**
- * This file handles HTTP requests to our backend
+ * Handles authenticated requests to the backend.
  */
+export default class BackendService {
+  private readonly tokenManager: TokenManager;
 
-const BEARER = 'Bearer ';
+  /**
+   * Axios instance with common headers added (mainly auth)
+   */
+  private readonly axiosInstance: AxiosInstance;
 
-/**
- * This method is used to get the group list that is connected to a user.  This group list
- * will contain cameras and other information that will be stored as a group object.
- *
- * @param userId : the userId of the user that we need the group list for.
- * @returns null if error occurs.
- *          An array of Groups that are owned by the user with the userId.
- */
+  constructor(tokenManager: TokenManager) {
+    this.tokenManager = tokenManager;
 
-export async function getGroupListAPI(
-  userId: string,
-  userAccessToken: string
-): Promise<Group[] | null> {
-  try {
-    const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(userId);
-    const config = {
-      headers: {
-        Authorization: BEARER + userAccessToken,
-        Accept: 'application/json',
-      },
-    };
-
-    const response = await axios.get(apiLinkWithExtension, config);
-    return response.data;
-  } catch (error) {
-    console.error(`Error in getGroupListAPI status code:`, error);
-    return null;
+    // Add authorization and accept headers to each request
+    this.axiosInstance = axios.create();
+    this.axiosInstance.interceptors.request.use(async (config) => {
+      const accessToken = await this.tokenManager.getAccessToken();
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+      };
+      Object.assign(config.headers!.common, headers);
+      return config;
+    });
   }
-}
 
-/**
- * This method will send a notification token to the backend to be stored
- * through our endpoints.  This is done at login.
- *
- * @param userIdFromLogin : userId of the user that just logged in
- * @param expoTokenFromLogin : notification token of the user that just logged in
- * @param userAccessToken : the users access token for bearer authroization
- * @returns void if success, else it will return the error message
- */
-export async function sendNotifyTokenAPI(
-  userIdFromLogin: string,
-  expoTokenFromLogin: string,
-  userAccessToken: string
-): Promise<void> {
-  try {
-    const config = {
-      headers: {
-        Authorization: BEARER + userAccessToken,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    };
-    const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(userIdFromLogin);
-
-    await axios.put(
-      apiLinkWithExtension,
-      {
-        expoToken: expoTokenFromLogin,
-      },
-      config
-    );
-    return undefined;
-  } catch (error) {
-    console.error(`Error in sendNotifyAPI status code:`, error);
-    return Promise.reject(error);
+  private getUser(): User {
+    return this.tokenManager.getUser();
   }
-  // no error: return void
-}
 
-/**
- * This method will get the notification history of a certain user through the backend.
- *
- * @param userId : user that we're searching for notifications for.
- * @returns null if error
- *          An array of notifications resembling notification history
- */
-export async function getNotificationHistoryAPI(
-  userId: string,
-  userAccessToken: string
-): Promise<Notification[] | null> {
-  try {
-    const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(userId);
-    const config = {
-      headers: {
-        Authorization: BEARER + userAccessToken,
-        Accept: 'application/json',
-      },
-    };
+  /**
+   * This method is used to get the group list that is connected to a user.  This group list
+   * will contain cameras and other information that will be stored as a group object.
+   *
+   * @returns null if error occurs.
+   *          An array of Groups that are owned by the user with the userId.
+   */
+  public async getGroupListAPI(): Promise<Group[] | null> {
+    try {
+      const apiLinkWithExtension: string =
+        ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().userID);
 
-    const response = await axios.get(apiLinkWithExtension, config);
-    return response.data;
-  } catch (error) {
-    console.error(`Error in getNotificationHistoryAPI status code:`, error);
-    return null;
+      const response = await this.axiosInstance.get(apiLinkWithExtension);
+      return response.data;
+    } catch (error) {
+      console.error(`Error in getGroupListAPI status code:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * This method will send a notification token to the backend to be stored
+   * through our endpoints.  This is done at login.
+   *
+   * @param expoTokenFromLogin : notification token of the user that just logged in
+   * @returns void if success, else it will return the error message
+   */
+  public async sendNotifyTokenAPI(expoTokenFromLogin: string): Promise<void> {
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      const apiLinkWithExtension: string =
+        ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(this.getUser().userID);
+
+      await this.axiosInstance.put(
+        apiLinkWithExtension,
+        {
+          expoToken: expoTokenFromLogin,
+        },
+        config
+      );
+      return undefined;
+    } catch (error) {
+      console.error(`Error in sendNotifyAPI status code:`, error);
+      return Promise.reject(error);
+    }
+    // no error: return void
+  }
+
+  /**
+   * This method will get the notification history of a certain user through the backend.
+   *
+   * @returns null if error
+   *          An array of notifications resembling notification history
+   */
+  public async getNotificationHistoryAPI(): Promise<Notification[] | null> {
+    try {
+      const apiLinkWithExtension: string =
+        ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(this.getUser().userID);
+      const config = {
+        headers: {
+          Accept: 'application/json',
+        },
+      };
+
+      const response = await this.axiosInstance.get(apiLinkWithExtension, config);
+      return response.data;
+    } catch (error) {
+      console.error(`Error in getNotificationHistoryAPI status code:`, error);
+      return null;
+    }
   }
 }

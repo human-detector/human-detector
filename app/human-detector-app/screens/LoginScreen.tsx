@@ -1,11 +1,12 @@
-import { TokenResponse } from 'expo-auth-session';
+import { makeRedirectUri } from 'expo-auth-session';
+import Constants from 'expo-constants';
 import * as React from 'react';
-import { View } from 'react-native';
-import KeyCloakButton from '../components/KeyCloakButton';
+import { Button, View } from 'react-native';
+import TokenFetcher from '../src/auth/tokenFetcher';
+import TokenManager from '../src/auth/tokenManager';
 
 interface Props {
-  // Called when the authentication flow completes and we've received a token set
-  onTokenResponse(response: TokenResponse): void;
+  onSuccessfulLogin(tokenManager: TokenManager): void;
 }
 
 /**
@@ -15,10 +16,22 @@ interface Props {
  *
  * @returns LoginScreen component
  */
-export default function LoginScreen({ onTokenResponse }: Props): React.ReactElement {
+export default function LoginScreen({ onSuccessfulLogin }: Props): React.ReactElement<Props> {
   return (
     <View>
-      <KeyCloakButton onTokenResponse={onTokenResponse} />
+      <Button
+        title="Login"
+        onPress={() => {
+          const clientId = Constants.manifest?.extra?.clientId;
+          const issuerOrigin = Constants.manifest?.extra?.keycloakUrl;
+          const issuer = new URL('/realms/users', issuerOrigin);
+          const redirectUri = makeRedirectUri();
+          new TokenFetcher(clientId, issuer, redirectUri)
+            .getTokenManager()
+            .then(onSuccessfulLogin)
+            .catch((error) => console.error('Login flow failed', error));
+        }}
+      />
     </View>
   );
 }

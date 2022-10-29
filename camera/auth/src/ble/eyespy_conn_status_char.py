@@ -3,6 +3,7 @@ Wifi Connection Status Characteristic
 """
 
 import json
+import dbus
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_names import BLUEZ_GATT_CHARACTERISTIC
 
@@ -38,12 +39,13 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
         if not self.is_notifying:
             return
 
-        new_value = json.dumps({
+        new_value = dbus.ByteArray(json.dumps({
             "State": new_state[0].value,
             "Reason": new_state[1]
-        }).encode("ascii")
+        }).encode("ascii"))
 
-        self.PropertiesChanged(BLUEZ_GATT_CHARACTERISTIC, { 'Value': new_value }, [])
+        changed = dbus.Dictionary({ 'Value': new_value }, signature='sv')
+        self.PropertiesChanged(BLUEZ_GATT_CHARACTERISTIC, changed, [])
 
     def StartNotify(self):
         print("Start notification")

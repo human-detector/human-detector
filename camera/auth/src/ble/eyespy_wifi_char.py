@@ -3,7 +3,8 @@ EyeSpy Connect to Wifi Characteristic
 """
 
 import json
-from networking.wifi_manager import SecType
+from networking.key_manager import KeyManager
+from networking.wifi_manager import SecType, WifiManager
 from .dbus_interface.dbus_bluez_errors import InvalidArgsException
 from .dbus_interface.dbus_bluez_interface import Characteristic
 
@@ -25,7 +26,8 @@ class EyeSpyWifiCharacteristic(Characteristic):
         )
 
         self.json_str = ""
-        self.wifi_manager = kwargs["wifi_manager"]
+        self.wifi_manager: WifiManager = kwargs["wifi_manager"]
+        self.key_manager: KeyManager = kwargs["key_manager"]
 
     def WriteValue(self, value, options):
         """
@@ -54,31 +56,38 @@ class EyeSpyWifiCharacteristic(Characteristic):
         if "SSID" not in net_details or "UUID" not in net_details:
             raise InvalidArgsException
 
-        (access_point, sec_type) = self.wifi_manager.get_wifi_security(net_details["SSID"])
+        self._connect_to_wifi(net_details)
+
+        # Save off the UUID so detector can connect to backend
+        self.key_manager.keys.uuid = net_details["UUID"]
+        self.key_manager.keys.persist()
+
+    def _connect_to_wifi(self, net_details):
+        ssid = net_details["SSID"]
+
+        (access_point, sec_type) = self.wifi_manager.get_wifi_security(ssid)
 
         if sec_type == SecType.UNSUPPORTED or access_point is None:
             raise InvalidArgsException
 
+        # Open Networks w/ no security
         if sec_type == SecType.KEY_OPEN:
-            self.wifi_manager.connect_open(
-                net_details["SSID"]
-            )
+            self.wifi_manager.connect_open(ssid)
+        # WPA2-Personal Networks
+        elif sec_type == SecType.KEY_PSK:
+            try:
+                username = net_details["User"]
+            except KeyError as exc:
+                raise InvalidArgsException from exc
 
-        if "Pass" not in net_details:
-            raise InvalidArgsException
+            password = net_details["Pass"]
+            self.wifi_manager.connect_psk(ssid, password)
+        # Enterprise WPA2 networks
+        elif sec_type == SecType.KEY_802_1X:
+            try:
+                username = net_details["User"]
+                password = net_details["Pass"]
+            except KeyError as exc:
+                raise InvalidArgsException from exc
 
-        if sec_type == SecType.KEY_PSK:
-            self.wifi_manager.connect_psk(
-                net_details["SSID"],
-                net_details["Pass"]
-            )
-
-        if "User" not in net_details:
-            raise InvalidArgsException
-
-        if sec_type == SecType.KEY_802_1X:
-            self.wifi_manager.connect_enterprise(
-                net_details["SSID"],
-                net_details["User"],
-                net_details["Pass"]
-            )
+            self.wifi_manager.connect_enterprise(ssid, username, password)

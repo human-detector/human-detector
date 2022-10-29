@@ -15,6 +15,7 @@ import { NotFoundError } from '../errors.types';
 export type GetNotificationsOutput = {
   id: string;
   timestamp: string;
+  camera: string;
 }[];
 
 @Controller('cameras')

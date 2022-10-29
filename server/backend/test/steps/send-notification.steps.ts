@@ -14,6 +14,8 @@ import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
+import { Expo } from 'expo-server-sdk';
+import { Test } from '@nestjs/testing';
 
 const feature = loadFeature('test/features/send-notification.feature');
 
@@ -171,27 +173,27 @@ defineFeature(feature, (test) => {
       token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     and('Camera A has 0 notifications', async () => {
-      const res = await request(app.getHttpServer())
+      const resBefore = await request(app.getHttpServer())
         .get(`/cameras/${cameraA.id}/notifications`)
         .set('Authorization', token);
-      expect(res.status).toBe(200);
-      expect(res.body).toHaveLength(0);
+      expect(resBefore.status).toBe(200);
+      expect(resBefore.body).toHaveLength(0);
     });
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
         .put(`/cameras/${cameraA.id}/notifications`)
         .set('Authorization', token)
-        .send(new Notification());
+        .send();
     });
     then('The request succeeded', () => {
       expect(sendRes.status).toBe(200);
     });
     and('Camera A has 1 notification', async () => {
-      const res = await request(app.getHttpServer())
+      const resAfter = await request(app.getHttpServer())
         .get(`/cameras/${cameraA.id}/notifications`)
         .set('Authorization', token);
-      expect(res.status).toBe(200);
-      expect(res.body).toHaveLength(1);
+      expect(resAfter.status).toBe(200);
+      expect(resAfter.body).toHaveLength(1);
     });
   });
 });

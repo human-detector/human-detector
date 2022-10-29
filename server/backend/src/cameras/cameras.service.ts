@@ -6,8 +6,6 @@ import { NotFoundError } from '../errors.types';
 import { Notification } from './notification.entity';
 import { Camera } from './camera.entity';
 import { Expo } from 'expo-server-sdk';
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 @Injectable()
 export class CamerasService {

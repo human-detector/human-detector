@@ -14,6 +14,7 @@ import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
+import { GetNotificationsOutput } from 'src/cameras/cameras.controller';
 
 const feature = loadFeature('test/features/get-notifications.feature');
 
@@ -36,6 +37,7 @@ defineFeature(feature, (test) => {
   afterAll(async () => {
     await app.close();
     await testStack.dbContainer.stop();
+    await testStack.kcContainer.stop();
   });
 
   test('Using a valid ID with 2 notifications to get', ({
@@ -70,8 +72,20 @@ defineFeature(feature, (test) => {
       expect(getRes.status).toBe(200);
     });
     and('I will receive a Notification array of 2', async () => {
+      const expectedResponse: GetNotificationsOutput = [
+        {
+          id: cameraA.notifications[0].id,
+          timestamp: new Date(cameraA.notifications[0].timestamp).toISOString(),
+          camera: cameraA.notifications[0].camera.id,
+        },
+        {
+          id: cameraA.notifications[1].id,
+          timestamp: new Date(cameraA.notifications[1].timestamp).toISOString(),
+          camera: cameraA.notifications[1].camera.id,
+        },
+      ];
       expect(getRes.header['content-type']).toMatch(/^application\/json/);
-      expect(getRes.body).toHaveLength(2);
+      expect(getRes.body).toEqual(expectedResponse);
     });
   });
 
@@ -84,14 +98,16 @@ defineFeature(feature, (test) => {
     let cameraA: Camera;
     let cameraB: Camera;
     let getRes: request.Response;
+    let tokenA: string;
     let tokenB: string;
 
     given("I have camera A's details", async () => {
-      const { camera } = createCameraWithKeyPair('Camera-A');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
       cameraA = camera;
       cameraA.group = new Group('GroopA');
       cameraA.group.user = new User();
       await cameraRepository.persistAndFlush(cameraA);
+      tokenA = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     and('camera A has 1 notification', async () => {
       cameraA.notifications.add(new Notification());
@@ -116,6 +132,20 @@ defineFeature(feature, (test) => {
     then("the request will receive a 'Forbidden' error", () => {
       expect(getRes.status).toBe(403);
     });
+    and('camera A will still have 1 notification', async () => {
+      const expectedResponse: GetNotificationsOutput = [
+        {
+          id: cameraA.notifications[0].id,
+          timestamp: new Date(cameraA.notifications[0].timestamp).toISOString(),
+          camera: cameraA.notifications[0].camera.id,
+        },
+      ];
+      const getResActual = await request(app.getHttpServer())
+        .get(`/cameras/${cameraA.id}/notifications`)
+        .set('Authorization', tokenA);
+      expect(getRes.header['content-type']).toMatch(/^application\/json/);
+      expect(getResActual.body).toEqual(expectedResponse);
+    });
   });
 
   test('Trying to get notifications from a camera with 1 notification without any credentials', ({
@@ -127,17 +157,19 @@ defineFeature(feature, (test) => {
     let cameraA: Camera;
     let getRes: request.Response;
     let fakeToken: string;
+    let tokenA: string;
 
     given('I have no credentials', () => {
       fakeToken = '';
     });
     and('camera A has 1 notification attributed to it', async () => {
-      const { camera } = createCameraWithKeyPair('Camera-A');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
       cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
       cameraA.notifications.add(new Notification());
       await cameraRepository.persistAndFlush(cameraA);
+      tokenA = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     when('I try to get the notification from camera A', async () => {
       getRes = await request(app.getHttpServer())
@@ -148,7 +180,18 @@ defineFeature(feature, (test) => {
       expect(getRes.status).toBe(403);
     });
     and('Camera A will have the same notification as before', async () => {
-      expect(cameraA.notifications.toArray().length).toEqual(1);
+      const expectedResponse: GetNotificationsOutput = [
+        {
+          id: cameraA.notifications[0].id,
+          timestamp: new Date(cameraA.notifications[0].timestamp).toISOString(),
+          camera: cameraA.notifications[0].camera.id,
+        },
+      ];
+      const getResActual = await request(app.getHttpServer())
+        .get(`/cameras/${cameraA.id}/notifications`)
+        .set('Authorization', tokenA);
+      expect(getRes.header['content-type']).toMatch(/^application\/json/);
+      expect(getResActual.body).toEqual(expectedResponse);
     });
   });
 

@@ -1,5 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
-import { BleManager, Device, BleError, Characteristic } from 'react-native-ble-plx';
+import { BleManager, Device } from 'react-native-ble-plx';
 import { useState } from 'react';
 import * as EyeSpyUUID from '../../config/BLEConfig';
 

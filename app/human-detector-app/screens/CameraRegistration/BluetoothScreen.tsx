@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, ScrollView, Button } from 'react-native';
 import useBLE from '../../src/ble/bleConnect';
-import { getCameraSerialFromBLE, writeCameraWifi } from '../../src/ble/bleServices';
+import { checkCameraNotification, getCameraSerialFromBLE, writeCameraWifi, checkWifiType, cameraListener } from '../../src/ble/bleServices';
 
 let bool = false;
 
@@ -36,9 +36,12 @@ export default function BluetoothScreen(): React.ReactElement {
       console.log(allDevices);
 
       if(currentDevice) {
+        console.log("The process has started.");
+        checkCameraNotification(currentDevice, cameraListener);
+        console.log(checkWifiType(currentDevice));
+        getCameraSerialFromBLE(currentDevice);
         writeCameraWifi(currentDevice, "TestPass", "TestUUID");
         console.log(currentDevice);
-        getCameraSerialFromBLE(currentDevice);
       }
 
     return (

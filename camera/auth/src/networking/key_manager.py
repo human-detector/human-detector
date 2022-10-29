@@ -109,7 +109,7 @@ def _load_uuid(filename = _DEFAULT_UUID_LOC):
         return None
 
     with open(filename, 'r', encoding="utf8") as uuid_file:
-        return uuid_file.buffer.read().decode("utf8")
+        return uuid_file.buffer.read().decode("utf8").rstrip("\n")
 
 def _get_serial():
     if not _is_raspi():

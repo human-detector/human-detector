@@ -18,7 +18,8 @@ class EyeSpyService(Service):
         Service.__init__(
             self, bus, self.EYESPY_SERVICE_UUID, index, True)
         self.add_characteristic(
-            EyeSpyWifiCharacteristic(bus=bus, index=0, service=self, wifi_manager=wifi))
+            EyeSpyWifiCharacteristic(bus=bus, index=0, service=self,
+                                     key_manager=key, wifi_manager=wifi))
         self.add_characteristic(
             EyeSpyConnStatusCharacteristic(bus=bus, index=1, service=self, wifi_manager=wifi))
         self.add_characteristic(

@@ -13,8 +13,8 @@ from src.networking.net_config import NetConfig
 
 class TestNetRequests(unittest.TestCase):
     def setUp(self) -> None:
-        self.key = KeyManager.create_random_key("111")
-        self.net = NetRequests(self.key)
+        self.key_manager = KeyManager.create_test_key_manager("111")
+        self.net = NetRequests(self.key_manager)
         return super().setUp()
 
     def test_second_conversion(self):
@@ -36,10 +36,10 @@ class TestNetRequests(unittest.TestCase):
         heartbeat_delay = 0.1
 
         resp = responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_uuid()),
+            NetConfig.get_heartbeat_url(self.key_manager.keys.uuid),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": self.key.get_auth_token()
+                "Authorization": self.key_manager.get_auth_token()
             }
         )
 
@@ -53,10 +53,10 @@ class TestNetRequests(unittest.TestCase):
         cur_time = time.time()
 
         responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_uuid()),
+            NetConfig.get_heartbeat_url(self.key_manager.keys.uuid),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": self.key.get_auth_token()
+                "Authorization": self.key_manager.get_auth_token()
             },
             json={
                 "Timestamp": NetRequests.seconds_to_milliseconds(cur_time)
@@ -72,10 +72,10 @@ class TestNetRequests(unittest.TestCase):
         cur_time = time.time()
 
         responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_uuid()),
+            NetConfig.get_heartbeat_url(self.key_manager.keys.uuid),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": self.key.get_auth_token()
+                "Authorization": self.key_manager.get_auth_token()
             },
             json={
                 "Timestamp": NetRequests.seconds_to_milliseconds(cur_time)
@@ -93,10 +93,10 @@ class TestNetRequests(unittest.TestCase):
         heartbeat_delay = 0.1
 
         responses.put(
-            NetConfig.get_heartbeat_url(self.key.get_uuid()),
+            NetConfig.get_heartbeat_url(self.key_manager.keys.uuid),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": self.key.get_auth_token()
+                "Authorization": self.key_manager.get_auth_token()
             },
             status=401
         )

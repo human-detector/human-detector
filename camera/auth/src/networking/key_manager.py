@@ -29,20 +29,12 @@ class Keys():
         self.priv_key: Ed25519PrivateKey = _load_key() if priv_key is None else priv_key
         self.uuid = _load_uuid() if uid is None else uid
 
-    def get_priv_key(self):
-        """Return private key"""
-        return self.priv_key
-
-    def get_uuid(self):
-        """Return camera UUID"""
-        return self.uuid
-
     def _sign(self, data):
         return self.priv_key.sign(data)
 
     def get_auth_token(self):
         """Get an authentication token using UUID signed by private key"""
-        token = self._sign(str.encode(self.uuid))
+        token = self._sign(self.uuid.encode())
         return base64.b64encode(token).decode()
 
     def persist(self):
@@ -69,7 +61,7 @@ class KeyManager():
     """
 
     @staticmethod
-    def create_random_key(serial):
+    def create_test_key_manager(serial):
         """Creates and return a key manager with random keys"""
         return KeyManager(Keys.create_random_key(), serial)
 
@@ -85,19 +77,9 @@ class KeyManager():
         self.keys = Keys.create_random_key()
         self.keys.persist()
 
-    def get_uuid(self):
-        """
-        Return UUID from keys
-        """
-        return self.keys.get_uuid
-
-    def get_serial(self):
-        """Get serial number of Raspberry Pi"""
-        return self.serial
-
     def get_public_key(self):
         """Get the public part of the private/public key pair"""
-        return self.keys.get_priv_key().public_key()
+        return self.keys.priv_key.public_key()
 
     def get_auth_token(self):
         """Get authentication token from Keys object"""
@@ -127,7 +109,7 @@ def _load_uuid(filename = _DEFAULT_UUID_LOC):
         return None
 
     with open(filename, 'r', encoding="utf8") as uuid_file:
-        return uuid_file.buffer.read()
+        return uuid_file.buffer.read().decode("utf8").rstrip("\n")
 
 def _get_serial():
     if not _is_raspi():

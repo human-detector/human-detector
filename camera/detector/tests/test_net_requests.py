@@ -8,8 +8,8 @@ import base64
 
 class TestNetRequests(unittest.TestCase):
     def setUp(self) -> None:
-        self.key = KeyManager.create_random_key("111")
-        self.net = NetRequests(self.key)
+        self.key_manager = KeyManager.create_test_key_manager("111")
+        self.net = NetRequests(self.key_manager)
         return super().setUp()
     
     @responses.activate
@@ -18,10 +18,10 @@ class TestNetRequests(unittest.TestCase):
         base64_frame = base64.b64encode(frame)
 
         responses.put(
-            NetConfig.get_notif_url(self.key.get_serial()),
+            NetConfig.get_notif_url(self.key_manager.keys.uuid),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": self.key.get_auth_token()
+                "Authorization": self.key_manager.get_auth_token()
             },
             json={
                 "Frame": base64_frame.decode()

@@ -1,5 +1,6 @@
 from networking import Heartbeat
 from image_sources import CameraSource
+from networking.key_management import KeyManager
 from networking.net_requests import NetRequests
 from transforms import MobilenetV2Transform
 from detectors import TensorflowDetector
@@ -41,7 +42,7 @@ if args.stream_ip != '':
     outputs.append(FFMPEGOutput(input_resolution, fps, args.stream_ip, args.stream_port))
 
 if args.net:
-    network = NetRequests()
+    network = NetRequests(KeyManager())
     outputs.append(NotificationOutput(network))
 
 pipeline = DetectorPipeline(

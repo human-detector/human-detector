@@ -1,5 +1,5 @@
-import { Injectable, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { NotFoundError } from '../errors.types';
@@ -14,6 +14,7 @@ export class CamerasService {
     private cameraRepository: EntityRepository<Camera>,
     @InjectRepository(Notification)
     private notificationRepository: EntityRepository<Notification>,
+    private configService: ConfigService,
   ) {}
 
   /**
@@ -30,7 +31,9 @@ export class CamerasService {
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
-    const expoClient = new Expo({ accessToken: process.env.EXPO_ACCESS_TOKEN });
+    const expoClient = new Expo({
+      accessToken: this.configService.get<string>('expo.access_token'),
+    });
 
     const messages = [];
     const expoToken = cam.group.user.expoToken;

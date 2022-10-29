@@ -96,7 +96,6 @@ class Characteristic(dbus.service.Object):
         self.props = {
             "UUID": kwargs["uuid"],
             "Service": service.get_path(),
-            "Notifying": False,
             "Flags": kwargs["flags"],
             "Descriptors": dbus.Array([], signature='o')
         }

@@ -15,6 +15,7 @@ import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
 import { GetNotificationsOutput } from 'src/cameras/cameras.controller';
+import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from '../../src/cameras/push-notifications/push-notifications-service.interface';
 
 const feature = loadFeature('test/features/get-notifications.feature');
 
@@ -25,7 +26,13 @@ defineFeature(feature, (test) => {
   let em: EntityManager;
 
   beforeAll(async () => {
-    testStack = await buildTestStack({ imports: [CamerasModule] });
+    testStack = await buildTestStack({ imports: [CamerasModule] }, (builder) =>
+      Promise.resolve(
+        builder
+          .overrideProvider(IPUSH_NOTIFICATIONS_SERVICE_TOKEN)
+          .useValue('bogus'),
+      ),
+    );
 
     em = testStack.module.get<MikroORM>(MikroORM).em.fork();
     cameraRepository = em.getRepository(Camera);

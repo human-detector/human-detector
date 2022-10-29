@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { NotFoundError } from '../errors.types';
 import { Notification } from './notification.entity';
 import { Camera } from './camera.entity';
-import { Expo } from 'expo-server-sdk';
+import {
+  IPushNotification,
+  IPushNotificationsService,
+  IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
+} from './push-notifications/push-notifications-service.interface';
 
 @Injectable()
 export class CamerasService {
@@ -14,7 +17,8 @@ export class CamerasService {
     private cameraRepository: EntityRepository<Camera>,
     @InjectRepository(Notification)
     private notificationRepository: EntityRepository<Notification>,
-    private configService: ConfigService,
+    @Inject(IPUSH_NOTIFICATIONS_SERVICE_TOKEN)
+    private pushNotificationsService: IPushNotificationsService,
   ) {}
 
   /**
@@ -31,28 +35,21 @@ export class CamerasService {
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
-    const expoClient = new Expo({
-      accessToken: this.configService.get<string>('expo.access_token'),
-    });
 
-    const messages = [];
-    const expoToken = cam.group.user.expoToken;
-
-    if (!Expo.isExpoPushToken(expoToken)) {
-      console.error(`Push token ${expoToken} is not a valid Expo push token`);
-    }
-
-    messages.push({
-      to: expoToken,
+    const pushToken = cam.group.user.expoToken;
+    const pushNotification: IPushNotification = {
       sound: 'default',
       title: `${cam.name} has detected movement!`,
       body: 'This is a test notification',
       data: { withSome: 'data' },
-    });
+    };
     try {
-      const sent = await expoClient.sendPushNotificationsAsync(messages);
+      await this.pushNotificationsService.sendPushNotification(
+        pushToken,
+        pushNotification,
+      );
     } catch (error) {
-      console.error(error);
+      console.error('Error sending push notification', error);
     }
 
     cam.notifications.add(new Notification());

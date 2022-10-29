@@ -14,8 +14,10 @@ import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
-import { Expo } from 'expo-server-sdk';
-import { Test } from '@nestjs/testing';
+import {
+  IPushNotificationsService,
+  IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
+} from '../../src/cameras/push-notifications/push-notifications-service.interface';
 
 const feature = loadFeature('test/features/send-notification.feature');
 
@@ -23,10 +25,20 @@ defineFeature(feature, (test) => {
   let app: INestApplication;
   let testStack: TestStack;
   let cameraRepository: EntityRepository<Camera>;
+  let mockPushNotificationsService: jest.Mocked<IPushNotificationsService>;
   let em: EntityManager;
 
   beforeAll(async () => {
-    testStack = await buildTestStack({ imports: [CamerasModule] });
+    mockPushNotificationsService = {
+      sendPushNotification: jest.fn(),
+    };
+    testStack = await buildTestStack({ imports: [CamerasModule] }, (builder) =>
+      Promise.resolve(
+        builder
+          .overrideProvider(IPUSH_NOTIFICATIONS_SERVICE_TOKEN)
+          .useValue(mockPushNotificationsService),
+      ),
+    );
 
     em = testStack.module.get<EntityManager>(EntityManager);
     cameraRepository = em.getRepository(Camera);

@@ -11,6 +11,7 @@ import dbConfig from '../../mikro-orm.config';
 import { Module } from '@nestjs/common';
 import { createCameraWithKeyPair } from '../../test/helpers/camera';
 import { ConfigModule } from '@nestjs/config';
+import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from './push-notifications/push-notifications-service.interface';
 
 const notAUUID = 'junk';
 const validCamID = '4fa660b3-bc2d-4d12-b427-32283ca04a07';
@@ -38,6 +39,10 @@ describe('CamerasService', () => {
         {
           provide: getRepositoryToken(Camera),
           useValue: mockedCameraRepository,
+        },
+        {
+          provide: IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
+          useValue: 'bogus',
         },
       ],
     }).compile();

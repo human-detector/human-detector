@@ -90,14 +90,16 @@ class WifiManager:
                 continue
 
             if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_SAE:
-                return (access_point, SecType.UNSUPPORTED)
+                return (access_point, SecType.UNSUPPORTED) # WPA 3
 
             if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X:
-                return (access_point, SecType.KEY_802_1X) # Enterprise/Edu networks
+                return (access_point, SecType.KEY_802_1X) # WPA 2 Enterprise/Edu networks
 
             if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_PSK:
                 return (access_point, SecType.KEY_PSK) # WPA2 user+passkey
 
+            # This misses OWE and OWE_TM networks but I have no clue
+            # what these look like, or what open networks look like (are they just flags == 0?)
             return (access_point, SecType.KEY_OPEN)
 
         return (None, SecType.UNSUPPORTED)

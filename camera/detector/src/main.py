@@ -1,4 +1,3 @@
-from networking import Heartbeat
 from image_sources import CameraSource
 from networking.key_management import KeyManager
 from networking.net_requests import NetRequests

@@ -34,7 +34,7 @@ class Keys():
 
     def get_auth_token(self):
         """Get an authentication token using UUID signed by private key"""
-        token = self._sign(str.encode(self.uuid))
+        token = self._sign(self.uuid.encode())
         return base64.b64encode(token).decode()
 
     def persist(self):
@@ -109,7 +109,7 @@ def _load_uuid(filename = _DEFAULT_UUID_LOC):
         return None
 
     with open(filename, 'r', encoding="utf8") as uuid_file:
-        return uuid_file.buffer.read()
+        return uuid_file.buffer.read().decode("utf8")
 
 def _get_serial():
     if not _is_raspi():

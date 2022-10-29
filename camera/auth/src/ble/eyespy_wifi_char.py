@@ -79,11 +79,10 @@ class EyeSpyWifiCharacteristic(Characteristic):
         # WPA2-Personal Networks
         elif sec_type == SecType.KEY_PSK:
             try:
-                username = net_details["User"]
+                password = net_details["Pass"]
             except KeyError as exc:
                 raise FailedException from exc
 
-            password = net_details["Pass"]
             self.wifi_manager.connect_psk(ssid, password)
         # Enterprise WPA2 networks
         elif sec_type == SecType.KEY_802_1X:

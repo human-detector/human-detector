@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function CameraScreen(): React.ReactElement {
+export default function CameraScreen({ navigation }): React.ReactElement {
   const cameraOne: Camera = new Camera('123', "AAAAA's Camera", '99');
   const cameraTwo: Camera = new Camera('124', "BBBBB's Camera", '725');
   const cameraThree: Camera = new Camera('125', "CCCCC's Camera", '400');
@@ -80,10 +80,8 @@ export default function CameraScreen(): React.ReactElement {
           <TouchableOpacity
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
-              const cameraList: Camera[] = [...listOfCameras];
-              // adding camera here test
-              cameraList.push(new Camera('test', 'test', 'test'));
-              setListOfCameras(cameraList);
+              // Start camera registration process
+              navigation.navigate('Bluetooth');
             }}
           >
             <Text style={styles.addButtonText}> + </Text>
@@ -105,4 +103,3 @@ export function getCameraStream() {}
 export function isCameraOnline(): boolean {
   return true;
 }
-

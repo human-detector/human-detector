@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { View, ScrollView, Button } from 'react-native';
 import useBLE from '../../src/ble/bleConnect';
-import { checkCameraNotification, getCameraSerialFromBLE, writeCameraWifi, checkWifiType, cameraListener } from '../../src/ble/bleServices';
+import {
+  checkCameraNotification,
+  getCameraSerialFromBLE,
+  writeCameraWifi,
+  checkWifiType,
+  cameraListener,
+} from '../../src/ble/bleServices';
 
 let bool = false;
 
@@ -11,52 +17,46 @@ let bool = false;
  * visible cameras will be specific to EyeSpy cameras.
  * Clicking on a button will connect the mobile app to the bluetooth device, and then navigate to
  * the EnterCameraRegionInfoScreen.
- * @returns 
+ * @returns
  */
 
-export default function BluetoothScreen(): React.ReactElement {
+export default function BluetoothScreen({ navigation }): React.ReactElement {
+  const { requestPermissions, connectToDevice, scanForDevices, currentDevice, allDevices } =
+    useBLE();
 
-    const {
-        requestPermissions,
-        connectToDevice,
-        scanForDevices,
-        currentDevice,
-        allDevices,
-      } = useBLE();
-    
-      requestPermissions((isGranted: boolean) => {
-        if (isGranted) {
-          if(!bool) {
-            scanForDevices();
-            bool = true;
-          }
-        }
-      });
-    
-      console.log(allDevices);
-
-      if(currentDevice) {
-        console.log("The process has started.");
-        checkCameraNotification(currentDevice, cameraListener);
-        console.log(checkWifiType(currentDevice));
-        getCameraSerialFromBLE(currentDevice);
-        writeCameraWifi(currentDevice, "TestPass", "TestUUID");
-        console.log(currentDevice);
+  requestPermissions((isGranted: boolean) => {
+    if (isGranted) {
+      if (!bool) {
+        scanForDevices();
+        bool = true;
       }
+    }
+  });
 
-    return (
+  if (currentDevice) {
+    // User has connected to a device
+    currentDevice.isConnected().then((bool) => {
+      if (bool) navigation.navigate('CameraRegistrationInfo');
+    });
+
+    console.log('Camera is not connected!');
+  }
+
+  return (
     <View>
-        <ScrollView>
-            {allDevices.map((item) => (
-                <View key={item.id}>
-                    <Button 
-                    title={item.id}
-                    onPress={() => {
-                      connectToDevice(item);
-                      }}/>
-                </View>
-            ))}
-        </ScrollView>
+      <ScrollView>
+        {allDevices.map((item) => (
+          <View key={item.id}>
+            <Button
+              title={item.id}
+              onPress={() => {
+                // This button will connect device
+                connectToDevice(item);
+              }}
+            />
+          </View>
+        ))}
+      </ScrollView>
     </View>
-    )
+  );
 }

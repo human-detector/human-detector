@@ -83,26 +83,16 @@ export default function GroupScreen({
         <View key="add-button">
           <TouchableOpacity
             style={[styles.menuItem, styles.addButtonItem]}
-            onPress={() =>
-              setListOfGroups((oldGroups) => [...oldGroups, new Group('test', 'test')])
-            }
+            onPress={() => {
+              // TODO: Add a new group
+              console.log('You added a group!');
+            }}
           >
             <Text style={styles.addButtonText}> + </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
-
-    /*
-     * Instead of doing FlatList, I might want to change this to a scrollable view
-     */
-    //   <SafeAreaView style={styles.container}>
-    //     <FlatList
-    //         data={listOfCameras}
-    //         renderItem={renderItem}
-    //     />
-    //   </SafeAreaView>
-    //
   );
 }
 

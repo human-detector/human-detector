@@ -111,6 +111,8 @@ export async function checkWifiType(device: Device): Promise<string> {
 
     if (!checkChar.value) throw new Error('ERROR: No value in checkChar.value in checkWifiType()!');
 
+    console.log('TESTTESTTEST');
+    console.log(checkChar);
     return checkChar.value;
   } catch (error) {
     console.log('Error in checkWifiType(): ', error);

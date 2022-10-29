@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
+import LoadingIcon from '../../components/LoadingIcon';
 
 /**
  * The LoadingScreen screen will display when a user is waiting for something.
@@ -7,8 +8,9 @@ import {View} from 'react-native';
  * a successful connection notifciation from the camera.
  */
 export default function LoadingScreen(): React.ReactElement {
-    return (
-        <View/>
-    );
-
+  return (
+    <View>
+      <LoadingIcon />
+    </View>
+  );
 }

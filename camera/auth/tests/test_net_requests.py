@@ -13,7 +13,7 @@ from src.networking.net_config import NetConfig
 
 class TestNetRequests(unittest.TestCase):
     def setUp(self) -> None:
-        self.key_manager = KeyManager.create_random_key("111")
+        self.key_manager = KeyManager.create_test_key_manager("111")
         self.net = NetRequests(self.key_manager)
         return super().setUp()
 

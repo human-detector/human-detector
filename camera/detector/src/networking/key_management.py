@@ -61,7 +61,7 @@ class KeyManager():
     """
 
     @staticmethod
-    def create_random_key(serial):
+    def create_test_key_manager(serial):
         """Creates and return a key manager with random keys"""
         return KeyManager(Keys.create_random_key(), serial)
 

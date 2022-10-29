@@ -14,6 +14,7 @@ jobs:
       - name: Install dependencies
         working-directory: ./camera/auth
         run: |
+          sudo apt-get update && sudo apt-get upgrade
           sudo apt-get install build-essential libcairo2-dev libgirepository1.0-dev libdbus-glib-1-dev
           python -m pip install --upgrade pip
           pip install -r ./requirements.txt

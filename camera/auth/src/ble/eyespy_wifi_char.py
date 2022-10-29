@@ -5,7 +5,7 @@ EyeSpy Connect to Wifi Characteristic
 import json
 from networking.key_manager import KeyManager
 from networking.wifi_manager import SecType, WifiManager
-from .dbus_interface.dbus_bluez_errors import InvalidArgsException
+from .dbus_interface.dbus_bluez_errors import FailedException, NotPermittedException
 from .dbus_interface.dbus_bluez_interface import Characteristic
 
 class EyeSpyWifiCharacteristic(Characteristic):
@@ -54,7 +54,7 @@ class EyeSpyWifiCharacteristic(Characteristic):
 
         # Needs SSID, UUID, Passkey, and User if applicable
         if "SSID" not in net_details or "UUID" not in net_details:
-            raise InvalidArgsException
+            raise FailedException
 
         self._connect_to_wifi(net_details)
 
@@ -67,8 +67,11 @@ class EyeSpyWifiCharacteristic(Characteristic):
 
         (access_point, sec_type) = self.wifi_manager.get_wifi_security(ssid)
 
-        if sec_type == SecType.UNSUPPORTED or access_point is None:
-            raise InvalidArgsException
+        if access_point is None:
+            raise FailedException
+
+        if sec_type == SecType.UNSUPPORTED:
+            raise NotPermittedException
 
         # Open Networks w/ no security
         if sec_type == SecType.KEY_OPEN:
@@ -78,7 +81,7 @@ class EyeSpyWifiCharacteristic(Characteristic):
             try:
                 username = net_details["User"]
             except KeyError as exc:
-                raise InvalidArgsException from exc
+                raise FailedException from exc
 
             password = net_details["Pass"]
             self.wifi_manager.connect_psk(ssid, password)
@@ -88,6 +91,6 @@ class EyeSpyWifiCharacteristic(Characteristic):
                 username = net_details["User"]
                 password = net_details["Pass"]
             except KeyError as exc:
-                raise InvalidArgsException from exc
+                raise FailedException from exc
 
             self.wifi_manager.connect_enterprise(ssid, username, password)

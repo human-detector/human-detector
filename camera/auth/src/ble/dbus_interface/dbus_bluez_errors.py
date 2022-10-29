@@ -9,8 +9,8 @@ import dbus.exceptions
 # DBus/BlueZ exceptions
 #
 
-class InvalidArgsException(dbus.exceptions.DBusException):
-    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
+class InProgressException(dbus.exceptions.DBusException):
+    _dbus_error_name = 'org.bluez.Error.InProgress'
 
 class NotSupportedException(dbus.exceptions.DBusException):
     _dbus_error_name = 'org.bluez.Error.NotSupported'
@@ -18,8 +18,18 @@ class NotSupportedException(dbus.exceptions.DBusException):
 class NotPermittedException(dbus.exceptions.DBusException):
     _dbus_error_name = 'org.bluez.Error.NotPermitted'
 
+class NotAuthorizedException(dbus.exceptions.DBusException):
+    _dbus_error_Name = 'org.bluez.Error.NotAuthorized'
+
 class InvalidValueLengthException(dbus.exceptions.DBusException):
     _dbus_error_name = 'org.bluez.Error.InvalidValueLength'
 
 class FailedException(dbus.exceptions.DBusException):
-    _dbus_error_name = 'org.bluez.Error.Failed'
+    _dbus_error_name = 'org.bluez.Error.Failed(0x80)'
+
+#
+# DBus Properties Exceptions
+#
+
+class InvalidArgsException(dbus.exceptions.DBusException):
+    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'

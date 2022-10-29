@@ -7,7 +7,7 @@ import cryptography.hazmat.primitives.serialization as Serialization
 from networking.key_manager import KeyManager
 from networking.wifi_manager import DeviceState, WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
-from .dbus_interface.dbus_bluez_errors import NotPermittedException
+from .dbus_interface.dbus_bluez_errors import InProgressException
 
 class EyeSpySerialCharacteristic(Characteristic):
     """
@@ -40,7 +40,7 @@ class EyeSpySerialCharacteristic(Characteristic):
         # Prohibit reads when the camera is trying to connect
         # Reads generate new keys and persist them, which is *bad* when trying to connect
         if self.wifi_manager.get_state()[0] == DeviceState.CONNECTING:
-            raise NotPermittedException()
+            raise InProgressException()
 
         self.key_manager.gen_keys()
         out_str = json.dumps({

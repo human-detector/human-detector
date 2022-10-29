@@ -3,7 +3,6 @@ BlueZ Exceptions
 """
 #pylint: disable=missing-class-docstring
 
-from enum import Enum
 import dbus.exceptions
 
 #

@@ -59,9 +59,7 @@ export default class BackendService {
    * This method will send a notification token to the backend to be stored
    * through our endpoints.  This is done at login.
    *
-   * @param userIdFromLogin : userId of the user that just logged in
    * @param expoTokenFromLogin : notification token of the user that just logged in
-   * @param userAccessToken : the users access token for bearer authroization
    * @returns void if success, else it will return the error message
    */
   public async sendNotifyTokenAPI(expoTokenFromLogin: string): Promise<void> {

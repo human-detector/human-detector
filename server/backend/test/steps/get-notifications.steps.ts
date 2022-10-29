@@ -51,7 +51,7 @@ defineFeature(feature, (test) => {
     let token: string;
 
     given('I have a valid ID', async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'cereal');
       cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();
@@ -102,7 +102,10 @@ defineFeature(feature, (test) => {
     let tokenB: string;
 
     given("I have camera A's details", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'captain crunch',
+      );
       cameraA = camera;
       cameraA.group = new Group('GroopA');
       cameraA.group.user = new User();
@@ -114,7 +117,10 @@ defineFeature(feature, (test) => {
       await cameraRepository.flush();
     });
     and('camera B is registered', async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-B');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-B',
+        'cheerios',
+      );
       cameraB = camera;
       cameraB.group = new Group('GroopB');
       cameraB.group.user = new User();
@@ -163,7 +169,10 @@ defineFeature(feature, (test) => {
       fakeToken = '';
     });
     and('camera A has 1 notification attributed to it', async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'count chocula',
+      );
       cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();

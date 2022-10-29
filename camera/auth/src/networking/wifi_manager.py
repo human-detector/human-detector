@@ -19,6 +19,7 @@ class SecType(Enum):
     """Wifi Security Type"""
     KEY_802_1X = auto()
     KEY_PSK = auto()
+    KEY_OPEN = auto()
     UNSUPPORTED = auto()
 
 class WifiManager:
@@ -40,7 +41,7 @@ class WifiManager:
         reason = kwargs['reason']
         self.state = (self._get_state_val(new_state), reason)
 
-        print("State change! ", self.state[0].name)
+        print("State change! ", self.state[0].name, reason)
 
         for callback in self.status_callbacks:
             callback(self.state)
@@ -88,13 +89,16 @@ class WifiManager:
             if access_point.Ssid != ssid:
                 continue
 
+            if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_SAE:
+                return (access_point, SecType.UNSUPPORTED)
+
             if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X:
                 return (access_point, SecType.KEY_802_1X) # Enterprise/Edu networks
 
             if access_point.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_PSK:
                 return (access_point, SecType.KEY_PSK) # WPA2 user+passkey
 
-            return (access_point, SecType.UNSUPPORTED)
+            return (access_point, SecType.KEY_OPEN)
 
         return (None, SecType.UNSUPPORTED)
 
@@ -110,6 +114,33 @@ class WifiManager:
         for conn in connections:
             if conn.GetSettings()['connection']['type'] == '802-11-wireless':
                 conn.Delete()
+
+    def connect_open(self, ssid):
+        """Connect to an open 80211 network with no security"""
+        self._delete_old_config()
+
+        new_connection = {
+            '802-11-wireless': {
+                'mode': 'infrastructure',
+                'security': '802-11-wireless-security',
+                'ssid': ssid
+            },
+            '802-11-wireless-security': {
+                'key-mgmt': 'none'
+            },
+            'connection': {
+                'id': ssid,
+                'type': '802-11-wireless',
+                'uuid': str(uuid.uuid4())
+            },
+            'ipv4': {'method': 'auto'},
+            'ipv6': {'method': 'auto'}
+        }
+
+        #pylint: disable=no-member
+        NetworkManager.NetworkManager.AddAndActivateConnection(
+            new_connection, self.dev, "/"
+        )
 
     def connect_enterprise(self, ssid, user, passkey):
         """Connect to an Enterprise 802-1X network with ssid, username, and password"""

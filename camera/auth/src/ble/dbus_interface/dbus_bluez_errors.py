@@ -6,7 +6,7 @@ BlueZ Exceptions
 import dbus.exceptions
 
 #
-# DBus/BlueZ exceptions
+# BlueZ exceptions
 #
 
 class InProgressException(dbus.exceptions.DBusException):
@@ -26,3 +26,10 @@ class InvalidValueLengthException(dbus.exceptions.DBusException):
 
 class FailedException(dbus.exceptions.DBusException):
     _dbus_error_name = 'org.bluez.Error.Failed(0x80)'
+
+#
+# DBus Properties Exceptions
+#
+
+class InvalidArgsException(dbus.exceptions.DBusException):
+    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'

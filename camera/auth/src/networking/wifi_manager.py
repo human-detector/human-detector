@@ -127,9 +127,6 @@ class WifiManager:
                 'security': '802-11-wireless-security',
                 'ssid': ssid
             },
-            '802-11-wireless-security': {
-                'key-mgmt': 'none'
-            },
             'connection': {
                 'id': ssid,
                 'type': '802-11-wireless',

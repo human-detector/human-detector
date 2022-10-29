@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import { View, Button } from 'react-native';
 import Constants from 'expo-constants';
-import { makeRedirectUri, useAutoDiscovery } from 'expo-auth-session';
+import { TokenResponse, makeRedirectUri, useAutoDiscovery } from 'expo-auth-session';
 import * as KeyCloakAuth from '../src/auth/keyCloakAuth';
-import { sendNotifyTokenAPI } from '../services/backendService';
-import { getExponentPushToken, sendExpoNotifToken } from '../src/notifications/notifTokenInit';
 
 /**
  * Temporary codeVerifier generator
@@ -16,7 +14,7 @@ function genCodeVerifier(size: number) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
   const charLength = chars.length;
   let result = '';
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < size; i += 1) {
     result += chars.charAt(Math.floor(Math.random() * charLength));
   }
   return result;
@@ -24,18 +22,22 @@ function genCodeVerifier(size: number) {
 
 const redirectUri = makeRedirectUri();
 
+interface Props {
+  onTokenResponse(response: TokenResponse): void;
+}
+
 /**
  * This component will generate a button that will redirect to
  * KeyCloak authorization.
  *
  * @returns KeyCloakButton component
  */
-export default function KeyCloakButton({ setTokenResponse }): React.ReactElement {
+export default function KeyCloakButton({ onTokenResponse }: Props): React.ReactElement {
   const [codeVerifier, setCodeVerifier] = React.useState(genCodeVerifier(100));
   const apiUrl: string = Constants.manifest?.extra?.keycloakUrl;
 
   const discovery = useAutoDiscovery(`${apiUrl}/realms/users`);
-  const [request, response, promptAsync] = KeyCloakAuth.getAuthRequest(
+  const [, response, promptAsync] = KeyCloakAuth.getAuthRequest(
     discovery,
     redirectUri,
     codeVerifier
@@ -47,9 +49,7 @@ export default function KeyCloakButton({ setTokenResponse }): React.ReactElement
 
       // Returns authorization code will be connected to a user object
       KeyCloakAuth.exchangeCodeForToken(code, discovery, codeVerifier, redirectUri)
-        .then((val) => {
-          setTokenResponse(val);
-        })
+        .then((val) => onTokenResponse(val as TokenResponse))
         .catch((error) => {
           console.log(error);
         });
@@ -68,12 +68,3 @@ export default function KeyCloakButton({ setTokenResponse }): React.ReactElement
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    // paddingTop: 40,
-    // paddingHorizontal: 20
-  },
-});

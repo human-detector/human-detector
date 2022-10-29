@@ -43,7 +43,6 @@ if args.stream_ip != '':
 if args.net:
     network = NetRequests()
     outputs.append(NotificationOutput(network))
-    heartbeat = Heartbeat(network)
 
 pipeline = DetectorPipeline(
     CameraSource(input_resolution, fps),
@@ -63,10 +62,7 @@ signal.signal(signal.SIGINT, ctrl_c_handler)
 
 while running:
     sleep(1)
-    running = pipeline.check_alive() and (not args.net or heartbeat.is_connected())
-
-if args.net:
-    heartbeat.stop()
+    running = pipeline.check_alive()
 
 pipeline.stop()
 

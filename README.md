@@ -2,57 +2,11 @@
 
 This project is made up of three projects - Mobile app, Server, and Camera services. Testing instructions for all three are provided below.
 
-## Testing Camera Project
+## Camera Services
 
-This contains all the services which will run on the Raspberry Pi. This currently just includes the camera service which tries to detect people.
+The camera is made up of two services. One handles authentication and bluetooth communications, while the other detects people and sends notifications.
 
-```
-cd camera
-# install opencv, behave, and requests
-make install
-# run unit tests
-make test
-# run behavior tests
-make bdd
-```
-
-These tests assume that `python3` is installed and that both `python3` and `pip3` both are valid commands.
-
-## Deploying to Raspberry Pi
-
-Create an SD card with Raspian Lite 64-bit. Then run the below on the Pi:
-
-```
-# Update everything on the pi to latest
-sudo apt update && sudo apt upgrade
-# Install required packages
-sudo apt install git ffmpeg
-
-# Optionally install virtualenv if the Pi is used for other projects
-sudo apt install virtualenv
-
-# Download project
-git clone https://github.com/tucker-moore/human-detector.git
-cd human-detector/camera
-
-# Optionally use virtualenv to not mix Python dependencies with other projects
-virtualenv .env
-source .env/bin/activate # This needs to be ran everytime you login to the Pi!
-
-# Install python requirements
-make pi-install
-
-# Run detector
-python src/main.py
-```
-
-### Requirements
-
-The below are installed when running `make install`:
-
-- Opencv-Python: OpenCV can read images and camera streams. Contains lots of computer vision functionality
-- Requests: HTTPS request library
-- Behave: Behavior tests
+For more details, go to the [Camera Readme!](./camera/README.md)
 
 ## Mobile Application Tests
 
@@ -112,25 +66,28 @@ KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> npx exp
 
 ## Testing the Backend
 
-Running tests for the backend requires installing `node` and `npm`.
-It may work with older versions, but it is confirmed working on NodeJS 16.5.1 LTS.
-Once you have `node` and `npm` installed, navigate to `server/backend` and follow
-the instructions in the README for testing.
+### Prerequisites
+- [Node LTS](https://nodejs.org/en/download/)
+- [Docker](https://docs.docker.com/get-docker/) with Compose v2
+
+Docker Desktop should get you a compatible version of Compose. If you're
+Docker through your package manager, make sure you get Compose v2
+(`docker compose` will show a help message if you have it).
 
 ### Manual integration tests
 
 For full integration tests (like with the mobile app and camera), you can spawn
-a full test stack using [Docker](https://docs.docker.com/get-docker/).
+a full test stack using [Docker Compose](https://docs.docker.com/compose/).
 
 Some useful commands:
 
 - Build the containers for each component
   ```sh
-  $ docker-compose build
+  $ docker compose build
   ```
 - Run the test stack
   ```sh
-  $ docker-compose --env-file dev.env up
+  $ docker compose --env-file dev.env up
   ```
 - List running containers
   ```sh
@@ -140,7 +97,7 @@ Some useful commands:
   ```sh
   $ docker exec -it ${POSTGRES_CONTAINER_NAME} psql -U ${DB_USER} ${DB_NAME}
   ```
-- Clean up the resources created by `docker-compose`
+- Clean up the resources created by Compose:
   ```sh
-  $ docker-compose down
+  $ docker compose down
   ```

@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Register a camera to a user User A is attempting to register a camera to User B 1`] = `
+Object {
+  "message": "Forbidden",
+  "statusCode": 403,
+}
+`;
+
+exports[`Register a camera to a user User A is attempting to register a camera to a non-existant User B 1`] = `
+Object {
+  "message": "Forbidden",
+  "statusCode": 403,
+}
+`;
+
+exports[`Register a camera to a user User is attempting to register a camera to a non-existant Group 1`] = `
+Object {
+  "message": "Forbidden",
+  "statusCode": 403,
+}
+`;
+
+exports[`Register a camera to a user User is attempting to register a camera with no name 1`] = `
+Object {
+  "message": "Bad Request",
+  "statusCode": 400,
+}
+`;
+
+exports[`Register a camera to a user User is attempting to register a camera with no public key 1`] = `
+Object {
+  "message": "Bad Request",
+  "statusCode": 400,
+}
+`;
+
+exports[`Register a camera to a user User is attempting to register a camera with no serial 1`] = `
+Object {
+  "message": "Bad Request",
+  "statusCode": 400,
+}
+`;

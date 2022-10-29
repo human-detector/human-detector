@@ -1,8 +1,10 @@
-import { Get, Put, Param, Controller } from '@nestjs/common';
+import { Get, Put, Param, Controller, UseGuards } from '@nestjs/common';
+import { CameraAuthGuard } from './camera-auth.guard';
 import { CamerasService } from './cameras.service';
 import { Notification } from './notification.entity';
 
 @Controller('cameras')
+@UseGuards(CameraAuthGuard)
 export class CamerasController {
   constructor(private camerasService: CamerasService) {}
 

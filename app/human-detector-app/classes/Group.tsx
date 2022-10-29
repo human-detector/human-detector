@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+// FIXME: figure it out :(
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// eslint-disable-next-line import/no-cycle
 import Camera from './Camera';
 
 export default class Group {

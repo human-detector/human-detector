@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { CamerasService } from './cameras.service';
 import { Notification } from './notification.entity';
 import { NotFoundError } from '../errors.types';
+import { Camera } from './camera.entity';
 
 const notAUUID = 'junk';
 const validCamID = '4fa660b3-bc2d-4d12-b427-32283ca04a07';
@@ -11,6 +12,9 @@ const invalidCamID = 'c5fde899-ac02-465a-ae8b-7e082f1789c8';
 describe('CamerasService', () => {
   let camerasService: CamerasService;
   let mockedNotificationRepository;
+  const mockedCameraRepository = {
+    findOne: jest.fn(),
+  };
 
   beforeEach(async () => {
     mockedNotificationRepository = {
@@ -19,6 +23,7 @@ describe('CamerasService', () => {
         return;
       },
     };
+    mockedCameraRepository.findOne.mockClear();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -26,6 +31,10 @@ describe('CamerasService', () => {
         {
           provide: getRepositoryToken(Notification),
           useValue: mockedNotificationRepository,
+        },
+        {
+          provide: getRepositoryToken(Camera),
+          useValue: mockedCameraRepository,
         },
       ],
     }).compile();
@@ -72,6 +81,21 @@ describe('CamerasService', () => {
       expect(() => {
         camerasService.getNotifications(invalidCamID);
       }).toThrow(NotFoundError);
+    });
+  });
+
+  describe('getPublicKey', () => {
+    it("should return the camera's public key for valid cameras", () => {
+      const camera = new Camera('bogus', 'my-public-key', 'bogus-serial');
+      mockedCameraRepository.findOne.mockResolvedValueOnce(camera);
+      expect(camerasService.getPublicKey('')).resolves.toBe(camera.publicKey);
+    });
+
+    it('should throw a NotFoundError for invalid camera IDs', () => {
+      mockedCameraRepository.findOne.mockResolvedValueOnce(undefined);
+      expect(camerasService.getPublicKey('')).rejects.toBeInstanceOf(
+        NotFoundError,
+      );
     });
   });
 });

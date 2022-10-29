@@ -1,10 +1,56 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Camera from '../classes/Camera';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    // paddingTop: 40,
+    // paddingHorizontal: 20
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#777',
+    padding: 8,
+  },
+  pads: {
+    padding: 10,
+  },
+  boldHeader: {
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  menuItem: {
+    marginTop: 24,
+    marginLeft: 20,
+    marginRight: 20,
+    padding: 30,
+    backgroundColor: '#E0FFFF',
+    fontSize: 24,
+    borderWidth: 2,
+    borderColor: '#D3D3D3',
+  },
+  addButtonItem: {
+    borderColor: '#D3D3D3',
+    backgroundColor: '#DCDCDC',
+  },
+  menuButtonText: {
+    fontSize: 24,
+    marginTop: 10,
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    alignItems: 'center',
+    fontSize: 50,
+    marginTop: 0,
+    marginBottom: 0,
+  },
+});
 
 export default function CameraScreen(): React.ReactElement {
   const cameraOne: Camera = new Camera('123', "AAAAA's Camera", '99');
@@ -60,50 +106,3 @@ export function isCameraOnline(): boolean {
   return true;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    // paddingTop: 40,
-    // paddingHorizontal: 20
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#777',
-    padding: 8,
-  },
-  pads: {
-    padding: 10,
-  },
-  boldHeader: {
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  menuItem: {
-    marginTop: 24,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 30,
-    backgroundColor: '#E0FFFF',
-    fontSize: 24,
-    borderWidth: 2,
-    borderColor: '#D3D3D3',
-  },
-  addButtonItem: {
-    borderColor: '#D3D3D3',
-    backgroundColor: '#DCDCDC',
-  },
-  menuButtonText: {
-    fontSize: 24,
-    marginTop: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addButtonText: {
-    alignItems: 'center',
-    fontSize: 50,
-    marginTop: 0,
-    marginBottom: 0,
-  },
-});

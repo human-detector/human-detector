@@ -32,6 +32,8 @@
     "ts-node": "^10.0.0"
   },
   "devDependencies": {
+    "@golevelup/ts-jest": "^0.3.3",
+    "@jest-mock/express": "^2.0.1",
     "@keycloak/keycloak-admin-client": "^18.0.2",
     "@mikro-orm/cli": "^5.1.5",
     "@nestjs/cli": "^8.0.0",

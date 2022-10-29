@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as AuthSession from 'expo-auth-session';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
 import BluetoothScreen from './screens/CameraRegistration/BluetoothScreen';
 import { sendExpoNotifToken } from './src/notifications/notifTokenInit';
 import { getUserFromIDToken } from './src/auth/keyCloakAuth';
-import useBLE from './src/ble/bleConnect';
+import User from './classes/User';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,7 +17,8 @@ export default function App(): React.ReactElement {
   // Hooks
 
   // Update upon getting a token
-  const [tokenResponse, setTokenResponse] = React.useState(null);
+  const [tokenResponse, setTokenResponse] = React.useState<AuthSession.TokenResponse | null>(null);
+  const [user, setUser] = React.useState<User | null>(null);
 
   // Check if the token is expired
   if (tokenResponse != null) {
@@ -31,7 +32,7 @@ export default function App(): React.ReactElement {
 
   React.useEffect(() => {
     if (isUserSignedIn) {
-      sendExpoNotifToken(user.userID, tokenResponse.accessToken).catch(() =>
+      sendExpoNotifToken(user!.userID, tokenResponse!.accessToken).catch(() =>
         console.error('Error in sending expo token!')
       );
     }
@@ -76,17 +77,20 @@ export default function App(): React.ReactElement {
               },
             }}
           >
-            {(props) => <LoginScreen setTokenResponse={setTokenResponse} />}
+            {() => (
+              <LoginScreen
+                onTokenResponse={(response) => {
+                  // Translates IDToken to a user
+                  setUser(getUserFromIDToken(response.idToken!));
+                  setTokenResponse(response);
+                }}
+              />
+            )}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     );
   }
-
-  // If logged in, make the user and put them into the app
-
-  // Translates IDToken to a user
-  const user = getUserFromIDToken(tokenResponse.idToken);
 
   // If the user is logged in return the stack with all the information
   return (
@@ -126,51 +130,3 @@ export default function App(): React.ReactElement {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    // paddingTop: 40,
-    // paddingHorizontal: 20
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#777',
-    padding: 8,
-  },
-  pads: {
-    padding: 10,
-  },
-  boldHeader: {
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  menuItem: {
-    marginTop: 24,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 30,
-    backgroundColor: '#E0FFFF',
-    fontSize: 24,
-    borderWidth: 2,
-    borderColor: '#D3D3D3',
-  },
-  addButtonItem: {
-    borderColor: '#D3D3D3',
-    backgroundColor: '#DCDCDC',
-  },
-  menuButtonText: {
-    fontSize: 24,
-    marginTop: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addButtonText: {
-    alignItems: 'center',
-    fontSize: 50,
-    marginTop: 0,
-    marginBottom: 0,
-  },
-});

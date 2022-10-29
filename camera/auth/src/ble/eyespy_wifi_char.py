@@ -52,7 +52,7 @@ class EyeSpyWifiCharacteristic(Characteristic):
 
         # Needs SSID, UUID, Passkey, and User if applicable
         if "SSID" not in net_details or "UUID" not in net_details:
-            raise InvalidArgsException
+            raise FailedException
 
         (access_point, sec_type) = self.wifi_manager.get_wifi_security(net_details["SSID"])
 

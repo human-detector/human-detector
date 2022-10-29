@@ -49,7 +49,7 @@ defineFeature(feature, (test) => {
       token = '';
     });
     and('Camera A has 3 notifications', async () => {
-      const { camera } = createCameraWithKeyPair('Camera A');
+      const { camera } = createCameraWithKeyPair('Camera A', 'Serial A');
       cameraA = camera;
       cameraA.notifications.add(new Notification());
       cameraA.group = new Group('g');
@@ -78,7 +78,7 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('CameraA');
+      const { camera, keyPair } = createCameraWithKeyPair('CameraA', 'SerialA');
       cameraA = camera;
       cameraA.group = new Group('e');
       cameraA.group.user = new User();
@@ -111,7 +111,7 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'Serial-A');
       cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
@@ -119,7 +119,7 @@ defineFeature(feature, (test) => {
       token = getCameraAuthToken(camera, keyPair.privateKey);
     });
     and('Camera B has 2 notifications', async () => {
-      const { camera } = createCameraWithKeyPair('Camera-B');
+      const { camera } = createCameraWithKeyPair('Camera-B', 'Serial-B');
       cameraB = camera;
       cameraB.notifications.add(new Notification(), new Notification());
       cameraB.group = new Group('b');
@@ -151,7 +151,7 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A');
+      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'Serial-A');
       cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();

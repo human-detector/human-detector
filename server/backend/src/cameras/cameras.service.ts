@@ -33,6 +33,6 @@ export class CamerasService {
     if (camera === undefined) {
       throw new NotFoundError(`No camera with ID "${id}" exists`);
     }
-    return camera.token;
+    return camera.publicKey;
   }
 }

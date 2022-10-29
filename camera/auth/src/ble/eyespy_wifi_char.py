@@ -51,8 +51,8 @@ class EyeSpyWifiCharacteristic(Characteristic):
             return
 
         # Needs SSID, UUID, Passkey, and User if applicable
-        if "SSID" not in net_details or "UUID" not in net_details or "Pass" not in net_details:
-            raise FailedException
+        if "SSID" not in net_details or "UUID" not in net_details:
+            raise InvalidArgsException
 
         (access_point, sec_type) = self.wifi_manager.get_wifi_security(net_details["SSID"])
 
@@ -66,14 +66,21 @@ class EyeSpyWifiCharacteristic(Characteristic):
             if "User" not in net_details:
                 raise FailedException
 
-            self.wifi_manager.connect_enterprise(
+        if "Pass" not in net_details:
+            raise FailedException
+
+        if sec_type == SecType.KEY_PSK:
+            self.wifi_manager.connect_psk(
                 net_details["SSID"],
-                net_details["User"],
                 net_details["Pass"]
             )
 
-        elif sec_type == SecType.KEY_PSK:
-            self.wifi_manager.connect_psk(
+        if "User" not in net_details:
+            raise FailedException
+
+        if sec_type == SecType.KEY_802_1X:
+            self.wifi_manager.connect_enterprise(
                 net_details["SSID"],
+                net_details["User"],
                 net_details["Pass"]
             )

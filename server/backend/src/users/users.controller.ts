@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -21,6 +22,16 @@ export type GetGroupsOutput = {
   }[];
 }[];
 
+export type RegisterCameraBody = {
+  publicKey?: string;
+  serial?: string;
+  name?: string;
+}
+
+export type RegisterCameraResponse = {
+  id: string;
+}
+
 @Controller('users')
 @UseGuards(JwtIdentityGuard)
 export class UsersController {
@@ -38,6 +49,37 @@ export class UsersController {
           name: camera.name,
         })),
       }));
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  @Put(':uid/groups/:gid/cameras')
+  async registerCamera(
+    @Param('uid') userId: string,
+    @Param('gid') groupId: string,
+    @Body() body: RegisterCameraBody 
+  ): Promise<RegisterCameraResponse> {
+    if (body.name === undefined ||
+      body.publicKey === undefined ||
+      body.serial === undefined) {
+      throw new BadRequestException();
+    }
+
+    try {
+      const camera = await this.usersService.registerCamera(
+        userId,
+        groupId,
+        body
+      );
+
+      return {
+        id: camera.id
+      };
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();

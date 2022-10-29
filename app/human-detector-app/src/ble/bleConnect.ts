@@ -21,12 +21,12 @@ export default function useBLE(): BluetoothLowEnergyApi {
   // const [heartRate, setHeartRate] = useState<number>(0);
 
   const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
-  devices.findIndex((device) => nextDevice.id === device.id) > -1;
+    devices.findIndex((device) => nextDevice.id === device.id) > -1;
 
   /**
    * requestPermissions will ask the user to allow location permission
    * on their device
-   * @param callback 
+   * @param callback
    */
   const requestPermissions = async (callback: PermissionCallback) => {
     if (Platform.OS === 'android') {
@@ -70,7 +70,7 @@ export default function useBLE(): BluetoothLowEnergyApi {
   /**
    * This method will connect to a specified device and set it
    * as the currentDevice
-   * @param device 
+   * @param device
    */
   const connectToDevice = async (device: Device) => {
     try {

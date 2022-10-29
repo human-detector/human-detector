@@ -133,7 +133,10 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'Serial-A');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'Serial-A',
+      );
       cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
@@ -176,7 +179,10 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'Serial-A');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'Serial-A',
+      );
       cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();

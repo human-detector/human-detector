@@ -2,7 +2,7 @@ import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
-import { Camera } from '../cameras/camera.entity'
+import { Camera } from '../cameras/camera.entity';
 import { Group } from '../groups/group.entity';
 import { User } from './user.entity';
 import { RegisterCameraBody } from './users.controller';
@@ -34,7 +34,7 @@ export class UsersService {
 
   /**
    * Register a camera to the given user and group
-   * 
+   *
    * @param userId the user's ID.
    * @param groupId the group ID.
    * @param ncameraDetails the name, serial, and public key of a new camera.
@@ -46,7 +46,7 @@ export class UsersService {
   ): Promise<Camera> {
     const group = await this.groupRepository.findOne(
       { id: groupId },
-      { populate: ['user', 'cameras']},
+      { populate: ['user', 'cameras'] },
     );
 
     if (group === null) {
@@ -60,7 +60,7 @@ export class UsersService {
     const newCamera = new Camera(
       cameraDetails.name,
       cameraDetails.publicKey,
-      cameraDetails.serial
+      cameraDetails.serial,
     );
 
     group.cameras.add(newCamera);

@@ -1,19 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken, MikroOrmModule } from '@mikro-orm/nestjs';
-import { Collection } from '@mikro-orm/core';
+import { getRepositoryToken } from '@mikro-orm/nestjs';
 import { CamerasService } from './cameras.service';
 import { Camera } from './camera.entity';
 import { NotFoundError } from '../errors.types';
-import { Group } from '../groups/group.entity';
-import { User } from '../users/user.entity';
 import { Notification } from './notification.entity';
-import dbConfig from '../../mikro-orm.config';
-import { Module } from '@nestjs/common';
-import { createCameraWithKeyPair } from '../../test/helpers/camera';
 import { ConfigModule } from '@nestjs/config';
 import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from './push-notifications/push-notifications-service.interface';
 
-const notAUUID = 'junk';
 const validCamID = '4fa660b3-bc2d-4d12-b427-32283ca04a07';
 const invalidCamID = 'c5fde899-ac02-465a-ae8b-7e082f1789c8';
 

@@ -2,7 +2,10 @@ import { generateKeyPairSync, KeyLike, sign } from 'crypto';
 import { stringToBytes } from '../../src/util';
 import { Camera } from '../../src/cameras/camera.entity';
 
-export function createCameraWithKeyPair(name: string, serial: string): {
+export function createCameraWithKeyPair(
+  name: string,
+  serial: string,
+): {
   camera: Camera;
   keyPair: ReturnType<typeof generateKeyPairSync>;
 } {
@@ -10,7 +13,7 @@ export function createCameraWithKeyPair(name: string, serial: string): {
   const camera = new Camera(
     name,
     keyPair.publicKey.export({ format: 'pem', type: 'spki' }).toString(),
-    serial
+    serial,
   );
   return { camera, keyPair };
 }

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CanActivate, UnauthorizedException } from '@nestjs/common';
+import { CanActivate } from '@nestjs/common';
 import { CamerasController } from './cameras.controller';
 import { CamerasService } from './cameras.service';
 import { Notification } from './notification.entity';

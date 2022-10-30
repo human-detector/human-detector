@@ -200,8 +200,7 @@ defineFeature(feature, (test) => {
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
         .put(`/cameras/${cameraA.id}/notifications`)
-        .set('Authorization', token)
-        .send();
+        .set('Authorization', token);
     });
     then('The request succeeded', () => {
       expect(sendRes.status).toBe(200);

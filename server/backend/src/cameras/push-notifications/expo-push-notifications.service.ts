@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Expo from 'expo-server-sdk';
 import {
@@ -5,20 +6,20 @@ import {
   IPushNotificationsService,
 } from './push-notifications-service.interface';
 
+@Injectable()
 export class ExpoPushNotificationsService implements IPushNotificationsService {
-  private expoClient: Expo | null;
+  private expoClient: Expo;
 
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) {
+    this.expoClient = new Expo({
+      accessToken: this.configService.getOrThrow<string>('expo.access_token'),
+    });
+  }
 
   public sendPushNotification(
     pushToken: string,
     notification: IPushNotification,
   ): Promise<void> {
-    if (this.expoClient === null) {
-      this.expoClient = new Expo({
-        accessToken: this.configService.getOrThrow<string>('expo.access_token'),
-      });
-    }
     return this.expoClient
       .sendPushNotificationsAsync([{ to: pushToken, ...notification }])
       .then(() => {

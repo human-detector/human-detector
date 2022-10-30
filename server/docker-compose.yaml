@@ -8,6 +8,7 @@ services:
       - DB_USER
       - DB_PASSWORD
       - KEYCLOAK_HOST=keycloak:8080
+      - EXPO_ACCESS_TOKEN
     ports:
       - "3000"
 

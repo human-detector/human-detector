@@ -14,6 +14,10 @@ import { CamerasModule } from '../../src/cameras/cameras.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
+import {
+  IPushNotificationsService,
+  IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
+} from '../../src/cameras/push-notifications/push-notifications-service.interface';
 
 const feature = loadFeature('test/features/send-notification.feature');
 
@@ -21,10 +25,20 @@ defineFeature(feature, (test) => {
   let app: INestApplication;
   let testStack: TestStack;
   let cameraRepository: EntityRepository<Camera>;
+  let mockPushNotificationsService: jest.Mocked<IPushNotificationsService>;
   let em: EntityManager;
 
   beforeAll(async () => {
-    testStack = await buildTestStack({ imports: [CamerasModule] });
+    mockPushNotificationsService = {
+      sendPushNotification: jest.fn(),
+    };
+    testStack = await buildTestStack({ imports: [CamerasModule] }, (builder) =>
+      Promise.resolve(
+        builder
+          .overrideProvider(IPUSH_NOTIFICATIONS_SERVICE_TOKEN)
+          .useValue(mockPushNotificationsService),
+      ),
+    );
 
     em = testStack.module.get<EntityManager>(EntityManager);
     cameraRepository = em.getRepository(Camera);
@@ -51,9 +65,14 @@ defineFeature(feature, (test) => {
     and('Camera A has 3 notifications', async () => {
       const { camera } = createCameraWithKeyPair('Camera A', 'Serial A');
       cameraA = camera;
-      cameraA.notifications.add(new Notification());
+      cameraA.notifications.add(
+        new Notification(),
+        new Notification(),
+        new Notification(),
+      );
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       beforeNotifications = cameraA.notifications.toArray();
     });
@@ -66,7 +85,9 @@ defineFeature(feature, (test) => {
       expect(sendRes.status).toBe(401);
     });
     and('Camera A has 3 notifications', async () => {
-      expect(cameraA.notifications.toArray()).toEqual(beforeNotifications);
+      expect(cameraA.notifications.toArray().length).toEqual(
+        beforeNotifications.length,
+      );
     });
   });
 
@@ -82,6 +103,7 @@ defineFeature(feature, (test) => {
       cameraA = camera;
       cameraA.group = new Group('e');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       token = getCameraAuthToken(camera, keyPair.privateKey);
     });
@@ -111,10 +133,14 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'Serial-A');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'Serial-A',
+      );
       cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       token = getCameraAuthToken(camera, keyPair.privateKey);
     });
@@ -136,7 +162,9 @@ defineFeature(feature, (test) => {
       expect(sendRes.status).toBe(403);
     });
     and('Camera B has 2 notifications', async () => {
-      expect(cameraB.notifications.toArray()).toEqual(beforeNotifications);
+      expect(cameraB.notifications.toArray().length).toEqual(
+        beforeNotifications.length,
+      );
     });
   });
 
@@ -151,16 +179,23 @@ defineFeature(feature, (test) => {
     let sendRes: request.Response;
 
     given("I have camera A's credentials", async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'Serial-A');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'Serial-A',
+      );
       cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();
+      cameraA.group.user.expoToken = 'ExponentPushToken[000000000000]';
       await cameraRepository.persistAndFlush(cameraA);
       token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
-    and('Camera A has 1 notification', async () => {
-      cameraA.notifications.add(new Notification());
-      await cameraRepository.flush();
+    and('Camera A has 0 notifications', async () => {
+      const resBefore = await request(app.getHttpServer())
+        .get(`/cameras/${cameraA.id}/notifications`)
+        .set('Authorization', token);
+      expect(resBefore.status).toBe(200);
+      expect(resBefore.body).toHaveLength(0);
     });
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
@@ -170,8 +205,12 @@ defineFeature(feature, (test) => {
     then('The request succeeded', () => {
       expect(sendRes.status).toBe(200);
     });
-    and('Camera A has 2 notifications', async () => {
-      expect(cameraA.notifications.toArray()).toHaveLength(2);
+    and('Camera A has 1 notification', async () => {
+      const resAfter = await request(app.getHttpServer())
+        .get(`/cameras/${cameraA.id}/notifications`)
+        .set('Authorization', token);
+      expect(resAfter.status).toBe(200);
+      expect(resAfter.body).toHaveLength(1);
     });
   });
 });

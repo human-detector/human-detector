@@ -1,5 +1,5 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing';
 import mikroOrmOptions from '../../mikro-orm.config';
 import {
   Network,
@@ -36,6 +36,9 @@ export const TEST_STACK_TIMEOUT = 60000;
  */
 export async function buildTestStack(
   moduleMetadata: ModuleMetadata,
+  beforeCompile?: (
+    builder: TestingModuleBuilder,
+  ) => Promise<TestingModuleBuilder>,
 ): Promise<TestStack> {
   // FIXME: this assumes the tests are running in 'server/backend/' to life easier
   const dockerComposeFileDir = path.resolve(process.cwd(), '..');
@@ -73,7 +76,7 @@ export async function buildTestStack(
     .withEnv('SYNC_USERS_DB_PASSWORD', dbContainer.getPassword())
     .start();
 
-  const testModule = await Test.createTestingModule({
+  let testModuleBuilder = await Test.createTestingModule({
     ...moduleMetadata,
     imports: [
       ...moduleMetadata.imports,
@@ -89,6 +92,10 @@ export async function buildTestStack(
       }),
       MikroOrmModule.forRoot({
         ...mikroOrmOptions,
+        // Our modules only load entities that they manage repositories for, so most modules will
+        // be missing some entities if we use autoloading.
+        autoLoadEntities: false,
+        entities: ['./src/**/*.entity.ts'],
         dbName: dbContainer.getDatabase(),
         user: dbContainer.getUsername(),
         password: dbContainer.getPassword(),
@@ -97,7 +104,13 @@ export async function buildTestStack(
         allowGlobalContext: true,
       }),
     ],
-  }).compile();
+  });
+
+  if (beforeCompile) {
+    testModuleBuilder = await beforeCompile(testModuleBuilder);
+  }
+
+  const testModule = await testModuleBuilder.compile();
 
   const orm = testModule.get<MikroORM>(MikroORM);
   await orm.getSchemaGenerator().createSchema();

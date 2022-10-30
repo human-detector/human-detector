@@ -26,11 +26,11 @@ export type RegisterCameraBody = {
   publicKey?: string;
   serial?: string;
   name?: string;
-}
+};
 
 export type RegisterCameraResponse = {
   id: string;
-}
+};
 
 @Controller('users')
 @UseGuards(JwtIdentityGuard)
@@ -62,11 +62,13 @@ export class UsersController {
   async registerCamera(
     @Param('uid') userId: string,
     @Param('gid') groupId: string,
-    @Body() body: RegisterCameraBody 
+    @Body() body: RegisterCameraBody,
   ): Promise<RegisterCameraResponse> {
-    if (body.name === undefined ||
+    if (
+      body.name === undefined ||
       body.publicKey === undefined ||
-      body.serial === undefined) {
+      body.serial === undefined
+    ) {
       throw new BadRequestException();
     }
 
@@ -74,11 +76,11 @@ export class UsersController {
       const camera = await this.usersService.registerCamera(
         userId,
         groupId,
-        body
+        body,
       );
 
       return {
-        id: camera.id
+        id: camera.id,
       };
     } catch (error) {
       if (error instanceof NotFoundError) {

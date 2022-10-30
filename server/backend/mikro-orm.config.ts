@@ -1,7 +1,7 @@
-import { Options } from '@mikro-orm/core';
+import { MikroOrmModuleSyncOptions } from '@mikro-orm/nestjs';
 
-const options: Options = {
-  entities: ['./src/**/*.entity.ts', './src/**/*.entity.js'],
+const options: MikroOrmModuleSyncOptions = {
+  autoLoadEntities: true,
   type: 'postgresql',
   dbName: process.env.DB_NAME || undefined,
   host: process.env.DB_HOST || undefined,

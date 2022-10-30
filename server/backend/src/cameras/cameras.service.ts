@@ -1,27 +1,77 @@
-import { Injectable } from '@nestjs/common';
-import { EntityRepository } from '@mikro-orm/core';
+import { Inject, Injectable } from '@nestjs/common';
+import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { NotFoundError } from '../errors.types';
 import { Notification } from './notification.entity';
 import { Camera } from './camera.entity';
-import { NotFoundError } from '../errors.types';
+import {
+  IPushNotification,
+  IPushNotificationsService,
+  IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
+} from './push-notifications/push-notifications-service.interface';
 
 @Injectable()
 export class CamerasService {
   constructor(
-    @InjectRepository(Notification)
-    private notificationRepository: EntityRepository<Notification>,
     @InjectRepository(Camera)
     private cameraRepository: EntityRepository<Camera>,
+    @InjectRepository(Notification)
+    private notificationRepository: EntityRepository<Notification>,
+    @Inject(IPUSH_NOTIFICATIONS_SERVICE_TOKEN)
+    private pushNotificationsService: IPushNotificationsService,
   ) {}
 
-  sendNotification(id: string): boolean {
-    /* TODO: verify that ID refers to a valid camera and add a notification to DB */
-    return false;
+  /**
+   * Sends a notification to the user's phone and adds it to the
+   * collection of notifications the user has.
+   * @param idCam
+   */
+  public async sendNotification(idCam: string): Promise<boolean> {
+    const cam = await this.cameraRepository.findOne(
+      { id: idCam },
+      { populate: ['group.user'] },
+    );
+
+    if (cam === null) {
+      throw new NotFoundError(`Camera with given ID does not exist.`);
+    }
+
+    const pushToken = cam.group.user.expoToken;
+    const pushNotification: IPushNotification = {
+      sound: 'default',
+      title: `${cam.name} has detected movement!`,
+      body: 'This is a test notification',
+      data: { withSome: 'data' },
+    };
+    try {
+      await this.pushNotificationsService.sendPushNotification(
+        pushToken,
+        pushNotification,
+      );
+    } catch (error) {
+      console.error('Error sending push notification', error);
+    }
+
+    cam.notifications.add(new Notification());
+    this.cameraRepository.flush();
+    return true;
   }
 
-  getNotifications(id: string): Notification[] {
-    /* TODO: verify ID, get the notifications */
-    return [];
+  /**
+   * Gets a user's notification collection
+   * @param idCam
+   */
+  public async getNotifications(
+    idCam: string,
+  ): Promise<Collection<Notification>> {
+    const cam = await this.cameraRepository.findOne(
+      { id: idCam },
+      { populate: ['notifications'] },
+    );
+    if (cam === null) {
+      throw new NotFoundError(`Camera with given ID does not exist.`);
+    }
+    return cam.notifications;
   }
 
   /**

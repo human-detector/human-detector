@@ -51,7 +51,9 @@ defineFeature(
           await testStack.kcContainer.createDummyUserAndLogIn('users');
         user = await userRepository.findOneOrFail({ id });
         user.groups.add(new Group('group-a'));
-        user.groups[0].cameras.add(new Camera('My camera :)', 'wajebawk', 'definitely a serial'));
+        user.groups[0].cameras.add(
+          new Camera('My camera :)', 'wajebawk', 'definitely a serial'),
+        );
         await userRepository.flush();
         token = tokenSet.access_token;
       });

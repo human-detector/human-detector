@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import * as helpers from '../helpers';
 
@@ -33,7 +34,12 @@ export default async function fetchPushToken(): Promise<string> {
   }
 
   if (helpers.isDevice() && (await isUserNotificationsOn())) {
-    const token: string = (await Notifications.getExpoPushTokenAsync()).data; // get token
+    /**
+     * 'experienceId' is required when using EAS Build or the Bare workflow:
+     * https://docs.expo.dev/versions/latest/sdk/notifications/#getexpopushtokenasyncoptions-expotokenoptions-expopushtoken
+     */
+    const experienceId = Constants.manifest?.extra?.experienceId;
+    const token: string = (await Notifications.getExpoPushTokenAsync({ experienceId })).data; // get token
     return token;
   }
   throw new Error('Failed to get push token for push notification!');

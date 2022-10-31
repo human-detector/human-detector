@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { View, StyleSheet, TextInput, Button } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { checkWifiType, getCameraSerialFromBLE, WifiSecType, CameraSerial, writeCameraWifi } from '../../src/ble/bleServices';
+import useBLE from '../../src/ble/bleConnect';
+import { BackendContext } from '../../contexts/backendContext';
 
 /**
  * The EnterCameraRegInfoScreen will allow the user
@@ -69,33 +71,98 @@ const styles = StyleSheet.create({
   buttonNext: {},
 });
 
-export default function EnterCameraRegInfoScreen({
-  navigation,
-}: NativeStackScreenProps<{ Group: undefined; Cameras: undefined }, 'Group'>): React.ReactElement {
+export default function EnterCameraRegInfoScreen({ navigation }): React.ReactElement {
+  const [displayUser, setDisplayUser] = React.useState(false);
+  const [displayPass, setDisplayPass] = React.useState(false);
   const [user, setUser] = React.useState('');
   const [pass, setPass] = React.useState('');
 
+  const { currentDevice } = useBLE();
+  const context = React.useContext(BackendContext);
+
+  const submitWifiToPi = () => {
+    if (currentDevice === null) return;
+
+    if (displayPass && pass === '') {
+      // TODO: Display error
+      return;
+    }
+
+    if (displayUser && user === '') {
+      // TODO: Display error
+      return;
+    }
+    
+    getCameraSerialFromBLE(currentDevice).then(async (serial: CameraSerial) => {
+      if (context === null) {
+        console.error(`Backend services is null!`);
+        return;
+      }
+
+      // TODO: Talk to server
+      const uuid = await context.registerCamera(
+        "Camera-A",
+        serial.Serial,
+        serial.PubKey,
+        "GROUP UUID"
+      );
+
+      if (uuid === null) {
+        navigation.navigate('Bluetooth');
+        return;
+      }
+
+      writeCameraWifi(currentDevice, user, pass, uuid).catch((error) => {
+        console.error(error);
+        navigation.navigate('Bluetooth');
+      });
+      navigation.navigate('LoadingScreen');
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+
+  React.useEffect(() => {
+    console.log(currentDevice);
+    if (currentDevice === null) {
+      setDisplayPass(false);
+      setDisplayUser(false);
+      return;
+    }
+
+    checkWifiType(currentDevice).then((type: WifiSecType) => {
+      setDisplayUser(type === WifiSecType.WPA2_802_1X);
+      setDisplayPass(type === WifiSecType.WPA2_802_1X || type === WifiSecType.WPA2_PSK);
+
+      // Open wifi connections need no user or pass, just try connecting
+      if (type === WifiSecType.OPEN) {
+        submitWifiToPi();
+      }
+
+    }).catch((error) => {
+      console.error(error);
+      navigation.navigate('Bluetooth');
+    });
+  }, [currentDevice]);
+
   return (
     <View style={styles.container}>
-      <TextInput
+      {(displayUser) && <TextInput
         style={styles.input}
         onChangeText={setUser}
         value={user}
         placeholder="Enter WiFi username here"
-      />
-      <TextInput
+      />}
+      {(displayPass) && <TextInput
         style={styles.input}
         onChangeText={setPass}
         value={pass}
         placeholder="Enter WiFi password here"
-      />
-      <Button
+      />}
+      {(displayUser || displayPass) && <Button
         title="Next"
-        onPress={() => {
-          // Check if the user has typed anything in setUser and setPass
-          navigation.navigate('Group');
-        }}
-      />
+        onPress={submitWifiToPi}
+      />}
     </View>
   );
 }

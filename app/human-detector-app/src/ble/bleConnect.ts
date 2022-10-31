@@ -18,7 +18,6 @@ interface BluetoothLowEnergyApi {
 export default function useBLE(): BluetoothLowEnergyApi {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [currentDevice, setConnectedDevice] = useState<Device | null>(null);
-  // const [heartRate, setHeartRate] = useState<number>(0);
 
   const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
     devices.findIndex((device) => nextDevice.id === device.id) > -1;
@@ -40,6 +39,10 @@ export default function useBLE(): BluetoothLowEnergyApi {
           buttonNeutral: 'Maybe Later',
         }
       );
+      await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN
+      ]);
       callback(grantedStatus === PermissionsAndroid.RESULTS.GRANTED);
     } else {
       callback(true);
@@ -53,7 +56,7 @@ export default function useBLE(): BluetoothLowEnergyApi {
   const scanForDevices = () => {
     bleManager.startDeviceScan([EyeSpyUUID.BLE_SERVICE_UUID], null, (error, device) => {
       if (error) {
-        console.log(error);
+        console.log(error.errorCode);
       }
       if (device) {
         // Add Device

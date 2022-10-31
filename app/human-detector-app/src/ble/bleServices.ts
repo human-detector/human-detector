@@ -7,9 +7,17 @@ import * as EyeSpyUUID from '../../config/BLEConfig';
  * will need to connect to.
  */
 
-interface CameraSerial {
+export interface CameraSerial {
   Serial: string;
   PubKey: string;
+}
+
+export enum WifiSecType {
+  WPA2_802_1X = "KEY_802_1X",
+  WPA2_PSK = "KEY_PSK",
+  OPEN = "OPEN",
+  UNSUPPORTED = "UNSUPPORTED",
+  UNKNOWN = "",
 }
 
 /**
@@ -17,7 +25,7 @@ interface CameraSerial {
  * @param device
  * @returns Returns camera serial and BLE
  */
-export async function getCameraSerialFromBLE(device: Device): CameraSerial {
+export async function getCameraSerialFromBLE(device: Device): Promise<CameraSerial> {
   // Get EyeSpy serial characteristic
   try {
     const deviceDiscovered = await device.discoverAllServicesAndCharacteristics();
@@ -50,6 +58,7 @@ export async function getCameraSerialFromBLE(device: Device): CameraSerial {
  */
 export async function writeCameraWifi(
   device: Device,
+  username: string,
   password: string,
   cameraUUID: string
 ): Promise<void> {
@@ -65,8 +74,8 @@ export async function writeCameraWifi(
 
     const wifiDetails = {
       SSID: networkState.details?.ssid,
-      User: 'TestUSER',
-      Pass: 'TestPASS',
+      User: username,
+      Pass: password,
       UUID: cameraUUID,
     };
     const base64WifiDetails = window.btoa(JSON.stringify(wifiDetails));
@@ -85,7 +94,7 @@ export async function writeCameraWifi(
   }
 }
 
-export async function checkWifiType(device: Device): Promise<string> {
+export async function checkWifiType(device: Device): Promise<WifiSecType> {
   try {
     const deviceDiscovered = await device.discoverAllServicesAndCharacteristics();
     const networkState = await NetInfo.fetch();
@@ -111,9 +120,8 @@ export async function checkWifiType(device: Device): Promise<string> {
 
     if (!checkChar.value) throw new Error('ERROR: No value in checkChar.value in checkWifiType()!');
 
-    console.log('TESTTESTTEST');
-    console.log(checkChar);
-    return checkChar.value;
+    const wifiTypeJson: {Type: WifiSecType} = JSON.parse(window.atob(checkChar.value));
+    return wifiTypeJson.Type;
   } catch (error) {
     console.log('Error in checkWifiType(): ', error);
     throw error;

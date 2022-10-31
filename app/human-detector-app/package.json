@@ -22,7 +22,8 @@
     ]
   },
   "dependencies": {
-    "@config-plugins/react-native-ble-plx": "^2.0.1",
+    "@config-plugins/react-native-ble-plx": "~3.0.0",
+    "@expo/config-plugins": "^5.0.1",
     "@expo/ngrok": "^2.5.0",
     "@expo/prebuild-config": "^5.0.1",
     "@expo/vector-icons": "^13.0.0",
@@ -54,7 +55,7 @@
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-native": "0.69.6",
-    "react-native-ble-plx": "2.0.3",
+    "react-native-ble-plx": "~2.0.3",
     "react-native-safe-area-context": "4.3.1",
     "react-native-screens": "~3.15.0",
     "react-native-web": "~0.18.7",

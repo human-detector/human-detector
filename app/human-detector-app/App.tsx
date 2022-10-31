@@ -10,8 +10,11 @@ import EnterCameraRegInfoScreen from './screens/CameraRegistration/EnterCameraRe
 import fetchPushToken from './src/notifications/fetchPushToken';
 import BackendService from './services/backendService';
 import { BackendContext } from './contexts/backendContext';
+import { BLEContext } from './contexts/bleContext';
+import { BLEService } from './src/ble/bleServices';
 
 const Stack = createNativeStackNavigator();
+const bleService = new BLEService();
 
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);
@@ -57,6 +60,7 @@ export default function App(): React.ReactElement {
   // If the user is logged in return the stack with all the information
   return (
     <NavigationContainer>
+    <BLEContext.Provider value={bleService}>
       <BackendContext.Provider value={backendService}>
         <Stack.Navigator>
           <Stack.Screen
@@ -89,54 +93,56 @@ export default function App(): React.ReactElement {
               headerBackVisible: true,
             }}
           />
-          <Stack.Screen
-            name="Bluetooth"
-            component={BluetoothScreen}
-            options={{
-              title: 'Connect Camera',
-              headerStyle: {
-                backgroundColor: '#1E90FF',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
-          />
-          <Stack.Screen
-            name="CameraRegistrationInfo"
-            component={EnterCameraRegInfoScreen}
-            options={{
-              title: 'Connect Camera',
-              headerStyle: {
-                backgroundColor: '#1E90FF',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-              headerBackTitleVisible: true,
-              headerBackVisible: true,
-            }}
-          />
-          <Stack.Screen
-            name="Loading"
-            component={LoadingScreen}
-            options={{
-              title: 'Connect Camera',
-              headerStyle: {
-                backgroundColor: '#1E90FF',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-              headerBackTitleVisible: true,
-              headerBackVisible: true,
-            }}
-          />
+            <Stack.Screen
+              name="Bluetooth"
+              component={BluetoothScreen}
+              options={{
+                title: 'Connect Camera',
+                headerStyle: {
+                  backgroundColor: '#1E90FF',
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+            <Stack.Screen
+              name="CameraRegistrationInfo"
+              component={EnterCameraRegInfoScreen}
+              options={{
+                title: 'Connect Camera',
+                headerStyle: {
+                  backgroundColor: '#1E90FF',
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+                headerBackTitleVisible: true,
+                headerBackVisible: true,
+              }}
+            />
+            <Stack.Screen
+              name="Loading"
+              component={LoadingScreen}
+              options={{
+                title: 'Connect Camera',
+                headerStyle: {
+                  backgroundColor: '#1E90FF',
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+                headerBackTitleVisible: true,
+                headerBackVisible: true,
+              }}
+            />
         </Stack.Navigator>
       </BackendContext.Provider>
+      
+      </BLEContext.Provider>
     </NavigationContainer>
   );
 }

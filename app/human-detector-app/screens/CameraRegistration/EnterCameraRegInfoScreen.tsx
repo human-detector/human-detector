@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { View, StyleSheet, TextInput, Button } from 'react-native';
-import { checkWifiType, getCameraSerialFromBLE, WifiSecType, CameraSerial, writeCameraWifi } from '../../src/ble/bleServices';
-import useBLE from '../../src/ble/bleConnect';
+import { WifiSecType, CameraSerial } from '../../src/ble/bleServices';
 import { BackendContext } from '../../contexts/backendContext';
+import { BLEContext } from '../../contexts/bleContext';
 
 /**
  * The EnterCameraRegInfoScreen will allow the user
@@ -77,8 +77,9 @@ export default function EnterCameraRegInfoScreen({ navigation }): React.ReactEle
   const [user, setUser] = React.useState('');
   const [pass, setPass] = React.useState('');
 
-  const { currentDevice } = useBLE();
-  const context = React.useContext(BackendContext);
+  const backendContext = React.useContext(BackendContext);
+  const bleContext = React.useContext(BLEContext);
+  const currentDevice = bleContext.getCurrentConnectedDevice();
 
   const submitWifiToPi = () => {
     if (currentDevice === null) return;
@@ -93,18 +94,18 @@ export default function EnterCameraRegInfoScreen({ navigation }): React.ReactEle
       return;
     }
     
-    getCameraSerialFromBLE(currentDevice).then(async (serial: CameraSerial) => {
-      if (context === null) {
+    bleContext.getCameraSerialFromBLE().then(async (serial: CameraSerial) => {
+      if (backendContext === null) {
         console.error(`Backend services is null!`);
         return;
       }
 
       // TODO: Talk to server
-      const uuid = await context.registerCamera(
+      const uuid = await backendContext.registerCamera(
         "Camera-A",
         serial.Serial,
         serial.PubKey,
-        "GROUP UUID"
+        "486422e6-6ad3-4080-9b8e-3d4e6b054c51"
       );
 
       if (uuid === null) {
@@ -112,11 +113,11 @@ export default function EnterCameraRegInfoScreen({ navigation }): React.ReactEle
         return;
       }
 
-      writeCameraWifi(currentDevice, user, pass, uuid).catch((error) => {
+      bleContext.writeCameraWifi(user, pass, uuid).catch((error) => {
         console.error(error);
         navigation.navigate('Bluetooth');
       });
-      navigation.navigate('LoadingScreen');
+      navigation.navigate('Loading');
     }).catch((error) => {
       console.error(error);
     });
@@ -130,7 +131,8 @@ export default function EnterCameraRegInfoScreen({ navigation }): React.ReactEle
       return;
     }
 
-    checkWifiType(currentDevice).then((type: WifiSecType) => {
+    bleContext.checkWifiType().then((type: WifiSecType) => {
+      console.log(type);
       setDisplayUser(type === WifiSecType.WPA2_802_1X);
       setDisplayPass(type === WifiSecType.WPA2_802_1X || type === WifiSecType.WPA2_PSK);
 

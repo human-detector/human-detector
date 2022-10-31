@@ -1,15 +1,8 @@
 import * as React from 'react';
 import { View, ScrollView, Button } from 'react-native';
-import useBLE from '../../src/ble/bleConnect';
-import {
-  checkCameraNotification,
-  getCameraSerialFromBLE,
-  writeCameraWifi,
-  checkWifiType,
-  cameraListener,
-} from '../../src/ble/bleServices';
-
-let bool = false;
+import { Device } from 'react-native-ble-plx';
+import { BLEContext } from '../../contexts/bleContext';
+import { requestPermissions } from '../../src/ble/helpers'
 
 /**
  * This screen will start scanning on the device for bluetooth devices.
@@ -21,26 +14,33 @@ let bool = false;
  */
 
 export default function BluetoothScreen({ navigation }): React.ReactElement {
-  const { requestPermissions, connectToDevice, scanForDevices, currentDevice, allDevices } =
-    useBLE();
+  const [allDevices, setAllDevices] = React.useState<Device[]>([]);
+  const [device, setDevice] = React.useState<Device | null>(null);
+  const bleService = React.useContext(BLEContext);
 
-  requestPermissions((isGranted: boolean) => {
-    if (isGranted) {
-      if (!bool) {
-        scanForDevices();
-        bool = true;
+  React.useEffect(() => {
+    setAllDevices(bleService.getDevices());
+  }, [bleService.getDevices()]);
+
+  React.useEffect(() => {
+    requestPermissions().then((isGranted: boolean) => {
+      if (isGranted) {
+        bleService.scanForDevices(setAllDevices);
       }
-    }
-  });
-
-  if (currentDevice) {
-    // User has connected to a device
-    currentDevice.isConnected().then((bool) => {
-      if (bool) navigation.navigate('CameraRegistrationInfo');
     });
-
-    console.log('Camera is not connected!');
-  }
+  }, []);
+  
+  React.useEffect(() => {
+    if (device) {
+      // User has connected to a device
+      device.isConnected().then((bool) => {
+        if (bool) navigation.navigate('CameraRegistrationInfo');
+      });
+  
+      console.log('Camera is not connected!');
+    }
+  }, [device]);
+  
 
   return (
     <View>
@@ -51,7 +51,9 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
               title={item.id}
               onPress={() => {
                 // This button will connect device
-                connectToDevice(item);
+                bleService.connectToDevice(item).then(() => {
+                  setDevice(item);
+                });
               }}
             />
           </View>

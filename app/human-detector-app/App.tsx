@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Device } from 'react-native-ble-plx';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -16,20 +15,6 @@ const Stack = createNativeStackNavigator();
 
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);
-  const [currentDevice, setConnectedDevice] = React.useState<Device | null>(null);
-
-  const bleContext = {
-    device: currentDevice,
-    setDevice: setConnectedDevice,
-    connect: async (device: Device) => {
-     try {
-       const deviceConnection = await device.connect();
-       setConnectedDevice(deviceConnection);
-     } catch (error) {
-       console.log('ERROR WHEN CONNECTING', error);
-     }
-   }
-  }
 
   // If the user isn't logged in
   if (backendService === null) {

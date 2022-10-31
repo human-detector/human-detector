@@ -24,6 +24,7 @@
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
     "axios": "^1.1.2",
+    "body-parser": "^1.20.1",
     "dotenv": "^16.0.3",
     "expo-server-sdk": "^3.6.0",
     "jose": "^4.10.0",

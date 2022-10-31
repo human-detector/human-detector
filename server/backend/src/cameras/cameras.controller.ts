@@ -5,8 +5,9 @@ import {
   Controller,
   UseGuards,
   UnauthorizedException,
+  Body,
 } from '@nestjs/common';
-import { CamerasService } from './cameras.service';
+import { CamerasService, SendNotificationInput } from './cameras.service';
 import { CameraAuthGuard } from './camera-auth.guard';
 import { Collection } from '@mikro-orm/core';
 import { Notification } from './notification.entity';
@@ -24,9 +25,12 @@ export class CamerasController {
   constructor(private camerasService: CamerasService) {}
 
   @Put(':id/notifications')
-  async sendNotification(@Param('id') id: string): Promise<boolean> {
+  async sendNotification(
+    @Param('id') id: string,
+    @Body() input: SendNotificationInput,
+  ): Promise<boolean> {
     try {
-      const notifSent = await this.camerasService.sendNotification(id);
+      const notifSent = await this.camerasService.sendNotification(id, input);
       return notifSent;
     } catch (error) {
       if (error instanceof NotFoundError) {

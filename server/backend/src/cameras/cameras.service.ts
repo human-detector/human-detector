@@ -9,6 +9,12 @@ import {
   IPushNotificationsService,
   IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
 } from './push-notifications/push-notifications-service.interface';
+import { Snapshot } from 'src/snapshots/snapshot.entity';
+
+export interface SendNotificationInput {
+  // Base64-encoded image data
+  frame: string;
+}
 
 @Injectable()
 export class CamerasService {
@@ -26,7 +32,10 @@ export class CamerasService {
    * collection of notifications the user has.
    * @param idCam
    */
-  public async sendNotification(idCam: string): Promise<boolean> {
+  public async sendNotification(
+    idCam: string,
+    input: SendNotificationInput,
+  ): Promise<boolean> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
       { populate: ['group.user'] },
@@ -52,6 +61,8 @@ export class CamerasService {
       console.error('Error sending push notification', error);
     }
 
+    const notification = new Notification();
+    notification.snapshot = new Snapshot(input.frame);
     cam.notifications.add(new Notification());
     this.cameraRepository.flush();
     return true;

@@ -4,6 +4,7 @@ import { Device } from 'react-native-ble-plx';
 import { BLEContext } from '../../contexts/bleContext';
 import { requestPermissions } from '../../src/ble/helpers'
 
+
 /**
  * This screen will start scanning on the device for bluetooth devices.
  * It will display a list of th ebluetooth devices that can be detected from the app.  The
@@ -33,8 +34,8 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
   React.useEffect(() => {
     if (device) {
       // User has connected to a device
-      device.isConnected().then((bool) => {
-        if (bool) navigation.navigate('CameraRegistrationInfo');
+      device.isConnected().then((connected) => {
+        if (connected) navigation.navigate('CameraRegistrationInfo');
       });
   
       console.log('Camera is not connected!');

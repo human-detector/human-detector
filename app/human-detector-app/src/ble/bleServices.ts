@@ -1,9 +1,7 @@
-import { enc, lib } from 'crypto-js';
+import { enc } from 'crypto-js';
 import { BleError, Characteristic, Device, Subscription, BleManager } from 'react-native-ble-plx';
 import NetInfo from '@react-native-community/netinfo';
 import * as EyeSpyUUID from '../../config/BLEConfig';
-
-type PermissionCallback = (result: boolean) => void;
 
 /**
  * This file includes all of the camera bluetooth services that the mobile app
@@ -21,6 +19,22 @@ export enum WifiSecType {
   OPEN = "OPEN",
   UNSUPPORTED = "UNSUPPORTED",
   UNKNOWN = "",
+}
+
+/**
+ * Connection Status
+ */
+export enum ConnectionStatus {
+  INTERNAL_ERROR = 0,
+  DISCONNECTED = 1,
+  CONNECTING = 2,
+  SUCCESS = 3,
+  FAIL = 4,
+}
+
+export interface ConnectionNotification {
+  status: ConnectionStatus,
+  reason: number,
 }
 
 function isDuplicateDevice(devices: Device[], nextDevice: Device) {

@@ -8,10 +8,38 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function LoadingIcon(): React.ReactElement {
-  return (
-    <View style={styles.centerIcon}>
-      <AntDesign name="loading2" size={24} color="black" />
-    </View>
-  );
+export enum LoadingState {
+  Loading,
+  Success,
+  Failure
+}
+
+export interface LoadingIconProps {
+  state: LoadingState,
+}
+
+export function LoadingIcon(props: LoadingIconProps): React.ReactElement<LoadingIconProps> {
+  const { state } = props;
+  switch(state) {
+    case LoadingState.Loading:
+      return (
+        <View style={styles.centerIcon}>
+          <AntDesign name="loading2" size={24} color="black" />
+        </View>
+      )
+    case LoadingState.Success:
+      return (
+        <View style={styles.centerIcon}>
+          <AntDesign name="checkcircleo" size={24} color="green" />
+        </View>
+      )
+    case LoadingState.Failure:
+      return (
+        <View style={styles.centerIcon}>
+          <AntDesign name="exclamationcircleo" size={24} color="red" />
+        </View>
+      )
+    default:
+      throw new Error("Invalid loading state!");
+  }
 }

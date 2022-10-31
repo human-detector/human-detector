@@ -48,7 +48,7 @@ class NotificationOutput:
         if not retval:
             return
         
-        jpg = base64.b64encode(img_encode)
+        jpg = "data:image/jpeg;base64," + base64.b64encode(img_encode).decode()
         success, _ = self.net.send_notification(jpg)
 
         if not success:

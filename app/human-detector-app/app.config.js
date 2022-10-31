@@ -12,20 +12,7 @@ module.exports = {
       }
     },
     scheme: 'myapp',
-    "plugins": ["@config-plugins/react-native-ble-plx",
-    [
-      "expo-build-properties",
-      {
-        "android": {
-          "compileSdkVersion": 33,
-          "targetSdkVersion": 33,
-          "buildToolsVersion": "33.0.0"
-        },
-        "ios": {
-          "deploymentTarget": "13.0"
-        }
-      }
-    ]],
+    "plugins": ["@config-plugins/react-native-ble-plx"],
     "ios": {
       "bundleIdentifier": "com.yourcompany.yourappname",
       "supportsTablet": true,

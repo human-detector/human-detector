@@ -15,8 +15,8 @@ import { requestPermissions } from '../../src/ble/helpers'
  */
 
 export default function BluetoothScreen({ navigation }): React.ReactElement {
+  const [connecting, setConnecting ] = React.useState(false);
   const [allDevices, setAllDevices] = React.useState<Device[]>([]);
-  const [device, setDevice] = React.useState<Device | null>(null);
   const bleService = React.useContext(BLEContext);
 
   React.useEffect(() => {
@@ -30,16 +30,6 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
       }
     });
   }, []);
-  
-  React.useEffect(() => {
-    if (device) {
-      // User has connected to a device
-      device.isConnected().then((connected) => {
-        if (connected) navigation.navigate('CameraRegistrationInfo');
-      });
-    }
-  }, [device]);
-  
 
   return (
     <View>
@@ -49,11 +39,16 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
             <Button
               title={item.id}
               onPress={() => {
-                console.log("!");
+                if (connecting) return;
+                setConnecting(true);
+
                 // This button will connect device
                 bleService.connectToDevice(item).then(() => {
-                  console.log('connected');
-                  setDevice(item);
+                  setConnecting(false);
+                  navigation.navigate('CameraRegistrationInfo');
+                }).catch((error) => {
+                  console.error(error);
+                  setConnecting(false);
                 });
               }}
             />

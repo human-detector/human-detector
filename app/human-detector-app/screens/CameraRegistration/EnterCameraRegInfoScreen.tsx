@@ -131,7 +131,6 @@ export default function EnterCameraRegInfoScreen({ navigation }): React.ReactEle
     }
 
     bleContext.checkWifiType().then((type: WifiSecType) => {
-      console.log(type);
       setDisplayUser(type === WifiSecType.WPA2_802_1X);
       setDisplayPass(type === WifiSecType.WPA2_802_1X || type === WifiSecType.WPA2_PSK);
 

@@ -1,7 +1,7 @@
-import { enc } from 'crypto-js';
 import { BleError, Characteristic, Device, Subscription, BleManager } from 'react-native-ble-plx';
 import NetInfo from '@react-native-community/netinfo';
 import * as EyeSpyUUID from '../../config/BLEConfig';
+import { base64ToJson, isDuplicateDevice, jsonToBase64 } from './helpers';
 
 /**
  * This file includes all of the camera bluetooth services that the mobile app
@@ -22,8 +22,9 @@ export enum WifiSecType {
 }
 
 /**
- * Connection Status
+ * BLE Notification 
  */
+
 export enum ConnectionStatus {
   INTERNAL_ERROR = 0,
   DISCONNECTED = 1,
@@ -32,14 +33,16 @@ export enum ConnectionStatus {
   FAIL = 4,
 }
 
+// Notification JSON recieved from camera
 export interface ConnectionNotification {
-  status: ConnectionStatus,
-  reason: number,
+  Status: ConnectionStatus,
+  Reason: number,
 }
 
-function isDuplicateDevice(devices: Device[], nextDevice: Device) {
-  return devices.findIndex((device) => nextDevice.id === device.id) > -1;
-}
+export type NotificationCallback = (
+  error: BleError | null,
+  notif: ConnectionNotification | null
+) => Promise<void>;
 
 export class BLEService {
   private connectedDevice: Device | null = null;
@@ -52,25 +55,36 @@ export class BLEService {
    * scanForDevices will start scanning for BLE connections.  It will make it so it only
    * scans for our specific devices.  It will also add it to a list which can be displayed to the user.
    */
-  public scanForDevices(callback) {
+  public scanForDevices(callback: (devices: Device[]) => void) {
     this.bleManager.startDeviceScan([EyeSpyUUID.BLE_SERVICE_UUID], null, (error, device) => {
       if (error) {
-        console.log(error.errorCode);
+        console.error(error.errorCode);
       }
+
       if (device) {
         // Add Device
         if (!isDuplicateDevice(this.devices, device)) {
-          callback([...this.devices, device]);
-          this.devices =  [...this.devices, device];
+          this.devices = [...this.devices, device];
+          callback(this.devices);
         }
       }
     });
   };
 
+  /**
+   * Returns all scanned devices found
+   * 
+   * @returns Array of scanned devices
+   */
   public getDevices() {
     return this.devices;
   }
 
+  /**
+   * Currently connected device
+   * 
+   * @returns Device
+   */
   public getCurrentConnectedDevice() {
     return this.connectedDevice;
   }
@@ -81,14 +95,20 @@ export class BLEService {
    * @param device
    */
   public async connectToDevice(device: Device) {
-    try {
-      const deviceConnection = await device.connect();
-      this.connectedDevice = await deviceConnection.discoverAllServicesAndCharacteristics();
-      this.bleManager.stopDeviceScan();
-    } catch (error) {
-      console.log('ERROR WHEN CONNECTING', error);
-    }
+    const deviceConnection = await device.connect();
+    this.connectedDevice = await deviceConnection.discoverAllServicesAndCharacteristics();
+    this.bleManager.stopDeviceScan();
   };
+
+  /**
+   * Disconnect from current device
+   */
+  public async disconnectFromDevice() {
+    if (this.connectedDevice) {
+      await this.connectedDevice.cancelConnection();
+      this.connectedDevice = null;
+    }
+  }
 
   /**
    * getCameraSerialFromBLE will read the Eyespy Serial
@@ -97,29 +117,25 @@ export class BLEService {
    */
   public async getCameraSerialFromBLE(): Promise<CameraSerial> {
     // Get EyeSpy serial characteristic
-    try {
-      console.log(this.connectedDevice);
-      const characteristic: Characteristic = await this.connectedDevice!.readCharacteristicForService(
-        EyeSpyUUID.BLE_SERVICE_UUID,
-        EyeSpyUUID.SERIAL_UUID
-      );
+    const characteristic: Characteristic = await this.connectedDevice!.readCharacteristicForService(
+      EyeSpyUUID.BLE_SERVICE_UUID,
+      EyeSpyUUID.SERIAL_UUID
+    );
 
-      if (!characteristic.value) throw new Error('ERROR: No value in characteristic!');
+    if (!characteristic.value)
+      throw new Error('ERROR: No value in characteristic!');
 
-      const serialValues = JSON.parse(enc.Base64.parse(characteristic.value).toString(enc.Utf8));
+    const serialValues = base64ToJson(characteristic.value);
 
-      if (!serialValues.Serial || !serialValues.PubKey) throw new Error('ERROR: No serial value!');
+    if (!serialValues.Serial || !serialValues.PubKey)
+      throw new Error('ERROR: No serial value!');
 
-      // Get characteristic values (Serial values)
-      const { Serial, PubKey } = serialValues;
-      return {
-        Serial,
-        PubKey,
-      };
-    } catch (error) {
-      console.log('NO DEVICE CONNECTED', error.reason);
-      throw error;
-    }
+    // Get characteristic values (Serial values)
+    const { Serial, PubKey } = serialValues;
+    return {
+      Serial,
+      PubKey,
+    };
   }
 
   
@@ -132,37 +148,32 @@ export class BLEService {
     password: string,
     cameraUUID: string
   ): Promise<void> {
-    try {
+    const networkState = await NetInfo.fetch();
 
-      const networkState = await NetInfo.fetch();
-
-      if (!networkState.details?.ssid)
-        throw new Error(
-          'ERROR: SSID Could not be found. Make sure location permissions are turned on!'
-        );
-
-      const wifiDetails = {
-        SSID: networkState.details?.ssid,
-        User: username,
-        Pass: password,
-        UUID: cameraUUID,
-      };
-      const base64WifiDetails = enc.Base64.stringify(enc.Utf8.parse(JSON.stringify(wifiDetails)));
-      console.log(JSON.stringify(wifiDetails));
-      console.log(wifiDetails);
-      console.log(base64WifiDetails);
-      console.log(
-        await this.connectedDevice!.writeCharacteristicWithResponseForService(
-          EyeSpyUUID.BLE_SERVICE_UUID,
-          EyeSpyUUID.WIFI_UUID,
-          base64WifiDetails
-        )
+    if (!networkState.details?.ssid)
+      throw new Error(
+        'ERROR: SSID Could not be found. Make sure location permissions are turned on!'
       );
-    } catch (error) {
-      console.log('Error in writeCameraWifi()', error);
-    }
+
+    const wifiDetails = {
+      SSID: networkState.details?.ssid,
+      User: username,
+      Pass: password,
+      UUID: cameraUUID,
+    };
+
+    const base64WifiDetails = jsonToBase64(wifiDetails);
+    await this.connectedDevice!.writeCharacteristicWithResponseForService(
+      EyeSpyUUID.BLE_SERVICE_UUID,
+      EyeSpyUUID.WIFI_UUID,
+      base64WifiDetails
+    );
   }
 
+  /**
+   * Checks the wifi type using the SSID phone is currently connected to
+   * @returns Wifi Security Type
+   */
   public async checkWifiType(): Promise<WifiSecType> {
     try {
       const networkState = await NetInfo.fetch();
@@ -173,7 +184,7 @@ export class BLEService {
       const bleSendSSID = {
         SSID: networkState.details?.ssid,
       };
-      const base64SSID = enc.Base64.stringify(enc.Utf8.parse(JSON.stringify(bleSendSSID)));
+      const base64SSID = jsonToBase64(bleSendSSID);
       this.connectedDevice!.writeCharacteristicWithResponseForService(
         EyeSpyUUID.BLE_SERVICE_UUID,
         EyeSpyUUID.WIFI_CHECK_UUID,
@@ -186,9 +197,10 @@ export class BLEService {
         EyeSpyUUID.WIFI_CHECK_UUID
       );
 
-      if (!checkChar.value) throw new Error('ERROR: No value in checkChar.value in checkWifiType()!');
+      if (!checkChar.value) 
+        throw new Error('ERROR: No value in checkChar.value in checkWifiType()!');
 
-      const wifiTypeJson: {Type: WifiSecType} = JSON.parse(enc.Base64.parse(checkChar.value).toString(enc.Utf8));
+      const wifiTypeJson: {Type: WifiSecType} = base64ToJson(checkChar.value);
       return wifiTypeJson.Type;
     } catch (error) {
       console.log('Error in checkWifiType(): ', error);
@@ -202,15 +214,25 @@ export class BLEService {
    * @param device
    */
   public async checkCameraNotification(
-    onCameraNotificationUpdate: (
+    onCameraNotificationUpdate: NotificationCallback
+  ): Promise<Subscription> {
+
+    const bleCallback = (
       error: BleError | null,
       characteristic: Characteristic | null
-    ) => Promise<void>
-  ): Promise<Subscription> {
+    ): void => {
+      let returnVal: ConnectionNotification | null = null;
+      if (error === null && characteristic?.value != null) {
+        returnVal = base64ToJson(characteristic.value);
+      }
+
+      onCameraNotificationUpdate(error, returnVal);
+    }
+
     return this.connectedDevice!.monitorCharacteristicForService(
       EyeSpyUUID.BLE_SERVICE_UUID,
       EyeSpyUUID.CONNECTION_UUID,
-      onCameraNotificationUpdate
+      bleCallback
     );
   }
 }

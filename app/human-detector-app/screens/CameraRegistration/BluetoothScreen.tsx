@@ -37,8 +37,6 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
       device.isConnected().then((connected) => {
         if (connected) navigation.navigate('CameraRegistrationInfo');
       });
-  
-      console.log('Camera is not connected!');
     }
   }, [device]);
   

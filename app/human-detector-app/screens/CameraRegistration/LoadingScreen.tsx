@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
 import { View } from 'react-native';
-import { enc } from 'crypto-js';
-import { BleError, Characteristic, Subscription } from 'react-native-ble-plx';
+import { BleError, Subscription } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
-import { ConnectionNotification, ConnectionStatus } from '../../src/ble/bleServices';
+import { ConnectionStatus, ConnectionNotification } from '../../src/ble/bleServices';
 import { BLEContext } from '../../contexts/bleContext';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
@@ -27,24 +26,22 @@ export default function LoadingScreen({ navigation }): React.ReactElement {
 
     const endLoading = (nextScreen: string) => {
       bleSub?.remove();
+      bleContext.disconnectFromDevice();
       setTimeout(() => {
         navigation.navigate(nextScreen);
       }, END_LOGGING_TIMEOUT);
     }
 
-    const bleCallback = async (error: BleError | null, char: Characteristic | null) => {
-      if (error !== null || char === null) {
+    const bleCallback = async (
+      error: BleError | null,
+      notif: ConnectionNotification | null
+    ) => {
+      if (error !== null || notif === null) {
         // Error occured
         console.error(error);
+        navigation.navigate('Groups');
       } else {
-        if (!char.value) {
-          throw new Error('ERROR: No value in characteristic!');
-        }
-  
-        const notifValues = JSON.parse(enc.Base64.parse(char.value).toString(enc.Utf8));
-        
-        console.log(notifValues.State);
-        switch(notifValues.State) {
+        switch(notif.Status) {
           case ConnectionStatus.DISCONNECTED:
             break; // Do nothing
           case ConnectionStatus.CONNECTING:
@@ -52,7 +49,7 @@ export default function LoadingScreen({ navigation }): React.ReactElement {
             break;
           case ConnectionStatus.FAIL:
             setIcon(LoadingState.Failure);
-            endLoading('EnterCmaeraRegInfoScreen');
+            endLoading('EnterCameraRegInfoScreen');
             break;
           case ConnectionStatus.SUCCESS:
             setIcon(LoadingState.Success);

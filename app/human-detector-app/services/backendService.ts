@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import Camera from '../classes/Camera';
 import Group from '../classes/Group';
 import Notification from '../classes/Notification';
 import User from '../classes/User';

@@ -51,7 +51,7 @@ export function jsonToBase64(obj: any): string {
 export function base64ToJson(val: string): any {
     const base64CryptoWord = enc.Base64.parse(val);
     const jsonStr = base64CryptoWord.toString(enc.Utf8);
-    JSON.parse(jsonStr);
+    return JSON.parse(jsonStr);
 }
 
 /**

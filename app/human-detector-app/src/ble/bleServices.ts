@@ -35,7 +35,7 @@ export enum ConnectionStatus {
 
 // Notification JSON recieved from camera
 export interface ConnectionNotification {
-  Status: ConnectionStatus,
+  State: ConnectionStatus,
   Reason: number,
 }
 
@@ -95,6 +95,7 @@ export class BLEService {
    * @param device
    */
   public async connectToDevice(device: Device) {
+    if (await device.isConnected()) return;
     const deviceConnection = await device.connect();
     this.connectedDevice = await deviceConnection.discoverAllServicesAndCharacteristics();
     this.bleManager.stopDeviceScan();
@@ -203,7 +204,7 @@ export class BLEService {
       const wifiTypeJson: {Type: WifiSecType} = base64ToJson(checkChar.value);
       return wifiTypeJson.Type;
     } catch (error) {
-      console.log('Error in checkWifiType(): ', error);
+      console.error('Error in checkWifiType(): ', error);
       throw error;
     }
   }

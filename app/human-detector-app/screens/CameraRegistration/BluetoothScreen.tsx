@@ -49,8 +49,10 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
             <Button
               title={item.id}
               onPress={() => {
+                console.log("!");
                 // This button will connect device
                 bleService.connectToDevice(item).then(() => {
+                  console.log('connected');
                   setDevice(item);
                 });
               }}

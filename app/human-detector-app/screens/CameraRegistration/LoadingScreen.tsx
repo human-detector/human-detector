@@ -84,7 +84,7 @@ export default function LoadingScreen({ navigation }: Props): React.ReactElement
       setBleSub(sub);
     }).catch((error) => {
       console.error(error);
-      endLoading(true);
+      navigation.navigate('Bluetooth');
     });
   }, []);
 

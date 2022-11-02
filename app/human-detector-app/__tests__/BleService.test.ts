@@ -1,14 +1,11 @@
-import { BleManager, BleError, ScanOptions, Device, Characteristic } from 'react-native-ble-plx';
-import { BLEService, WifiSecType } from '../src/ble/bleServices';
+import { BleManager, BleError, ScanOptions, Device, Characteristic, Subscription } from 'react-native-ble-plx';
+import { BLEService, ConnectionStatus, ConnectionNotification, WifiSecType } from '../src/ble/bleServices';
 import { base64ToJson, jsonToBase64 } from '../src/ble/helpers';
 import * as EyeSpyUUID from '../config/BLEConfig';
 
-type ScanDeviceCallback = (
-    error: BleError | null,
-    device: Device | null,
-    ) => void;
-
-// Mocks NetInfo, needs to be top level otherwise mocking doesn't work
+/**
+ * Mocks NetInfo, needs to be top level otherwise mocking doesn't work
+ */
 jest.mock('@react-native-community/netinfo', () => ({
     fetch: async () => ({
         details: {
@@ -18,6 +15,16 @@ jest.mock('@react-native-community/netinfo', () => ({
 }));
 
 describe(BLEService, () => {
+    /**
+     * Helper to create a characteristic from a value
+     */
+    const createCharacteristic = (value: any) => ({
+            value
+        } as unknown as jest.Mocked<Characteristic>);
+
+    /**
+     * Mocks for reading from BLE Device
+     */
     const mockWifiTypeReturn = {
         Type: "KEY_PSK"
     };
@@ -27,42 +34,73 @@ describe(BLEService, () => {
         PubKey: "----START PUBLIC KEY-----\n1234567890abcdefg=\n-----END PUBLIC KEY\n"
     }
 
-    const mockBleRead = jest.fn().mockImplementation(
-        async (serviceUUID: string, charUUID: string): Promise<Characteristic> => {
+    const mockBleRead = jest.fn().mockImplementation(async (
+        serviceUUID: string,
+        charUUID: string
+    ): Promise<Characteristic> => {
         
         if (serviceUUID !== EyeSpyUUID.BLE_SERVICE_UUID)
             throw new Error("Service does not exist");
         
         if (charUUID === EyeSpyUUID.SERIAL_UUID) {
-            return {
-                value: jsonToBase64(mockSerialReturn)
-            } as unknown as jest.Mocked<Characteristic>;
+            return createCharacteristic(jsonToBase64(mockSerialReturn));
         }
 
         if (charUUID === EyeSpyUUID.WIFI_CHECK_UUID) {
-            return {
-                value: jsonToBase64(mockWifiTypeReturn)
-            } as unknown as jest.Mocked<Characteristic>;
+            return createCharacteristic(jsonToBase64(mockWifiTypeReturn));
         }
 
         throw new Error("Characteristic does not exist");
     });
 
+    /**
+     * Monitoring mocks
+     */
+    const mockBleMonitor = jest.fn().mockImplementation(async (
+        serviceUUID: string,
+        charUUID: string,
+        callback: (error: BleError | null, char: Characteristic | null) => Promise<void>
+    ) => {
+        
+        if (serviceUUID !== EyeSpyUUID.BLE_SERVICE_UUID || charUUID !== EyeSpyUUID.CONNECTION_UUID) {
+            throw new Error("Service or Characteristic UUID do not exist");
+        }
+
+        callback(null, createCharacteristic(jsonToBase64({
+            State: ConnectionStatus.CONNECTING,
+            Reason: 0
+        })));
+
+        callback(null, createCharacteristic(jsonToBase64({
+            State: ConnectionStatus.SUCCESS,
+            Reason: 0
+        })));
+
+        return {
+            remove: () => {}
+        } as unknown as jest.Mocked<Subscription>;
+    });
+
+    /**
+     * Mocks for scanning devices
+     */
     const mockedDevice: jest.Mocked<Device> = {
         id: '12:34:56:78',
         connect: jest.fn().mockReturnThis(),
         isConnected: jest.fn().mockImplementation(async () => false),
         discoverAllServicesAndCharacteristics: jest.fn().mockReturnThis(),
         readCharacteristicForService: mockBleRead,
-        writeCharacteristicWithResponseForService: jest.fn()
+        writeCharacteristicWithResponseForService: jest.fn(),
+        monitorCharacteristicForService: mockBleMonitor,
     } as unknown as jest.Mocked<Device>
 
-    const mockStartDeviceScan = jest.fn().mockImplementation(
-        (UUIDs: string[] | null,
-         options: ScanOptions | null, 
-         callback: ScanDeviceCallback) => {
-            callback(null, mockedDevice);
-        });
+    const mockStartDeviceScan = jest.fn().mockImplementation((
+        UUIDs: string[] | null,
+        options: ScanOptions | null, 
+        callback: (error: BleError | null, device: Device | null) => void
+    ) => {
+        callback(null, mockedDevice);
+    });
 
     const mockBleManager: jest.Mocked<BleManager> = {
         startDeviceScan: mockStartDeviceScan,
@@ -136,7 +174,10 @@ describe(BLEService, () => {
     });
 
     it("Can monitor connection status", async () => {
-
+        const callback = jest.fn();
+        const sub = await bleService.checkCameraNotification(callback);
+        expect(sub).toBeDefined();
+        expect(callback).toBeCalledTimes(2);
     });
 
     it("Can convert base64 string to a JSON", () => {
@@ -156,6 +197,4 @@ describe(BLEService, () => {
 
         expect(jsonToBase64(obj)).toEqual(base64Str);
     });
-
-
 });

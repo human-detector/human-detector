@@ -1,5 +1,5 @@
 import { BleManager, BleError, ScanOptions, Device, Characteristic, Subscription } from 'react-native-ble-plx';
-import { BLEService, ConnectionStatus, ConnectionNotification, WifiSecType } from '../src/ble/bleServices';
+import { BLEService, ConnectionStatus, WifiSecType } from '../src/ble/bleServices';
 import { base64ToJson, jsonToBase64 } from '../src/ble/helpers';
 import * as EyeSpyUUID from '../config/BLEConfig';
 

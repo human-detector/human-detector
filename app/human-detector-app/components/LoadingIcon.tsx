@@ -56,10 +56,11 @@ export function LoadingIcon(props: LoadingIconProps): React.ReactElement<Loading
     }
   }, [state]);
   
-  const backgroundColor = props.background ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0)';
+  const { background } = props;
+  const backgroundColor = background ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0)';
 
   return (
-    <View style={[styles.centerIcon, { backgroundColor: backgroundColor }]}>
+    <View style={[styles.centerIcon, { backgroundColor }]}>
       <Animated.View style={[{transform: [{rotate: `${rotation}deg` }]}]}>
         {state === LoadingState.Loading && <AntDesign name="loading2" size={100} color="black" />}
         {state === LoadingState.Success && <AntDesign name="checkcircleo" size={100} color="green" />}
@@ -67,4 +68,8 @@ export function LoadingIcon(props: LoadingIconProps): React.ReactElement<Loading
       </Animated.View>
     </View>
   )
+}
+
+LoadingIcon.defaultProps = {
+  background: false
 }

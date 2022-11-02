@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ScrollView, Button, StyleSheet } from 'react-native';
+import { View, ScrollView, Button } from 'react-native';
 import { Device } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
 import { BLEContext } from '../../contexts/bleContext';
@@ -51,7 +51,7 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
           </View>
         ))}
       </ScrollView>
-      {connecting && <LoadingIcon state={LoadingState.Loading} background={true}/>}
+      {connecting && <LoadingIcon state={LoadingState.Loading} background />}
     </View>
   );
 }

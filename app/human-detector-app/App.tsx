@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { BleManager } from 'react-native-ble-plx';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -14,7 +15,7 @@ import { BLEContext } from './contexts/bleContext';
 import { BLEService } from './src/ble/bleServices';
 
 const Stack = createNativeStackNavigator();
-const bleService = new BLEService();
+const bleService = new BLEService(new BleManager());
 
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);

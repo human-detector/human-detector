@@ -49,7 +49,11 @@ export class BLEService {
 
   private devices: Device[] = [];
 
-  private bleManager = new BleManager();
+  private bleManager;
+
+  constructor(manager: BleManager) {
+    this.bleManager = manager;
+  }
 
   /**
    * scanForDevices will start scanning for BLE connections.  It will make it so it only

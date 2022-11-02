@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Camera from '../classes/Camera';
-import { RootStackParamList } from '../StackParamList';
+import { RootStackParamList } from '../src/Navigation/StackParamList';
 
 const styles = StyleSheet.create({
   container: {
@@ -84,7 +84,7 @@ export default function CameraScreen({ navigation }: Props): React.ReactElement 
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
               // Start camera registration process
-              navigation.navigate('Bluetooth');
+              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList'});
             }}
           >
             <Text style={styles.addButtonText}> + </Text>

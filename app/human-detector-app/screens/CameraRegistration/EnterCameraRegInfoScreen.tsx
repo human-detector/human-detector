@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { View, StyleSheet, TextInput, Button } from 'react-native';
+import { View, StyleSheet, TextInput, Button, KeyboardAvoidingView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WifiSecType, CameraSerial } from '../../src/ble/bleServices';
 import { BackendContext } from '../../contexts/backendContext';
 import { BLEContext } from '../../contexts/bleContext';
-import { RootStackParamList } from '../../StackParamList';
+import { BLEParamList } from '../../src/Navigation/BLEParamList';
 
 /**
  * The EnterCameraRegInfoScreen will allow the user
@@ -22,58 +22,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // paddingTop: 40,
-    // paddingHorizontal: 20
+    justifyContent: 'flex-end',
+    padding:20
   },
   textInput: {
     borderWidth: 1,
     borderColor: '#777',
-    padding: 8,
-  },
-  pads: {
-    padding: 10,
-  },
-  boldHeader: {
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  menuItem: {
-    marginTop: 24,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 30,
-    backgroundColor: '#E0FFFF',
-    fontSize: 24,
-    borderWidth: 2,
-    borderColor: '#D3D3D3',
-  },
-  addButtonItem: {
-    borderColor: '#D3D3D3',
-    backgroundColor: '#DCDCDC',
-  },
-  menuButtonText: {
-    fontSize: 24,
-    marginTop: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addButtonText: {
-    alignItems: 'center',
-    fontSize: 50,
-    marginTop: 0,
-    marginBottom: 0,
+    padding: 8
   },
   input: {
     height: 40,
-    margin: 12,
+    marginBottom: 10,
     borderWidth: 1,
     padding: 10,
   },
-  buttonNext: {},
+  button: {
+    marginTop: 20
+  }
 });
 
-type Props = NativeStackScreenProps<RootStackParamList, 'CameraRegistrationInfo'>
+type Props = NativeStackScreenProps<BLEParamList, 'CameraRegistrationInfo'>
 export default function EnterCameraRegInfoScreen({ navigation }: Props): React.ReactElement {
   const [displayUser, setDisplayUser] = React.useState(false);
   const [displayPass, setDisplayPass] = React.useState(false);
@@ -112,13 +80,13 @@ export default function EnterCameraRegInfoScreen({ navigation }: Props): React.R
       );
 
       if (uuid === null) {
-        navigation.navigate('Bluetooth');
+        navigation.navigate('BluetoothDeviceList');
         return;
       }
 
       bleContext.writeCameraWifi(user, pass, uuid).catch((error) => {
         console.error(error);
-        navigation.navigate('Bluetooth');
+        navigation.navigate('BluetoothDeviceList');
       });
       navigation.navigate('Loading');
     }).catch((error) => {
@@ -144,28 +112,31 @@ export default function EnterCameraRegInfoScreen({ navigation }: Props): React.R
 
     }).catch((error) => {
       console.error(error);
-      navigation.navigate('Bluetooth');
+      navigation.navigate('BluetoothDeviceList');
     });
   }, [currentDevice]);
 
   return (
-    <View style={styles.container}>
-      {(displayUser) && <TextInput
-        style={styles.input}
-        onChangeText={setUser}
-        value={user}
-        placeholder="Enter WiFi username here"
-      />}
-      {(displayPass) && <TextInput
-        style={styles.input}
-        onChangeText={setPass}
-        value={pass}
-        placeholder="Enter WiFi password here"
-      />}
-      {(displayUser || displayPass) && <Button
-        title="Next"
-        onPress={submitWifiToPi}
-      />}
-    </View>
+    <KeyboardAvoidingView style={styles.container}>
+        {(displayUser) && <TextInput
+          style={styles.input}
+          onChangeText={setUser}
+          value={user}
+          placeholder="Enter WiFi username here"
+        />}
+        {(displayPass) && <TextInput
+          style={styles.input}
+          onChangeText={setPass}
+          value={pass}
+          secureTextEntry
+          placeholder="Enter WiFi password here"
+        />}
+        {(displayUser || displayPass) && <View style={styles.button}>
+          <Button
+              title="Next"
+              onPress={submitWifiToPi}
+          />
+        </View>}
+    </KeyboardAvoidingView>
   );
 }

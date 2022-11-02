@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Group from '../classes/Group';
-import { RootStackParamList } from '../StackParamList';
+import { RootStackParamList } from '../src/Navigation/StackParamList';
 
 const styles = StyleSheet.create({
   container: {
@@ -61,7 +61,9 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
   const groupThree: Group = new Group("CCCCC's Group", '400');
 
   const [listOfGroups, setListOfGroups] = useState<Group[]>([]);
-  setListOfGroups([groupOne, groupTwo, groupThree]);
+  React.useEffect(() => {
+    setListOfGroups([groupOne, groupTwo, groupThree]);
+  }, []);
 
   const pressHandler = () => {
     navigation.navigate('Cameras');

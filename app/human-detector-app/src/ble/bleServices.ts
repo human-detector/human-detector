@@ -76,6 +76,14 @@ export class BLEService {
   };
 
   /**
+   * Stop scanning for new devices
+   */
+  public stopScanForDevices() {
+    this.devices = [];
+    this.bleManager.stopDeviceScan();
+  }
+
+  /**
    * Returns all scanned devices found
    * 
    * @returns Array of scanned devices
@@ -102,7 +110,6 @@ export class BLEService {
     if (await device.isConnected()) return;
     const deviceConnection = await device.connect();
     this.connectedDevice = await deviceConnection.discoverAllServicesAndCharacteristics();
-    this.bleManager.stopDeviceScan();
   };
 
   /**

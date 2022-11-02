@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { View, ScrollView, Button } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Device } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
+import { BLEParamList } from '../../src/Navigation/BLEParamList';
 import { BLEContext } from '../../contexts/bleContext';
 import { requestPermissions } from '../../src/ble/helpers'
-import { RootStackParamList } from '../../StackParamList';
 
 /**
  * This screen will start scanning on the device for bluetooth devices.
@@ -16,19 +17,23 @@ import { RootStackParamList } from '../../StackParamList';
  * @returns
  */
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Bluetooth'>
+type Props = NativeStackScreenProps<BLEParamList, 'BluetoothDeviceList'>
 export default function BluetoothScreen({ navigation }: Props): React.ReactElement {
   const [connecting, setConnecting ] = React.useState(false);
   const [allDevices, setAllDevices] = React.useState<Device[]>([]);
   const bleService = React.useContext(BLEContext);
 
-  React.useEffect(() => {
+  useFocusEffect(() => {
     requestPermissions().then((isGranted: boolean) => {
       if (isGranted) {
         bleService.scanForDevices(setAllDevices);
       }
     });
-  }, []);
+
+    return () => {
+      bleService.stopScanForDevices();
+    }
+  });
 
   return (
     <View style={{flex: 1}}>
@@ -39,7 +44,7 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
               title={item.id}
               onPress={() => {
                 if (connecting) return;
-                setConnecting(true);
+                setConnecting(true);          
 
                 // This button will connect device
                 bleService.connectToDevice(item).then(() => {

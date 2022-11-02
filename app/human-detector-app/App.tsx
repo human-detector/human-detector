@@ -5,15 +5,13 @@ import { BleManager } from 'react-native-ble-plx';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
-import BluetoothScreen from './screens/CameraRegistration/BluetoothScreen';
-import LoadingScreen from './screens/CameraRegistration/LoadingScreen';
-import EnterCameraRegInfoScreen from './screens/CameraRegistration/EnterCameraRegInfoScreen';
 import fetchPushToken from './src/notifications/fetchPushToken';
 import BackendService from './services/backendService';
 import { BackendContext } from './contexts/backendContext';
 import { BLEContext } from './contexts/bleContext';
 import { BLEService } from './src/ble/bleServices';
-import { RootStackParamList } from './StackParamList';
+import BLEScreens from './src/ble/bleScreens'
+import { RootStackParamList } from './src/Navigation/StackParamList';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());
@@ -62,14 +60,10 @@ export default function App(): React.ReactElement {
   // If the user is logged in return the stack with all the information
   return (
     <NavigationContainer>
-    <BLEContext.Provider value={bleService}>
-      <BackendContext.Provider value={backendService}>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Groups"
-            component={GroupScreen}
-            options={{
-              title: 'EyeSpy',
+      <BLEContext.Provider value={bleService}>
+        <BackendContext.Provider value={backendService}>
+          <Stack.Navigator
+            screenOptions={{
               headerStyle: {
                 backgroundColor: '#1E90FF',
               },
@@ -77,73 +71,30 @@ export default function App(): React.ReactElement {
               headerTitleStyle: {
                 fontWeight: 'bold',
               },
-            }}
-          />
-          <Stack.Screen
-            name="Cameras"
-            component={CameraScreen}
-            options={{
-              title: 'EyeSpy',
-              headerStyle: {
-                backgroundColor: '#1E90FF',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-              headerBackTitleVisible: false,
-              headerBackVisible: true,
-            }}
-          />
+            }}>
             <Stack.Screen
-              name="Bluetooth"
-              component={BluetoothScreen}
-              options={{
-                title: 'Connect Camera',
-                headerStyle: {
-                  backgroundColor: '#1E90FF',
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                  fontWeight: 'bold',
-                },
-              }}
+              name="Groups"
+              component={GroupScreen}
+              options={{ title: 'EyeSpy' }}
             />
             <Stack.Screen
-              name="CameraRegistrationInfo"
-              component={EnterCameraRegInfoScreen}
+              name="Cameras"
+              component={CameraScreen}
               options={{
-                title: 'Connect Camera',
-                headerStyle: {
-                  backgroundColor: '#1E90FF',
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                  fontWeight: 'bold',
-                },
-                headerBackTitleVisible: true,
+                title: 'EyeSpy',
+                headerBackTitleVisible: false,
                 headerBackVisible: true,
               }}
             />
             <Stack.Screen
-              name="Loading"
-              component={LoadingScreen}
+              name="CameraRegistration"
+              component={BLEScreens}
               options={{
-                title: 'Connect Camera',
-                headerStyle: {
-                  backgroundColor: '#1E90FF',
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                  fontWeight: 'bold',
-                },
-                headerBackTitleVisible: true,
-                headerBackVisible: true,
+                headerShown: false
               }}
             />
-        </Stack.Navigator>
-      </BackendContext.Provider>
-      
+          </Stack.Navigator>
+        </BackendContext.Provider>
       </BLEContext.Provider>
     </NavigationContainer>
   );

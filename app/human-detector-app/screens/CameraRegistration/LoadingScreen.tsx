@@ -6,7 +6,7 @@ import { BleError, Subscription, BleErrorCode } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
 import { ConnectionStatus, ConnectionNotification } from '../../src/ble/bleServices';
 import { BLEContext } from '../../contexts/bleContext';
-import { RootStackParamList } from '../../StackParamList';
+import { BLEParamList } from '../../src/Navigation/BLEParamList';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
 
@@ -16,7 +16,7 @@ const END_LOGGING_TIMEOUT = 3 * 1000;
  * a successful connection notifciation from the camera.
  */
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Loading'>
+type Props = NativeStackScreenProps<BLEParamList, 'Loading'>
 export default function LoadingScreen({ navigation }: Props): React.ReactElement {
   const [ connState, setConnState] = useState<ConnectionNotification>();
   const [ bleSub, setBleSub ] = useState<Subscription>();
@@ -29,7 +29,7 @@ export default function LoadingScreen({ navigation }: Props): React.ReactElement
     bleSub!.remove();
     bleContext.disconnectFromDevice();
     setTimeout(() => {
-      navigation.navigate(failure ? 'CameraRegistrationInfo' : 'Groups');
+      navigation.navigate(failure ? 'CameraRegistrationInfo' : 'BluetoothDeviceList');
     }, END_LOGGING_TIMEOUT);
   }
 
@@ -72,7 +72,7 @@ export default function LoadingScreen({ navigation }: Props): React.ReactElement
         }
 
         console.error(error);
-        navigation.navigate('Groups');
+        navigation.navigate('BluetoothDeviceList');
       } else {
         setConnState(notif);
       }
@@ -84,7 +84,7 @@ export default function LoadingScreen({ navigation }: Props): React.ReactElement
       setBleSub(sub);
     }).catch((error) => {
       console.error(error);
-      navigation.navigate('Bluetooth');
+      navigation.navigate('BluetoothDeviceList');
     });
   }, []);
 

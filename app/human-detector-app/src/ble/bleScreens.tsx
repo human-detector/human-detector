@@ -12,7 +12,7 @@ export default function BLEScreens() {
     return (
         <Stack.Navigator
             initialRouteName='BluetoothDeviceList'
-            defaultScreenOptions={{
+            screenOptions={{
                 headerStyle: {
                     backgroundColor: '#1E90FF',
                 },

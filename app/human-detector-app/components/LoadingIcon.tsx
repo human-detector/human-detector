@@ -1,12 +1,17 @@
 import * as React from 'react';
-import { StyleSheet, Animated, Easing } from 'react-native';
+import { StyleSheet, Animated, Easing, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
 const styles = StyleSheet.create({
   centerIcon: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1
+    flex: 1,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0
   }
 });
 
@@ -18,6 +23,7 @@ export enum LoadingState {
 
 export interface LoadingIconProps {
   state: LoadingState,
+  background?: boolean
 }
 
 export function LoadingIcon(props: LoadingIconProps): React.ReactElement<LoadingIconProps> {
@@ -49,12 +55,16 @@ export function LoadingIcon(props: LoadingIconProps): React.ReactElement<Loading
         break;
     }
   }, [state]);
+  
+  const backgroundColor = props.background ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0)';
 
   return (
-    <Animated.View style={[styles.centerIcon, {transform: [{rotate: `${rotation}deg` }]}]}>
-      {state === LoadingState.Loading && <AntDesign name="loading2" size={100} color="black" />}
-      {state === LoadingState.Success && <AntDesign name="checkcircleo" size={100} color="green" />}
-      {state === LoadingState.Failure && <AntDesign name="exclamationcircleo" size={100} color="red" />}
-    </Animated.View>
+    <View style={[styles.centerIcon, { backgroundColor: backgroundColor }]}>
+      <Animated.View style={[{transform: [{rotate: `${rotation}deg` }]}]}>
+        {state === LoadingState.Loading && <AntDesign name="loading2" size={100} color="black" />}
+        {state === LoadingState.Success && <AntDesign name="checkcircleo" size={100} color="green" />}
+        {state === LoadingState.Failure && <AntDesign name="exclamationcircleo" size={100} color="red" />}
+      </Animated.View>
+    </View>
   )
 }

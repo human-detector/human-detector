@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { View, ScrollView, Button } from 'react-native';
+import { View, ScrollView, Button, StyleSheet } from 'react-native';
 import { Device } from 'react-native-ble-plx';
+import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
 import { BLEContext } from '../../contexts/bleContext';
 import { requestPermissions } from '../../src/ble/helpers'
-
 
 /**
  * This screen will start scanning on the device for bluetooth devices.
@@ -20,10 +20,6 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
   const bleService = React.useContext(BLEContext);
 
   React.useEffect(() => {
-    setAllDevices(bleService.getDevices());
-  }, [bleService.getDevices()]);
-
-  React.useEffect(() => {
     requestPermissions().then((isGranted: boolean) => {
       if (isGranted) {
         bleService.scanForDevices(setAllDevices);
@@ -32,7 +28,7 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
   }, []);
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <ScrollView>
         {allDevices.map((item) => (
           <View key={item.id}>
@@ -55,6 +51,7 @@ export default function BluetoothScreen({ navigation }): React.ReactElement {
           </View>
         ))}
       </ScrollView>
+      {connecting && <LoadingIcon state={LoadingState.Loading} background={true}/>}
     </View>
   );
 }

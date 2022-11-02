@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Camera from '../classes/Camera';
+import { RootStackParamList } from '../StackParamList';
 
 const styles = StyleSheet.create({
   container: {
@@ -52,7 +54,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function CameraScreen({ navigation }): React.ReactElement {
+type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>
+export default function CameraScreen({ navigation }: Props): React.ReactElement {
   const cameraOne: Camera = new Camera('123', "AAAAA's Camera", '99');
   const cameraTwo: Camera = new Camera('124', "BBBBB's Camera", '725');
   const cameraThree: Camera = new Camera('125', "CCCCC's Camera", '400');

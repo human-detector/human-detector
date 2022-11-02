@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Group from '../classes/Group';
+import { RootStackParamList } from '../StackParamList';
 
 const styles = StyleSheet.create({
   container: {
@@ -53,16 +54,14 @@ const styles = StyleSheet.create({
   },
 });
 
-// FIXME: Define the route params object (first param to the 'NativeStackScreenProps' type) in one central file
-//        so each component can use it. The dummy object here is a placeholder to pass typechecking.
-export default function GroupScreen({
-  navigation,
-}: NativeStackScreenProps<{ Group: undefined; Cameras: undefined }, 'Group'>): React.ReactElement {
+type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>
+export default function GroupScreen({ navigation }: Props): React.ReactElement {
   const groupOne: Group = new Group("AAAAAA's Group", '99');
   const groupTwo: Group = new Group("BBBBB's Group", '725');
   const groupThree: Group = new Group("CCCCC's Group", '400');
 
-  const [listOfGroups, setListOfGroups] = useState([groupOne, groupTwo, groupThree]);
+  const [listOfGroups, setListOfGroups] = useState<Group[]>([]);
+  setListOfGroups([groupOne, groupTwo, groupThree]);
 
   const pressHandler = () => {
     navigation.navigate('Cameras');

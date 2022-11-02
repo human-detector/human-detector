@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { View, ScrollView, Button } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Device } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
 import { BLEContext } from '../../contexts/bleContext';
 import { requestPermissions } from '../../src/ble/helpers'
+import { RootStackParamList } from '../../StackParamList';
 
 /**
  * This screen will start scanning on the device for bluetooth devices.
@@ -14,7 +16,8 @@ import { requestPermissions } from '../../src/ble/helpers'
  * @returns
  */
 
-export default function BluetoothScreen({ navigation }): React.ReactElement {
+type Props = NativeStackScreenProps<RootStackParamList, 'Bluetooth'>
+export default function BluetoothScreen({ navigation }: Props): React.ReactElement {
   const [connecting, setConnecting ] = React.useState(false);
   const [allDevices, setAllDevices] = React.useState<Device[]>([]);
   const bleService = React.useContext(BLEContext);

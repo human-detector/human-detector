@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
 import { View } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BleError, Subscription, BleErrorCode } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
 import { ConnectionStatus, ConnectionNotification } from '../../src/ble/bleServices';
 import { BLEContext } from '../../contexts/bleContext';
+import { RootStackParamList } from '../../StackParamList';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
 
@@ -13,7 +15,9 @@ const END_LOGGING_TIMEOUT = 3 * 1000;
  * The original primary use for this screen is for when the user is waiting for
  * a successful connection notifciation from the camera.
  */
-export default function LoadingScreen({ navigation }): React.ReactElement {
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Loading'>
+export default function LoadingScreen({ navigation }: Props): React.ReactElement {
   const [ connState, setConnState] = useState<ConnectionNotification>();
   const [ bleSub, setBleSub ] = useState<Subscription>();
   const [ icon, setIcon ] = useState<LoadingState>(LoadingState.Loading);
@@ -21,11 +25,11 @@ export default function LoadingScreen({ navigation }): React.ReactElement {
   const bleContext = useContext(BLEContext);
   const currentDevice = bleContext.getCurrentConnectedDevice();
 
-  const endLoading = (nextScreen: string) => {
+  const endLoading = (failure:boolean) => {
     bleSub!.remove();
     bleContext.disconnectFromDevice();
     setTimeout(() => {
-      navigation.navigate(nextScreen);
+      navigation.navigate(failure ? 'CameraRegistrationInfo' : 'Groups');
     }, END_LOGGING_TIMEOUT);
   }
 
@@ -40,14 +44,14 @@ export default function LoadingScreen({ navigation }): React.ReactElement {
         break;
       case ConnectionStatus.FAIL:
         setIcon(LoadingState.Failure);
-        endLoading('EnterCameraRegInfoScreen');
+        endLoading(true);
         break;
       case ConnectionStatus.SUCCESS:
         setIcon(LoadingState.Success);
-        endLoading('Groups');
+        endLoading(false);
         break;
       default:
-        endLoading('Groups');
+        endLoading(false);
         console.error("UNKNOWN STATE!");
         break;
     }
@@ -80,7 +84,7 @@ export default function LoadingScreen({ navigation }): React.ReactElement {
       setBleSub(sub);
     }).catch((error) => {
       console.error(error);
-      endLoading('Bluetooth');
+      endLoading(true);
     });
   }, []);
 

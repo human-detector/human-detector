@@ -13,8 +13,9 @@ import BackendService from './services/backendService';
 import { BackendContext } from './contexts/backendContext';
 import { BLEContext } from './contexts/bleContext';
 import { BLEService } from './src/ble/bleServices';
+import { RootStackParamList } from './StackParamList';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());
 
 export default function App(): React.ReactElement {

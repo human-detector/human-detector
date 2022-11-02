@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { View, StyleSheet, TextInput, Button } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WifiSecType, CameraSerial } from '../../src/ble/bleServices';
 import { BackendContext } from '../../contexts/backendContext';
 import { BLEContext } from '../../contexts/bleContext';
+import { RootStackParamList } from '../../StackParamList';
 
 /**
  * The EnterCameraRegInfoScreen will allow the user
@@ -71,7 +73,8 @@ const styles = StyleSheet.create({
   buttonNext: {},
 });
 
-export default function EnterCameraRegInfoScreen({ navigation }): React.ReactElement {
+type Props = NativeStackScreenProps<RootStackParamList, 'CameraRegistrationInfo'>
+export default function EnterCameraRegInfoScreen({ navigation }: Props): React.ReactElement {
   const [displayUser, setDisplayUser] = React.useState(false);
   const [displayPass, setDisplayPass] = React.useState(false);
   const [user, setUser] = React.useState('');

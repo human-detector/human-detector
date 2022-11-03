@@ -25,7 +25,9 @@ export default function LoginScreen({ onSuccessfulLogin }: Props): React.ReactEl
           const clientId = Constants.manifest?.extra?.clientId;
           const issuerOrigin = Constants.manifest?.extra?.keycloakUrl;
           const issuer = new URL('/realms/users', issuerOrigin);
-          const redirectUri = makeRedirectUri();
+          const redirectUri = makeRedirectUri({
+            path: 'redirect',
+          });
           new TokenFetcher(clientId, issuer, redirectUri)
             .getTokenManager()
             .then(onSuccessfulLogin)

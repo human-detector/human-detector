@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Camera from '../classes/Camera';
+import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
   container: {
@@ -52,7 +54,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function CameraScreen(): React.ReactElement {
+type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>
+export default function CameraScreen({ navigation }: Props): React.ReactElement {
   const cameraOne: Camera = new Camera('123', "AAAAA's Camera", '99');
   const cameraTwo: Camera = new Camera('124', "BBBBB's Camera", '725');
   const cameraThree: Camera = new Camera('125', "CCCCC's Camera", '400');
@@ -80,10 +83,8 @@ export default function CameraScreen(): React.ReactElement {
           <TouchableOpacity
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
-              const cameraList: Camera[] = [...listOfCameras];
-              // adding camera here test
-              cameraList.push(new Camera('test', 'test', 'test'));
-              setListOfCameras(cameraList);
+              // Start camera registration process
+              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList'});
             }}
           >
             <Text style={styles.addButtonText}> + </Text>
@@ -105,4 +106,3 @@ export function getCameraStream() {}
 export function isCameraOnline(): boolean {
   return true;
 }
-

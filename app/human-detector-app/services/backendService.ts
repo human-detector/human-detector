@@ -36,6 +36,41 @@ export default class BackendService {
   }
 
   /**
+   * Registers the camera in the backend and returns the UUID of it.
+   * 
+   * @param name New camera name
+   * @param serial New camera serial
+   * @param publicKey New camera's public key
+   * @param groupId Group ID to put camera in
+   * @returns Camera UUID
+   */
+  public async registerCamera(
+    name: string,
+    serial: string,
+    publicKey: string,
+    groupId: string
+  ): Promise<string | null> {
+    const apiLinkWithExtension: string = 
+      ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().userID, groupId);
+    
+    try {
+      const response = await this.axiosInstance.put(
+        apiLinkWithExtension,
+        {
+          name,
+          serial,
+          publicKey
+        }
+      );
+
+      return response.data.id;
+    } catch (error) {
+      console.error(`Error in registerCamera status code:`, error);
+      return null;
+    }
+  }
+
+  /**
    * This method is used to get the group list that is connected to a user.  This group list
    * will contain cameras and other information that will be stored as a group object.
    *

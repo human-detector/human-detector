@@ -11,3 +11,5 @@ export const getSendNotifKeyUrlExtension = (userId: string): string =>
 export const getGroupsListUrlExtension = (userId: string): string => `/users/${userId}/groups/`;
 export const getNotificationHistoryUrlExtension = (userId: string): string =>
   `/users/${userId}/notifications/`;
+export const registerCameraUrlExtension = (userId: string, groupId: string): string =>
+  `/users/${userId}/groups/${groupId}/cameras`

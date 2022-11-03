@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Device } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
-import { BLEParamList } from '../../src/Navigation/BLEParamList';
+import { BLEParamList } from '../../src/navigation/bleParamList';
 import { BLEContext } from '../../contexts/bleContext';
 import { requestPermissions } from '../../src/ble/helpers'
 

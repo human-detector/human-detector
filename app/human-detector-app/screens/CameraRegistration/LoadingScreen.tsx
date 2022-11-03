@@ -6,7 +6,7 @@ import { BleError, Subscription, BleErrorCode } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
 import { ConnectionStatus, ConnectionNotification } from '../../src/ble/bleServices';
 import { BLEContext } from '../../contexts/bleContext';
-import { BLEParamList } from '../../src/Navigation/BLEParamList';
+import { BLEParamList } from '../../src/navigation/bleParamList';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
 

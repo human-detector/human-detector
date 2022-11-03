@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Camera from '../classes/Camera';
-import { RootStackParamList } from '../src/Navigation/StackParamList';
+import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
   container: {

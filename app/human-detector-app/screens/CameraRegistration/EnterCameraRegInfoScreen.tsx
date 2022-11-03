@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WifiSecType, CameraSerial } from '../../src/ble/bleServices';
 import { BackendContext } from '../../contexts/backendContext';
 import { BLEContext } from '../../contexts/bleContext';
-import { BLEParamList } from '../../src/Navigation/BLEParamList';
+import { BLEParamList } from '../../src/navigation/bleParamList';
 
 /**
  * The EnterCameraRegInfoScreen will allow the user

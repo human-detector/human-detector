@@ -11,7 +11,7 @@ import { BackendContext } from './contexts/backendContext';
 import { BLEContext } from './contexts/bleContext';
 import { BLEService } from './src/ble/bleServices';
 import BLEScreens from './src/ble/bleScreens'
-import { RootStackParamList } from './src/Navigation/StackParamList';
+import { RootStackParamList } from './src/navigation/stackParamList';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());

@@ -4,7 +4,7 @@ import * as React from 'react';
 import BluetoothScreen from '../../screens/CameraRegistration/BluetoothScreen';
 import LoadingScreen from '../../screens/CameraRegistration/LoadingScreen';
 import EnterCameraRegInfoScreen from '../../screens/CameraRegistration/EnterCameraRegInfoScreen';
-import { BLEParamList } from '../navigation/BLEParamList';
+import { BLEParamList } from '../navigation/bleParamList';
 
 const Stack = createNativeStackNavigator<BLEParamList>();
 

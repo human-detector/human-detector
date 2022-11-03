@@ -1,5 +1,5 @@
 import { NavigatorScreenParams } from "@react-navigation/native";
-import { BLEParamList } from "./BLEParamList"
+import { BLEParamList } from "./bleParamList"
 
 export type RootStackParamList = {
     Login: undefined

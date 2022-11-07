@@ -6,14 +6,7 @@ import uuid
 import sys
 from enum import Enum, auto
 import NetworkManager
-
-class DeviceState(Enum):
-    """Internal network state"""
-    INTERNAL_ERROR = 0
-    DISCONNECTED = 1
-    CONNECTING = 2
-    SUCCESS = 3
-    FAIL = 4
+from .connection_state import DeviceState, provide_net_state
 
 class SecType(Enum):
     """Wifi Security Type"""
@@ -30,8 +23,6 @@ class WifiManager:
             print("No wifi devices found!")
             sys.exit(-1)
 
-        self.state = (DeviceState.DISCONNECTED, 0)
-        self.status_callbacks = []
         self.dev.OnStateChanged(self.state_changed_callback)
 
     # pylint: disable=unused-argument
@@ -39,20 +30,9 @@ class WifiManager:
         """Network Manager callback when network state changes"""
         new_state = kwargs['new_state']
         reason = kwargs['reason']
-        self.state = (self._get_state_val(new_state), reason)
 
-        print("State change! ", self.state[0].name, reason)
-
-        for callback in self.status_callbacks:
-            callback(self.state)
-
-    def register_state_callback(self, callback):
-        """Register callbacks which are called when wifi state changes"""
-        self.status_callbacks.append(callback)
-
-    def get_state(self):
-        """Get current state of wifi adapter"""
-        return self.state
+        print("State change! ", new_state.name, reason)
+        provide_net_state(self._get_state_val(new_state), reason)
 
     # Convert internal NetworkManager state into an output state for the phone
     def _get_state_val(self, state):

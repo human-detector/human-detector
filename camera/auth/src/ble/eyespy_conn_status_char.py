@@ -6,6 +6,7 @@ import json
 import dbus
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_names import BLUEZ_GATT_CHARACTERISTIC
+from connection_state import register_net_state_callback
 
 class EyeSpyConnStatusCharacteristic(Characteristic):
     """
@@ -28,8 +29,7 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
             index   = kwargs["index"]
         )
         self.is_notifying = False
-        self.wifi_manager = kwargs["wifi_manager"]
-        self.wifi_manager.register_state_callback(self.state_change_callback)
+        register_net_state_callback(self.state_change_callback)
 
     def state_change_callback(self, new_state):
         """
@@ -39,10 +39,8 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
         if not self.is_notifying:
             return
 
-        new_value = dbus.ByteArray(json.dumps({
-            "State": new_state[0].value,
-            "Reason": new_state[1]
-        }).encode("ascii"))
+        json_bytes = json.dumps(new_state).encode("ascii")
+        new_value = dbus.ByteArray(json_bytes)
 
         changed = dbus.Dictionary({ 'Value': new_value }, signature='sv')
         self.PropertiesChanged(BLUEZ_GATT_CHARACTERISTIC, changed, [])

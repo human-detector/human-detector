@@ -6,7 +6,7 @@ import uuid
 import sys
 from enum import Enum, auto
 import NetworkManager
-from .connection_state import DeviceState, provide_net_state
+from .connection_status import DeviceState, FailReason, provide_net_state
 
 class SecType(Enum):
     """Wifi Security Type"""
@@ -32,7 +32,13 @@ class WifiManager:
         reason = kwargs['reason']
 
         print("State change! ", new_state.name, reason)
-        provide_net_state(self._get_state_val(new_state), reason)
+        provide_net_state(self._get_state_val(new_state), self._get_reason_val(reason))
+
+    def _get_reason_val(self, reason):
+        if reason == NetworkManager.NM_DEVICE_STATE_REASON_SSID_NOT_FOUND:
+            return FailReason.SSID_NOT_FOUND
+
+        return FailReason.INCORRECT_SECRETS
 
     # Convert internal NetworkManager state into an output state for the phone
     def _get_state_val(self, state):
@@ -48,7 +54,7 @@ class WifiManager:
             return DeviceState.FAIL
 
         if state == NetworkManager.NM_DEVICE_STATE_ACTIVATED:
-            return DeviceState.SUCCESS
+            return DeviceState.ATTEMPTING_PING
 
         return DeviceState.CONNECTING
 

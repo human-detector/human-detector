@@ -4,9 +4,9 @@ Wifi Connection Status Characteristic
 
 import json
 import dbus
+from networking.connection_status import register_net_state_callback
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_names import BLUEZ_GATT_CHARACTERISTIC
-from connection_state import register_net_state_callback
 
 class EyeSpyConnStatusCharacteristic(Characteristic):
     """

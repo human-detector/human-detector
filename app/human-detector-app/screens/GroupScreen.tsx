@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Group from '../classes/Group';
+import { BackendContext } from '../contexts/backendContext';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
   },
 });
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>
+type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>;
 export default function GroupScreen({ navigation }: Props): React.ReactElement {
   const groupOne: Group = new Group("AAAAAA's Group", '99');
   const groupTwo: Group = new Group("BBBBB's Group", '725');
@@ -85,8 +86,8 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
           <TouchableOpacity
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
-              // TODO: Add a new group
-              console.log('You added a group!');
+              // Start group registration
+              navigation.navigate('GroupRegistration');
             }}
           >
             <Text style={styles.addButtonText}> + </Text>

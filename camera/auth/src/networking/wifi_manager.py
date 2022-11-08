@@ -9,6 +9,7 @@ from threading import Condition, Thread
 from time import sleep, time
 import NetworkManager
 from .net_requests import NetRequests
+from .key_manager import KeyManager
 from .connection_status import DeviceState, FailReason, provide_net_state
 
 class SecType(Enum):
@@ -23,13 +24,13 @@ class WifiManager:
     condition_lock = Condition()
     ping = False
 
-    def __init__(self, net_manager: NetRequests):
+    def __init__(self, keys: KeyManager):
         self.dev = self._get_wifi_adapter()
         if self.dev is None:
             print("No wifi devices found!")
             sys.exit(-1)
 
-        self.net_requests = net_manager
+        self.net_requests = NetRequests(keys)
         self.dev.OnStateChanged(self.state_changed_callback)
         self.thread = Thread(target=self._attempt_heartbeat_thread, daemon=True)
         self.thread.start()
@@ -206,7 +207,7 @@ class WifiManager:
 
     def _attempt_heartbeat(self):
         for _ in range(0, 5):
-            sleep(5000)
+            sleep(5)
             cur_time = time()
             success, req =  self.net_requests.send_heartbeat(cur_time)
             if success:
@@ -221,3 +222,4 @@ class WifiManager:
             with self.condition_lock:
                 self.condition_lock.wait_for(lambda : self.ping)
                 self._attempt_heartbeat()
+                self.ping = False

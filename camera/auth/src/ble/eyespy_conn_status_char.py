@@ -40,8 +40,8 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
             return
 
         json_bytes = json.dumps({
-            "State": new_state.State.name,
-            "Reason": new_state.Reason.name
+            "State": new_state["State"].value,
+            "Reason": new_state["Reason"].value
         }).encode("ascii")
         new_value = dbus.ByteArray(json_bytes)
 

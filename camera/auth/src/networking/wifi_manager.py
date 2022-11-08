@@ -22,7 +22,6 @@ class WifiManager:
     """Monitors connection status and connects to Enterprise and WPA2-PSK networks"""
     condition_lock = Condition()
     ping = False
-    thread = Thread(target=ping, daemon=True)
 
     def __init__(self, net_manager: NetRequests):
         self.dev = self._get_wifi_adapter()
@@ -32,6 +31,8 @@ class WifiManager:
 
         self.net_requests = net_manager
         self.dev.OnStateChanged(self.state_changed_callback)
+        self.thread = Thread(target=self._attempt_heartbeat_thread, daemon=True)
+        self.thread.start()
 
     # pylint: disable=unused-argument
     def state_changed_callback(self, net_manager, interface, **kwargs):
@@ -46,7 +47,8 @@ class WifiManager:
 
         if adapted_state == DeviceState.ATTEMPTING_PING:
             self.ping = True
-            self.condition_lock.notify()
+            with self.condition_lock:
+                self.condition_lock.notify()
 
     def _get_reason_val(self, reason):
         if reason == NetworkManager.NM_DEVICE_STATE_REASON_SSID_NOT_FOUND:

@@ -5,7 +5,10 @@ Wifi Manager
 import uuid
 import sys
 from enum import Enum, auto
+from threading import Condition, Thread
+from time import sleep, time
 import NetworkManager
+from .net_requests import NetRequests
 from .connection_status import DeviceState, FailReason, provide_net_state
 
 class SecType(Enum):
@@ -17,12 +20,17 @@ class SecType(Enum):
 
 class WifiManager:
     """Monitors connection status and connects to Enterprise and WPA2-PSK networks"""
-    def __init__(self):
+    condition_lock = Condition()
+    ping = False
+    thread = Thread(target=ping, daemon=True)
+
+    def __init__(self, net_manager: NetRequests):
         self.dev = self._get_wifi_adapter()
         if self.dev is None:
             print("No wifi devices found!")
             sys.exit(-1)
 
+        self.net_requests = net_manager
         self.dev.OnStateChanged(self.state_changed_callback)
 
     # pylint: disable=unused-argument
@@ -30,9 +38,15 @@ class WifiManager:
         """Network Manager callback when network state changes"""
         new_state = kwargs['new_state']
         reason = kwargs['reason']
+        adapted_state = self._get_state_val(new_state)
+        adapted_reason = self._get_reason_val(reason)
 
         print("State change! ", new_state.name, reason)
-        provide_net_state(self._get_state_val(new_state), self._get_reason_val(reason))
+        provide_net_state(adapted_state, adapted_reason)
+
+        if adapted_state == DeviceState.ATTEMPTING_PING:
+            self.ping = True
+            self.condition_lock.notify()
 
     def _get_reason_val(self, reason):
         if reason == NetworkManager.NM_DEVICE_STATE_REASON_SSID_NOT_FOUND:
@@ -187,3 +201,21 @@ class WifiManager:
         NetworkManager.NetworkManager.AddAndActivateConnection(
             new_connection, self.dev, "/"
         )
+
+    def _attempt_heartbeat(self):
+        for _ in range(0, 5):
+            sleep(5000)
+            cur_time = time()
+            success, req =  self.net_requests.send_heartbeat(cur_time)
+            if success:
+                provide_net_state(DeviceState.CONNECTED, FailReason.NONE)
+                return
+
+        fail_reason = FailReason.FORBIDDEN if req.status_code == 403 else FailReason.BACKEND_DOWN
+        provide_net_state(DeviceState.FAILED, fail_reason)
+
+    def _attempt_heartbeat_thread(self):
+        while True:
+            with self.condition_lock:
+                self.condition_lock.wait_for(lambda : self.ping)
+                self._attempt_heartbeat()

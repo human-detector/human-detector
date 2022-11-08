@@ -4,7 +4,6 @@ Allows multiple sources to provide and consume a connection state
 """
 
 from enum import Enum
-from threading import Condition, Thread
 
 class DeviceState(Enum):
     """Internal network state"""
@@ -17,14 +16,14 @@ class DeviceState(Enum):
 
 class FailReason(Enum):
     """Failure reason for connecting"""
-    SSID_NOT_FOUND = 0
-    INCORRECT_SECRETS = 1
-    FORBIDDEN = 2
-    BACKEND_DOWN = 3
+    NONE = 0
+    SSID_NOT_FOUND = 1
+    INCORRECT_SECRETS = 2
+    FORBIDDEN = 3
+    BACKEND_DOWN = 4
+
 
 __callbacks = []
-__condition_lock = Condition()
-__ping = False
 
 network_state = {
     "State": DeviceState.DISCONNECTED,
@@ -54,11 +53,3 @@ def provide_net_state(new_state, new_reason):
 
     for callback in __callbacks:
         callback(network_state)
-
-def _attempt_heartbeat_thread():
-    while True:
-        with __condition_lock:
-            __condition_lock.wait_for(lambda : __ping)
-
-
-Thread(target=_attempt_heartbeat_thread, daemon=True)

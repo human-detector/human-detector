@@ -44,8 +44,8 @@ class EyeSpySerialCharacteristic(Characteristic):
 
         self.key_manager.gen_keys()
         out_str = json.dumps({
-            "Serial": self.key_manager.get_serial(),
-            "PubKey": self.key_manager.get_public_key().public_bytes(
+            "Serial": self.key_manager.serial,
+            "PubKey": self.key_manager.keys.priv_key.public_key().public_bytes(
                 Serialization.Encoding.PEM,
                 Serialization.PublicFormat.SubjectPublicKeyInfo
             ).decode()

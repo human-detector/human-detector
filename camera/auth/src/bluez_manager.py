@@ -40,7 +40,8 @@ class BluezManager():
     @staticmethod
     def create_manager():
         """Returns a new BluezManager with keys and wifi managers passed in"""
-        return BluezManager(WifiManager(), KeyManager())
+        key_manager = KeyManager()
+        return BluezManager(WifiManager(key_manager), key_manager)
 
     def __init__(self, wifi_manager, key_manager):
         self.bus = dbus.SystemBus()

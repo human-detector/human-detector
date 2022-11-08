@@ -41,7 +41,7 @@ class WifiManager:
         adapted_state = self._get_state_val(new_state)
         adapted_reason = self._get_reason_val(reason)
 
-        print("State change! ", new_state.name, reason)
+        print("State change! ", adapted_state.name, reason)
         provide_net_state(adapted_state, adapted_reason)
 
         if adapted_state == DeviceState.ATTEMPTING_PING:

@@ -39,7 +39,10 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
         if not self.is_notifying:
             return
 
-        json_bytes = json.dumps(new_state).encode("ascii")
+        json_bytes = json.dumps({
+            "State": new_state.State.name,
+            "Reason": new_state.Reason.name
+        }).encode("ascii")
         new_value = dbus.ByteArray(json_bytes)
 
         changed = dbus.Dictionary({ 'Value': new_value }, signature='sv')

@@ -211,11 +211,11 @@ class WifiManager:
             cur_time = time()
             success, req =  self.net_requests.send_heartbeat(cur_time)
             if success:
-                provide_net_state(DeviceState.CONNECTED, FailReason.NONE)
+                provide_net_state(DeviceState.SUCCESS, FailReason.NONE)
                 return
 
         fail_reason = FailReason.FORBIDDEN if req.status_code == 403 else FailReason.BACKEND_DOWN
-        provide_net_state(DeviceState.FAILED, fail_reason)
+        provide_net_state(DeviceState.FAIL, fail_reason)
 
     def _attempt_heartbeat_thread(self):
         while True:

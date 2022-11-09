@@ -4,23 +4,35 @@
 import Camera from './Camera';
 
 export default class Group {
-  groupName: string;
+  private groupName: string;
 
-  groupId: string;
+  private groupId: string;
 
-  cameras: Camera[];
+  private cameras: Camera[];
 
-  constructor(groupName: string, groupID: string) {
+  constructor(groupName: string, groupID: string, cameras: Camera[]) {
     this.groupName = groupName;
     this.groupId = groupID;
-    this.cameras = [];
+    this.cameras = cameras;
   }
-}
 
-export function renameGroup(newName: string, group: Group): Group {
-  return new Group('name', 'ID');
-}
+  get getGroupId(): string {
+    return this.groupId;
+  }
 
-export function addToGroup(newCam: Camera, group: Group): Group {
-  return new Group('name', 'ID');
+  get getGroupName(): string {
+    return this.groupName;
+  }
+
+  get getCameras(): Camera[] {
+    return this.cameras;
+  }
+
+  addCameraToGroup(newCam: Camera) {
+    this.cameras.push(newCam);
+  }
+
+  removeCameraFromGroup(camerasIndex: number) {
+    this.cameras.splice(camerasIndex);
+  }
 }

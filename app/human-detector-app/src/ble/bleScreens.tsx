@@ -9,36 +9,36 @@ import { BLEParamList } from '../navigation/bleParamList';
 const Stack = createNativeStackNavigator<BLEParamList>();
 
 export default function BLEScreens() {
-    return (
-        <Stack.Navigator
-            initialRouteName='BluetoothDeviceList'
-            screenOptions={{
-                headerStyle: {
-                    backgroundColor: '#1E90FF',
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                    fontWeight: 'bold',
-                },
-                headerBackTitleVisible: true,
-                headerBackVisible: true,
-            }}
-        >
-            <Stack.Screen
-                name='BluetoothDeviceList'
-                component={BluetoothScreen}
-                options={{ title: 'Select camera to add' }}
-            />
-            <Stack.Screen
-                name='CameraRegistrationInfo'
-                component={EnterCameraRegInfoScreen}
-                options={{ title: 'Enter WiFi Details' }}
-            />
-            <Stack.Screen
-                name='Loading'
-                component={LoadingScreen}
-                options={{ title: 'Connecting Camera to WiFi...', }}
-            />
-        </Stack.Navigator>
-    );
+  return (
+    <Stack.Navigator
+      initialRouteName="BluetoothDeviceList"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#1E90FF',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerBackTitleVisible: true,
+        headerBackVisible: true,
+      }}
+    >
+      <Stack.Screen
+        name="BluetoothDeviceList"
+        component={BluetoothScreen}
+        options={{ title: 'Select camera to add' }}
+      />
+      <Stack.Screen
+        name="CameraRegistrationInfo"
+        component={EnterCameraRegInfoScreen}
+        options={{ title: 'Enter WiFi Details' }}
+      />
+      <Stack.Screen
+        name="Loading"
+        component={LoadingScreen}
+        options={{ title: 'Connecting Camera to WiFi...' }}
+      />
+    </Stack.Navigator>
+  );
 }

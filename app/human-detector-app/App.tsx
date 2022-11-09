@@ -10,7 +10,9 @@ import BackendService from './services/backendService';
 import { BackendContext } from './contexts/backendContext';
 import { BLEContext } from './contexts/bleContext';
 import { BLEService } from './src/ble/bleServices';
-import BLEScreens from './src/ble/bleScreens'
+import BLEScreens from './src/ble/bleScreens';
+import { UserContext } from './contexts/userContext';
+import GroupRegistrationScreen from './src/groupRegScreens';
 import { RootStackParamList } from './src/navigation/stackParamList';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -58,44 +60,51 @@ export default function App(): React.ReactElement {
   }
 
   // If the user is logged in return the stack with all the information
+
   return (
     <NavigationContainer>
-      <BLEContext.Provider value={bleService}>
-        <BackendContext.Provider value={backendService}>
-          <Stack.Navigator
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: '#1E90FF',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}>
-            <Stack.Screen
-              name="Groups"
-              component={GroupScreen}
-              options={{ title: 'EyeSpy' }}
-            />
-            <Stack.Screen
-              name="Cameras"
-              component={CameraScreen}
-              options={{
-                title: 'EyeSpy',
-                headerBackTitleVisible: false,
-                headerBackVisible: true,
+      <UserContext.Provider value={backendService.getUser()}>
+        <BLEContext.Provider value={bleService}>
+          <BackendContext.Provider value={backendService}>
+            <Stack.Navigator
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: '#1E90FF',
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
               }}
-            />
-            <Stack.Screen
-              name="CameraRegistration"
-              component={BLEScreens}
-              options={{
-                headerShown: false
-              }}
-            />
-          </Stack.Navigator>
-        </BackendContext.Provider>
-      </BLEContext.Provider>
+            >
+              <Stack.Screen name="Groups" component={GroupScreen} options={{ title: 'EyeSpy' }} />
+              <Stack.Screen
+                name="Cameras"
+                component={CameraScreen}
+                options={{
+                  title: 'EyeSpy',
+                  headerBackTitleVisible: false,
+                  headerBackVisible: true,
+                }}
+              />
+              <Stack.Screen
+                name="CameraRegistration"
+                component={BLEScreens}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="GroupRegistration"
+                component={GroupRegistrationScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+            </Stack.Navigator>
+          </BackendContext.Provider>
+        </BLEContext.Provider>
+      </UserContext.Provider>
     </NavigationContainer>
   );
 }

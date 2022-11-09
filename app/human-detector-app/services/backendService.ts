@@ -31,7 +31,7 @@ export default class BackendService {
     });
   }
 
-  private getUser(): User {
+  public getUser(): User {
     return this.tokenManager.getUser();
   }
 
@@ -51,7 +51,7 @@ export default class BackendService {
     groupId: string
   ): Promise<string | null> {
     const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().userID, groupId);
+      ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().getUserId, groupId);
 
     try {
       const response = await this.axiosInstance.put(apiLinkWithExtension, {
@@ -75,7 +75,7 @@ export default class BackendService {
    */
   public async registerGroupAPI(name: string): Promise<string | null> {
     const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.registerGroupUrlExtension(this.getUser().userID);
+      ServerUrl.apiLink + ServerUrl.registerGroupUrlExtension(this.getUser().getUserId);
 
     try {
       const response = await this.axiosInstance.put(apiLinkWithExtension, {
@@ -99,7 +99,7 @@ export default class BackendService {
   public async getGroupListAPI(): Promise<Group[] | null> {
     try {
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().userID);
+        ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().getUserId);
 
       const response = await this.axiosInstance.get(apiLinkWithExtension);
       return response.data;
@@ -124,7 +124,7 @@ export default class BackendService {
         },
       };
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(this.getUser().userID);
+        ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(this.getUser().getUserId);
 
       await this.axiosInstance.put(
         apiLinkWithExtension,
@@ -150,7 +150,7 @@ export default class BackendService {
   public async getNotificationHistoryAPI(): Promise<Notification[] | null> {
     try {
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(this.getUser().userID);
+        ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(this.getUser().getUserId);
       const config = {
         headers: {
           Accept: 'application/json',

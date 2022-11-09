@@ -28,11 +28,7 @@ export function getUserFromIDToken(idToken: string): User {
   const words = CryptoJS.enc.Base64.parse(idToken.split('.')[1]); // Get the payload
   const textString = CryptoJS.enc.Utf8.stringify(words);
 
-  const user = new User(
-    JSON.parse(textString).preferred_username,
-    JSON.parse(textString).sub,
-    true // they should be logged in when getting here
-  );
+  const user = new User(JSON.parse(textString).preferred_username, JSON.parse(textString).sub, []);
 
   return user;
 }

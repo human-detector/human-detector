@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Group from '../classes/Group';
-import { BackendContext } from '../contexts/backendContext';
 import { RootStackParamList } from '../src/navigation/stackParamList';
+import { UserContext } from '../contexts/userContext';
 
 const styles = StyleSheet.create({
   container: {
@@ -57,27 +57,32 @@ const styles = StyleSheet.create({
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>;
 export default function GroupScreen({ navigation }: Props): React.ReactElement {
-  const groupOne: Group = new Group("AAAAAA's Group", '99');
-  const groupTwo: Group = new Group("BBBBB's Group", '725');
-  const groupThree: Group = new Group("CCCCC's Group", '400');
+  const [userContext, setUserContext] = React.useState(React.useContext(UserContext));
 
-  const [listOfGroups, setListOfGroups] = useState<Group[]>([]);
-  React.useEffect(() => {
-    setListOfGroups([groupOne, groupTwo, groupThree]);
-  }, []);
+  if (!userContext) {
+    console.error('User context not defined!');
+    throw new Error('Error in GroupScreen.');
+  }
 
-  const pressHandler = () => {
+  const pressHandler = (groupId: string) => {
+    // TODO: Navigate with the camera array for the group press
+    console.log(groupId);
     navigation.navigate('Cameras');
   };
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        {listOfGroups.map((item) => (
-          <View key={item.groupId}>
-            <TouchableOpacity style={styles.menuItem} onPress={pressHandler}>
-              <Text style={styles.menuButtonText}> {item.groupName} </Text>
-              <CameraSettingsButton cameraId={item.groupId} />
+        {userContext.getGroupList.map((item) => (
+          <View key={item.getGroupId}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                pressHandler('testGroupId');
+              }}
+            >
+              <Text style={styles.menuButtonText}> {item.getGroupName} </Text>
+              <CameraSettingsButton cameraId={item.getGroupId} />
             </TouchableOpacity>
           </View>
         ))}
@@ -87,29 +92,13 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
               // Start group registration
-              navigation.navigate('GroupRegistration');
+              navigation.navigate('GroupRegistration', { screen: 'GroupRegistrationInfo' });
             }}
           >
             <Text style={styles.addButtonText}> + </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
-  );
-}
-
-export function GroupOnPress() {
-  return (
-    <View>
-      <Text> Placeholder </Text>
-    </View>
-  );
-}
-
-export function GroupDisplayButton() {
-  return (
-    <View>
-      <Text> Placeholder </Text>
     </View>
   );
 }

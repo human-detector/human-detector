@@ -6,6 +6,7 @@ import CameraSettingsButton from '../components/CameraSettingsButton';
 import Group from '../classes/Group';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 import { UserContext } from '../contexts/userContext';
+import { NavigationHelpersContext, useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
   container: {
@@ -57,7 +58,8 @@ const styles = StyleSheet.create({
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>;
 export default function GroupScreen({ navigation }: Props): React.ReactElement {
-  const [userContext, setUserContext] = React.useState(React.useContext(UserContext));
+  const userContext = React.useContext(UserContext);
+  const isFocused = useIsFocused();
 
   if (!userContext) {
     console.error('User context not defined!');
@@ -66,8 +68,7 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
 
   const pressHandler = (groupId: string) => {
     // TODO: Navigate with the camera array for the group press
-    console.log(groupId);
-    navigation.navigate('Cameras');
+    navigation.navigate('Cameras', { groupId });
   };
 
   return (
@@ -78,7 +79,7 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                pressHandler('testGroupId');
+                pressHandler(item.getGroupId);
               }}
             >
               <Text style={styles.menuButtonText}> {item.getGroupName} </Text>
@@ -92,7 +93,9 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
               // Start group registration
-              navigation.navigate('GroupRegistration', { screen: 'GroupRegistrationInfo' });
+              navigation.navigate('GroupRegistration', {
+                screen: 'GroupRegistrationInfo',
+              });
             }}
           >
             <Text style={styles.addButtonText}> + </Text>

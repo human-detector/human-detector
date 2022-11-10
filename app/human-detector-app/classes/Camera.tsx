@@ -7,12 +7,21 @@ import Group from './Group';
 export default class Camera {
   // field
   private cameraId: string;
+
   private cameraName: string;
 
   // constructor
   constructor(cameraName: string, cameraId: string) {
     this.cameraId = cameraId;
     this.cameraName = cameraName;
+  }
+
+  get getCameraName() {
+    return this.cameraName;
+  }
+
+  get getCameraId() {
+    return this.cameraId;
   }
 
   set setCameraName(cameraName: string) {

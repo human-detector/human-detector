@@ -29,6 +29,10 @@ export default class User {
     return this.groupList;
   }
 
+  getGroupFromId(groupId: string) {
+    return this.groupList.find((group) => group.getGroupId === groupId);
+  }
+
   addGroupToList(newGroup: Group): boolean {
     this.groupList.push(newGroup);
     return true;

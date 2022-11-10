@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
-import Camera from '../classes/Camera';
+import { UserContext } from '../contexts/userContext';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
@@ -54,27 +54,31 @@ const styles = StyleSheet.create({
   },
 });
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>
-export default function CameraScreen({ navigation }: Props): React.ReactElement {
-  const cameraOne: Camera = new Camera('123', "AAAAA's Camera", '99');
-  const cameraTwo: Camera = new Camera('124', "BBBBB's Camera", '725');
-  const cameraThree: Camera = new Camera('125', "CCCCC's Camera", '400');
+type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>;
+export default function CameraScreen({ navigation, route }: Props): React.ReactElement {
+  const userContext = React.useContext(UserContext);
+  const isFocused = useIsFocused();
+  const { groupId } = route.params;
 
-  const [listOfCameras, setListOfCameras] = useState([cameraOne, cameraTwo, cameraThree]);
+  if (!userContext) {
+    console.error('no user context in camera screen!');
+    throw new Error('no user context in camera screen');
+  }
+  const groupToView = userContext.getGroupFromId(groupId);
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        {listOfCameras.map((item) => (
-          <View key={item.cameraId}>
+        {groupToView?.getCameras.map((item) => (
+          <View key={item.getCameraId}>
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                setListOfCameras([item]);
+                console.log('You clicked on a camera!');
               }}
             >
-              <Text style={styles.menuButtonText}> {item.cameraName} </Text>
-              <CameraSettingsButton cameraId={item.cameraId} />
+              <Text style={styles.menuButtonText}> {item.getCameraName} </Text>
+              <CameraSettingsButton cameraId={item.getCameraId} />
             </TouchableOpacity>
           </View>
         ))}
@@ -84,7 +88,7 @@ export default function CameraScreen({ navigation }: Props): React.ReactElement 
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
               // Start camera registration process
-              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList'});
+              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList' });
             }}
           >
             <Text style={styles.addButtonText}> + </Text>

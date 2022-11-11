@@ -60,6 +60,7 @@ defineFeature(loadFeature('test/features/register-group.feature'), (test) => {
       const { id, tokenSet } =
         await testStack.kcContainer.createDummyUserAndLogIn('users');
       user = await usersRepository.findOneOrFail({ id });
+      console.log(user);
       group = new Group('Group-A');
       user.groups.add(group);
       await usersRepository.flush();

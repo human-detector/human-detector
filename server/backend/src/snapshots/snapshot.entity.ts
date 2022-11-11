@@ -13,14 +13,14 @@ export class Snapshot {
   @PrimaryKey({ type: UuidType })
   id = v4();
 
-  // Base64-encoded image data
+  // Binary image data
   @Property()
-  image: string;
+  image: Buffer;
 
   @OneToOne(() => Notification)
   notification: Notification;
 
-  constructor(image: string) {
+  constructor(image: Buffer) {
     this.image = image;
   }
 }

@@ -17,7 +17,7 @@ export class Snapshot {
   @Property()
   image: Buffer;
 
-  @OneToOne(() => Notification)
+  @OneToOne(() => Notification, (notification) => notification.snapshot)
   notification: Notification;
 
   constructor(image: Buffer) {

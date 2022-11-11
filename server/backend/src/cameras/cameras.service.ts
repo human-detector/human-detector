@@ -59,9 +59,7 @@ export class CamerasService {
       console.error('Error sending push notification', error);
     }
 
-    const notification = new Notification();
-    notification.snapshot = new Snapshot(frame);
-    cam.notifications.add(new Notification());
+    cam.notifications.add(new Notification(new Snapshot(frame)));
     this.cameraRepository.flush();
     return true;
   }

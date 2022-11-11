@@ -22,6 +22,10 @@ export class Notification {
   @ManyToOne(() => Camera)
   camera!: Camera;
 
-  @OneToOne(() => Snapshot)
+  @OneToOne()
   snapshot: Snapshot;
+
+  constructor(snapshot: Snapshot) {
+    this.snapshot = snapshot;
+  }
 }

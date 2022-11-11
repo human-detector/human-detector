@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Register a group to a user User A is attempting to register a group to a non-existant User B 1`] = `
+Object {
+  "message": "Forbidden",
+  "statusCode": 403,
+}
+`;

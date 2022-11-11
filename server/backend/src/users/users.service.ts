@@ -31,13 +31,45 @@ export class UsersService {
     }
     return user.groups;
   }
+  /**
+   * Register a group to the given user
+   *
+   * @param userId the user's ID
+   * @param groupName the name of the group that it is to be given
+   */
+
+  public async registerGroup(
+    userId: string,
+    groupName: string,
+  ): Promise<Group> {
+    // find and populate user.groups
+    const user = await this.usersRepository.findOne(
+      { id: userId },
+      { populate: ['groups'] },
+    );
+
+    if (user == null) {
+      throw new NotFoundError(`User with ID "${userId}" does not exist`);
+    }
+
+    if (user.id != userId) {
+      throw new NotFoundError(`Pulled user with wrong ID!`);
+    }
+
+    // Make an empty group
+    const newGroup = new Group(groupName);
+    user.groups.add(newGroup);
+
+    await this.usersRepository.flush();
+    return newGroup;
+  }
 
   /**
    * Register a camera to the given user and group
    *
    * @param userId the user's ID.
    * @param groupId the group ID.
-   * @param ncameraDetails the name, serial, and public key of a new camera.
+   * @param cameraDetails the name, serial, and public key of a new camera.
    */
   public async registerCamera(
     userId: string,

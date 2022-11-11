@@ -92,7 +92,7 @@ defineFeature(feature, (test) => {
         },
       ];
       expect(getRes.header['content-type']).toMatch(/^application\/json/);
-      // expect(getRes.body).toEqual(expectedResponse);
+      expect(getRes.body).toEqual(expectedResponse);
     });
   });
 
@@ -157,7 +157,7 @@ defineFeature(feature, (test) => {
         .get(`/cameras/${cameraA.id}/notifications`)
         .set('Authorization', tokenA);
       expect(getRes.header['content-type']).toMatch(/^application\/json/);
-      // expect(getResActual.body).toEqual(expectedResponse);
+      expect(getResActual.body).toEqual(expectedResponse);
     });
   });
 
@@ -207,7 +207,7 @@ defineFeature(feature, (test) => {
         .get(`/cameras/${cameraA.id}/notifications`)
         .set('Authorization', tokenA);
       expect(getRes.header['content-type']).toMatch(/^application\/json/);
-      // expect(getResActual.body).toEqual(expectedResponse);
+      expect(getResActual.body).toEqual(expectedResponse);
     });
   });
 

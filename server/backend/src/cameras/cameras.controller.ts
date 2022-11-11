@@ -17,7 +17,7 @@ import { ImageBuffer } from './image-buffer';
 export type GetNotificationsOutput = {
   id: string;
   timestamp: string;
-  cameraId: string;
+  camera: string;
 }[];
 
 @Controller('cameras')
@@ -52,7 +52,7 @@ export class CamerasController {
       return notifications.toJSON().map((notification) => ({
         id: notification.id,
         timestamp: notification.timestamp,
-        cameraId: notification.camera.id,
+        camera: notification.camera.id,
       }));
     } catch (error) {
       if (error instanceof NotFoundError) {

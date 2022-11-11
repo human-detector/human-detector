@@ -73,7 +73,7 @@ export class CamerasService {
   ): Promise<Collection<Notification>> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
-      { populate: ['notifications'] },
+      { populate: ['notifications', 'notifications.camera.id'] },
     );
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);

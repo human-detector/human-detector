@@ -83,12 +83,12 @@ defineFeature(feature, (test) => {
         {
           id: cameraA.notifications[0].id,
           timestamp: new Date(cameraA.notifications[0].timestamp).toISOString(),
-          cameraId: cameraA.notifications[0].camera.id,
+          camera: cameraA.notifications[0].camera.id,
         },
         {
           id: cameraA.notifications[1].id,
           timestamp: new Date(cameraA.notifications[1].timestamp).toISOString(),
-          cameraId: cameraA.notifications[1].camera.id,
+          camera: cameraA.notifications[1].camera.id,
         },
       ];
       expect(getRes.header['content-type']).toMatch(/^application\/json/);
@@ -150,7 +150,7 @@ defineFeature(feature, (test) => {
         {
           id: cameraA.notifications[0].id,
           timestamp: new Date(cameraA.notifications[0].timestamp).toISOString(),
-          cameraId: cameraA.notifications[0].camera.id,
+          camera: cameraA.notifications[0].camera.id,
         },
       ];
       const getResActual = await request(app.getHttpServer())
@@ -200,7 +200,7 @@ defineFeature(feature, (test) => {
         {
           id: cameraA.notifications[0].id,
           timestamp: new Date(cameraA.notifications[0].timestamp).toISOString(),
-          cameraId: cameraA.notifications[0].camera.id,
+          camera: cameraA.notifications[0].camera.id,
         },
       ];
       const getResActual = await request(app.getHttpServer())

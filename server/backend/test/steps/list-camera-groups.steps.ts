@@ -73,6 +73,7 @@ defineFeature(
                 {
                   id: user.groups[0].cameras[0].id,
                   name: user.groups[0].cameras[0].name,
+                  notifications: [],
                 },
               ],
             },

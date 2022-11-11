@@ -6,17 +6,18 @@ import {
   UseGuards,
   UnauthorizedException,
   Body,
+  UsePipes,
 } from '@nestjs/common';
-import { CamerasService, SendNotificationInput } from './cameras.service';
+import { CamerasService } from './cameras.service';
 import { CameraAuthGuard } from './camera-auth.guard';
-import { Collection } from '@mikro-orm/core';
-import { Notification } from './notification.entity';
 import { NotFoundError } from '../errors.types';
+import { Base64ImageValidationPipe } from './base64-image-validation.pipe';
+import { ImageBuffer } from './image-buffer';
 
 export type GetNotificationsOutput = {
   id: string;
   timestamp: string;
-  camera: string;
+  cameraId: string;
 }[];
 
 @Controller('cameras')
@@ -25,12 +26,13 @@ export class CamerasController {
   constructor(private camerasService: CamerasService) {}
 
   @Put(':id/notifications')
+  @UsePipes(new Base64ImageValidationPipe([{ type: 'body', name: 'frame' }]))
   async sendNotification(
     @Param('id') id: string,
-    @Body() input: SendNotificationInput,
+    @Body('frame') frame: ImageBuffer,
   ): Promise<boolean> {
     try {
-      const notifSent = await this.camerasService.sendNotification(id, input);
+      const notifSent = await this.camerasService.sendNotification(id, frame);
       return notifSent;
     } catch (error) {
       if (error instanceof NotFoundError) {
@@ -44,9 +46,14 @@ export class CamerasController {
   @Get(':id/notifications')
   async getNotifications(
     @Param('id') id: string,
-  ): Promise<Collection<Notification, unknown>> {
+  ): Promise<GetNotificationsOutput> {
     try {
-      return await this.camerasService.getNotifications(id);
+      const notifications = await this.camerasService.getNotifications(id);
+      return notifications.toJSON().map((notification) => ({
+        id: notification.id,
+        timestamp: notification.timestamp,
+        cameraId: notification.camera.id,
+      }));
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new UnauthorizedException();

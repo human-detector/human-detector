@@ -9,12 +9,8 @@ import {
   IPushNotificationsService,
   IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
 } from './push-notifications/push-notifications-service.interface';
-import { Snapshot } from 'src/snapshots/snapshot.entity';
-
-export interface SendNotificationInput {
-  // Base64-encoded image data
-  frame: string;
-}
+import { Snapshot } from '../snapshots/snapshot.entity';
+import { ImageBuffer } from './image-buffer';
 
 @Injectable()
 export class CamerasService {
@@ -31,10 +27,12 @@ export class CamerasService {
    * Sends a notification to the user's phone and adds it to the
    * collection of notifications the user has.
    * @param idCam
+   * @param frame Image to associate with this notification. No validation is done on this
+   * frame data, so check your buffer beforehand.
    */
   public async sendNotification(
     idCam: string,
-    input: SendNotificationInput,
+    frame: ImageBuffer,
   ): Promise<boolean> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
@@ -62,7 +60,7 @@ export class CamerasService {
     }
 
     const notification = new Notification();
-    notification.snapshot = new Snapshot(input.frame);
+    notification.snapshot = new Snapshot(frame);
     cam.notifications.add(new Notification());
     this.cameraRepository.flush();
     return true;

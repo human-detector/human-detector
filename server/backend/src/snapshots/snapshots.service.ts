@@ -12,10 +12,10 @@ export class SnapshotsService {
   ) {}
 
   /**
-   * Fetch a snapshot image, returning the image encoded in base64.
+   * Fetch a snapshot's image.
    * @param id snapshot ID
    */
-  public async getSnapshotImage(id: string): Promise<string> {
+  public async getSnapshotImage(id: string): Promise<Buffer> {
     const snapshot = await this.snapshotRepository
       .findOneOrFail({ id })
       .catch(() => {

@@ -18,6 +18,7 @@ import {
   IPushNotificationsService,
   IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
 } from '../../src/cameras/push-notifications/push-notifications-service.interface';
+import { notificationWithDummySnapshot } from '../helpers/notification';
 
 const feature = loadFeature('test/features/send-notification.feature');
 
@@ -66,9 +67,9 @@ defineFeature(feature, (test) => {
       const { camera } = createCameraWithKeyPair('Camera A', 'Serial A');
       cameraA = camera;
       cameraA.notifications.add(
-        new Notification(),
-        new Notification(),
-        new Notification(),
+        notificationWithDummySnapshot(),
+        notificationWithDummySnapshot(),
+        notificationWithDummySnapshot(),
       );
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
@@ -147,7 +148,10 @@ defineFeature(feature, (test) => {
     and('Camera B has 2 notifications', async () => {
       const { camera } = createCameraWithKeyPair('Camera-B', 'Serial-B');
       cameraB = camera;
-      cameraB.notifications.add(new Notification(), new Notification());
+      cameraB.notifications.add(
+        notificationWithDummySnapshot(),
+        notificationWithDummySnapshot(),
+      );
       cameraB.group = new Group('b');
       cameraB.group.user = new User();
       await cameraRepository.persistAndFlush(cameraB);

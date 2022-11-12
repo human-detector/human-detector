@@ -42,7 +42,7 @@ defineFeature(loadFeature('test/features/register-group.feature'), (test) => {
     await app.close();
     await testStack.kcContainer.stop();
     await testStack.dbContainer.stop();
-  });
+  }, TEST_STACK_TIMEOUT);
 
   test('User is registering a group from the app', ({
     given,
@@ -55,20 +55,22 @@ defineFeature(loadFeature('test/features/register-group.feature'), (test) => {
     let token: string;
     let response: request.Response;
     let groupId: string;
+    let userId: string;
 
     given('I have credentials', async () => {
       const { id, tokenSet } =
         await testStack.kcContainer.createDummyUserAndLogIn('users');
-      user = await usersRepository.findOneOrFail({ id });
-      console.log(user);
-      group = new Group('Group-A');
-      user.groups.add(group);
+      user = user = await usersRepository.findOneOrFail(
+        { id },
+        { populate: ['groups'] },
+      );
+      user.groups.add(new Group('Group-A'));
       await usersRepository.flush();
       token = tokenSet.access_token;
     });
     when('I register a group through the app', async () => {
       response = await request(app.getHttpServer())
-        .put(`/users/${user.id}/group`)
+        .put(`/users/${user.id}/groups`)
         .send({
           name: 'New-Group',
         })
@@ -84,7 +86,6 @@ defineFeature(loadFeature('test/features/register-group.feature'), (test) => {
         await groupRepository.findOneOrFail({ id: groupId }),
       ).toBeInstanceOf(Group);
     });
-    console.log(user);
 
     and('The group is registered', async () => {
       expect(user.groups).toHaveLength(2);

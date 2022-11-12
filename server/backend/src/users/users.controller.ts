@@ -62,9 +62,9 @@ export class UsersController {
     }
   }
 
-  @Put(':uid/group')
+  @Put(':id/group')
   async registerGroup(
-    @Param('uid') userId: string,
+    @Param('id') userId: string,
     @Body('name') groupName: string,
   ): Promise<RegisterGroupResponse> {
     if (groupName === undefined) {

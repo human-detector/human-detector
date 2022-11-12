@@ -1,14 +1,19 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 
 import BluetoothScreen from '../../screens/CameraRegistration/BluetoothScreen';
 import LoadingScreen from '../../screens/CameraRegistration/LoadingScreen';
 import EnterCameraRegInfoScreen from '../../screens/CameraRegistration/EnterCameraRegInfoScreen';
 import { BLEParamList } from '../navigation/bleParamList';
+import { RootStackParamList } from '../navigation/stackParamList';
 
 const Stack = createNativeStackNavigator<BLEParamList>();
+type Props = NativeStackScreenProps<RootStackParamList, 'CameraRegistration'>;
+export default function BLEScreens({ route }: Props) {
+  const { groupId } = route.params;
 
-export default function BLEScreens() {
+  console.log(groupId);
+
   return (
     <Stack.Navigator
       initialRouteName="BluetoothDeviceList"
@@ -32,6 +37,7 @@ export default function BLEScreens() {
       <Stack.Screen
         name="CameraRegistrationInfo"
         component={EnterCameraRegInfoScreen}
+        initialParams={{ groupId }}
         options={{ title: 'Enter WiFi Details' }}
       />
       <Stack.Screen

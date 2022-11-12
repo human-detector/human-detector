@@ -88,7 +88,10 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
               // Start camera registration process
-              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList' });
+              navigation.navigate('CameraRegistration', {
+                screen: 'BluetoothDeviceList',
+                groupId,
+              });
             }}
           >
             <Text style={styles.addButtonText}> + </Text>

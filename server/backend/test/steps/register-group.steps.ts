@@ -114,7 +114,7 @@ defineFeature(loadFeature('test/features/register-group.feature'), (test) => {
 
     when('I register the group to user B', async () => {
       response = await request(app.getHttpServer())
-        .put(`/users/${userB.id}/group`)
+        .put(`/users/${userB.id}/groups`)
         .send({ name: 'New-Group-A' })
         .auth(userTokenA, { type: 'bearer' });
     });
@@ -143,7 +143,7 @@ defineFeature(loadFeature('test/features/register-group.feature'), (test) => {
 
     when('I register the group to user B', async () => {
       response = await request(app.getHttpServer())
-        .put(`/users/${userIdB}/group`)
+        .put(`/users/${userIdB}/groups`)
         .send({ name: 'New-Group-A' })
         .auth(userTokenA, { type: 'bearer' });
     });

@@ -62,7 +62,7 @@ export class UsersController {
     }
   }
 
-  @Put(':id/group')
+  @Put(':id/groups')
   async registerGroup(
     @Param('id') userId: string,
     @Body('name') groupName: string,

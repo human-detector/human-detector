@@ -20,6 +20,18 @@ import {
 } from '../../src/cameras/push-notifications/push-notifications-service.interface';
 import { notificationWithDummySnapshot } from '../helpers/notification';
 
+const TEST_IMAGE_BASE64 =
+  '/9j/4AAQSkZJRgABAQEADwAPAAD/2wBDAEMuMjoyKkM6NjpLR0NPZKZsZFxcZMySmnmm8dT++u3U' +
+  '6eX//////////+Xp////////////////////////////2wBDAUdLS2RXZMRsbMT//+n/////////' +
+  '////////////////////////////////////////////////////////////wgARCAALAAsDASIA' +
+  'AhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAECA//EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAM' +
+  'AwEAAhADEAAAAa0Gf//EABYQAAMAAAAAAAAAAAAAAAAAAAEQMf/aAAgBAQABBQI1/wD/xAAUEQEA' +
+  'AAAAAAAAAAAAAAAAAAAA/9oACAEDAQE/AX//xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oACAECAQE/' +
+  'AX//xAAUEAEAAAAAAAAAAAAAAAAAAAAg/9oACAEBAAY/Ah//xAAZEAEAAgMAAAAAAAAAAAAAAAAB' +
+  'ADEQEUH/2gAIAQEAAT8hT1ohUQWsf//aAAwDAQACAAMAAAAQ8//EABQRAQAAAAAAAAAAAAAAAAAA' +
+  'AAD/2gAIAQMBAT8Qf//EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQIBAT8Qf//EABkQAQACAwAA' +
+  'AAAAAAAAAAAAAAEAERAxof/aAAgBAQABPxCx7IUI7qCFCmP/2Q==';
+
 const feature = loadFeature('test/features/send-notification.feature');
 
 defineFeature(feature, (test) => {
@@ -204,7 +216,8 @@ defineFeature(feature, (test) => {
     when('I try to send a notification on behalf of camera A', async () => {
       sendRes = await request(app.getHttpServer())
         .put(`/cameras/${cameraA.id}/notifications`)
-        .set('Authorization', token);
+        .set('Authorization', token)
+        .send({ frame: TEST_IMAGE_BASE64 });
     });
     then('The request succeeded', () => {
       expect(sendRes.status).toBe(200);

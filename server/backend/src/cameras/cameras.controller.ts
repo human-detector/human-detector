@@ -26,10 +26,10 @@ export class CamerasController {
   constructor(private camerasService: CamerasService) {}
 
   @Put(':id/notifications')
-  @UsePipes(new Base64ImageValidationPipe([{ type: 'body', name: 'frame' }]))
+  @UsePipes()
   async sendNotification(
     @Param('id') id: string,
-    @Body('frame') frame: ImageBuffer,
+    @Body('frame', Base64ImageValidationPipe) frame: ImageBuffer,
   ): Promise<boolean> {
     try {
       const notifSent = await this.camerasService.sendNotification(id, frame);

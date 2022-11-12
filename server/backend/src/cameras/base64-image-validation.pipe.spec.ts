@@ -15,37 +15,15 @@ const TEST_IMAGE_BASE64 =
   'AAAAAAAAAAAAAAEAERAxof/aAAgBAQABPxCx7IUI7qCFCmP/2Q==';
 
 describe(Base64ImageValidationPipe, () => {
-  it('should ignore unspecified parameters', () => {
-    const pipe = new Base64ImageValidationPipe([
-      { type: 'body', name: 'test' },
-    ]);
-    const differentTypeMetadata: ArgumentMetadata = {
-      type: 'param',
-      metatype: String,
-      data: 'test',
-    };
-    const differentNameMetadata: ArgumentMetadata = {
-      type: 'body',
-      metatype: String,
-      data: 'wawa',
-    };
-    expect(pipe.transform('t', differentTypeMetadata)).toBe('t');
-    expect(pipe.transform('t', differentNameMetadata)).toBe('t');
-  });
-
   it('should throw an error if the data is not a base64 encoded image', () => {
-    const pipe = new Base64ImageValidationPipe([
-      { type: 'body', name: 'test' },
-    ]);
+    const pipe = new Base64ImageValidationPipe();
     expect(() => {
       pipe.transform('wawa', { type: 'body', metatype: String, data: 'test' });
     }).toThrow(BadRequestException);
   });
 
   it('should transform base64-encoded images', () => {
-    const pipe = new Base64ImageValidationPipe([
-      { type: 'body', name: 'test' },
-    ]);
+    const pipe = new Base64ImageValidationPipe();
     expect(
       pipe.transform(TEST_IMAGE_BASE64, {
         type: 'body',

@@ -43,8 +43,6 @@ export default function GroupRegInfoScreen({ route, navigation }: Props): React.
     console.error('no user context!');
     throw new Error('no user context');
   }
-
-  console.log(route);
   return (
     <View>
       <TextInput
@@ -66,7 +64,6 @@ export default function GroupRegInfoScreen({ route, navigation }: Props): React.
           }
           const newGroup = new Group(groupName, groupId, []);
           userContext.addGroupToList(newGroup);
-          console.log(userContext.groupList);
           navigation.goBack();
         }}
       />

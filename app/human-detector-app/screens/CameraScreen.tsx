@@ -69,7 +69,7 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
   return (
     <View style={styles.container}>
       <ScrollView>
-        {groupToView?.getCameras.map((item) => (
+        {groupToView?.cameras.map((item) => (
           <View key={item.getCameraId}>
             <TouchableOpacity
               style={styles.menuItem}

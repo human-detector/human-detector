@@ -5,6 +5,8 @@ import { WifiSecType, CameraSerial } from '../../src/ble/bleServices';
 import { BackendContext } from '../../contexts/backendContext';
 import { BLEContext } from '../../contexts/bleContext';
 import { BLEParamList } from '../../src/navigation/bleParamList';
+import { UserContext } from '../../contexts/userContext';
+import Camera from '../../classes/Camera';
 
 /**
  * The EnterCameraRegInfoScreen will allow the user
@@ -50,10 +52,16 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
   const [pass, setPass] = React.useState('');
 
   const { groupId } = route.params;
+  console.log(groupId, 'In Camera Reg');
 
   const backendContext = React.useContext(BackendContext);
   const bleContext = React.useContext(BLEContext);
+  const userContext = React.useContext(UserContext);
   const currentDevice = bleContext.getCurrentConnectedDevice();
+
+  if (!userContext) {
+    throw new Error('user context is null!');
+  }
 
   const submitWifiToPi = () => {
     if (currentDevice === null) return;
@@ -93,6 +101,7 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
           console.error(error);
           navigation.navigate('BluetoothDeviceList');
         });
+        userContext.getGroupFromId(groupId)?.cameras.push(new Camera(cameraName, uuid));
         navigation.navigate('Loading');
       })
       .catch((error) => {
@@ -112,11 +121,6 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
       .then((type: WifiSecType) => {
         setDisplayUser(type === WifiSecType.WPA2_802_1X);
         setDisplayPass(type === WifiSecType.WPA2_802_1X || type === WifiSecType.WPA2_PSK);
-
-        // Open wifi connections need no user or pass, just try connecting
-        if (type === WifiSecType.OPEN) {
-          submitWifiToPi();
-        }
       })
       .catch((error) => {
         console.error(error);
@@ -149,11 +153,9 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
           placeholder="Enter WiFi password here"
         />
       )}
-      {(displayUser || displayPass) && (
-        <View style={styles.button}>
-          <Button title="Next" onPress={submitWifiToPi} />
-        </View>
-      )}
+      <View style={styles.button}>
+        <Button title="Next" onPress={submitWifiToPi} />
+      </View>
     </KeyboardAvoidingView>
   );
 }

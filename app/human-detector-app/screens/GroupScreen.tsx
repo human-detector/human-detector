@@ -75,15 +75,15 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
     <View style={styles.container}>
       <ScrollView>
         {userContext.groupList.map((item) => (
-          <View key={item.getGroupId}>
+          <View key={item.groupId}>
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                pressHandler(item.getGroupId);
+                pressHandler(item.groupId);
               }}
             >
-              <Text style={styles.menuButtonText}> {item.getGroupName} </Text>
-              <CameraSettingsButton cameraId={item.getGroupId} />
+              <Text style={styles.menuButtonText}> {item.groupName} </Text>
+              <CameraSettingsButton cameraId={item.groupId} />
             </TouchableOpacity>
           </View>
         ))}

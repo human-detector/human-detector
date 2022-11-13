@@ -60,7 +60,7 @@ export class CamerasService {
     }
 
     cam.notifications.add(new Notification(new Snapshot(frame)));
-    this.cameraRepository.flush();
+    await this.cameraRepository.flush();
     return true;
   }
 

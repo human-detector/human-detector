@@ -4,6 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import Camera from '../classes/Camera';
+import Notification from '../classes/Notification';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
@@ -54,13 +55,13 @@ const styles = StyleSheet.create({
   },
 });
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>
+type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>;
 export default function CameraScreen({ navigation }: Props): React.ReactElement {
   const cameraOne: Camera = new Camera('123', "AAAAA's Camera", '99');
   const cameraTwo: Camera = new Camera('124', "BBBBB's Camera", '725');
   const cameraThree: Camera = new Camera('125', "CCCCC's Camera", '400');
 
-  const [listOfCameras, setListOfCameras] = useState([cameraOne, cameraTwo, cameraThree]);
+  const [listOfCameras] = useState([cameraOne, cameraTwo, cameraThree]);
 
   return (
     <View style={styles.container}>
@@ -70,7 +71,17 @@ export default function CameraScreen({ navigation }: Props): React.ReactElement 
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                setListOfCameras([item]);
+                // FIXME: don't hardcode the notifications!
+                navigation.navigate('Notifications', {
+                  notifications: [
+                    new Notification(
+                      'FIXME',
+                      new Date('2020'),
+                      item,
+                      '1a072775-0fe2-4029-b1b7-466e9e3344e4'
+                    ),
+                  ],
+                });
               }}
             >
               <Text style={styles.menuButtonText}> {item.cameraName} </Text>
@@ -84,7 +95,7 @@ export default function CameraScreen({ navigation }: Props): React.ReactElement 
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
               // Start camera registration process
-              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList'});
+              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList' });
             }}
           >
             <Text style={styles.addButtonText}> + </Text>

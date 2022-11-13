@@ -59,14 +59,14 @@ export default function GroupRegInfoScreen({ route, navigation }: Props): React.
           /**
            * Upon button press, register a group
            */
-          // const groupId: string | null = await backendContext.registerGroupAPI(groupName);
-          // if (!groupId) {
-          //   console.error('Error in getting the groupId!');
-          //   throw new Error('Error in group registration');
-          // }
-          const newGroup = new Group(groupName, '84923843294823984', []);
+          const groupId: string | null = await backendContext.registerGroupAPI(groupName);
+          if (!groupId) {
+            console.error('Error in getting the groupId!');
+            throw new Error('Error in group registration');
+          }
+          const newGroup = new Group(groupName, groupId, []);
           userContext.addGroupToList(newGroup);
-          console.log(userContext.getGroupList);
+          console.log(userContext.groupList);
           navigation.goBack();
         }}
       />

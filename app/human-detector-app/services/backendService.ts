@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import Camera from '../classes/Camera';
 import Group from '../classes/Group';
 import Notification from '../classes/Notification';
 import User from '../classes/User';
@@ -32,8 +33,6 @@ export default class BackendService {
   }
 
   public getUser(): User {
-    // const groups = this.getGroupListAPI();
-    // console.log(groups);
     return this.tokenManager.getUser();
   }
 
@@ -53,7 +52,7 @@ export default class BackendService {
     groupId: string
   ): Promise<string | null> {
     const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().getUserId, groupId);
+      ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().userId, groupId);
 
     try {
       const response = await this.axiosInstance.put(apiLinkWithExtension, {
@@ -77,7 +76,7 @@ export default class BackendService {
    */
   public async registerGroupAPI(name: string): Promise<string | null> {
     const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.registerGroupUrlExtension(this.getUser().getUserId);
+      ServerUrl.apiLink + ServerUrl.registerGroupUrlExtension(this.getUser().userId);
 
     try {
       const response = await this.axiosInstance.put(apiLinkWithExtension, {
@@ -100,12 +99,11 @@ export default class BackendService {
    */
   public async getGroupListAPI(): Promise<Group[] | null> {
     try {
-      console.log('test');
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().getUserId);
+        ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().userId);
 
       const response = await this.axiosInstance.get(apiLinkWithExtension);
-      return response.data;
+      return BackendService.responseIntoGroupArray(response.data);
     } catch (error) {
       console.error(`Error in getGroupListAPI status code:`, error);
       return null;
@@ -127,7 +125,7 @@ export default class BackendService {
         },
       };
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(this.getUser().getUserId);
+        ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(this.getUser().userId);
 
       await this.axiosInstance.put(
         apiLinkWithExtension,
@@ -153,7 +151,7 @@ export default class BackendService {
   public async getNotificationHistoryAPI(): Promise<Notification[] | null> {
     try {
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(this.getUser().getUserId);
+        ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(this.getUser().userId);
       const config = {
         headers: {
           Accept: 'application/json',
@@ -166,5 +164,13 @@ export default class BackendService {
       console.error(`Error in getNotificationHistoryAPI status code:`, error);
       return null;
     }
+  }
+
+  private static responseIntoGroupArray(response: any): Group[] {
+    return response.map((group: any) => {
+      // TODO: Get notification array
+      const newCamArr = group.cameras.map((cam: any) => new Camera(cam.name, cam.id));
+      return new Group(group.name, group.id, newCamArr);
+    });
   }
 }

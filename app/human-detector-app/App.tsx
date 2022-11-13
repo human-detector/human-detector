@@ -14,12 +14,15 @@ import BLEScreens from './src/ble/bleScreens';
 import { UserContext } from './contexts/userContext';
 import GroupRegistrationScreen from './src/groupRegScreens';
 import { RootStackParamList } from './src/navigation/stackParamList';
+import User from './classes/User';
+import Group from './classes/Group';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());
 
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);
+  const [groups, setGroups] = React.useState<Group[]>([]);
 
   // If the user isn't logged in
   if (backendService === null) {
@@ -42,7 +45,7 @@ export default function App(): React.ReactElement {
           >
             {() => (
               <LoginScreen
-                onSuccessfulLogin={(tokenManager) => {
+                onSuccessfulLogin={async (tokenManager) => {
                   const backend = new BackendService(tokenManager);
                   setBackendService(backend);
                   fetchPushToken()
@@ -50,6 +53,7 @@ export default function App(): React.ReactElement {
                     .catch((error) =>
                       console.error('Error fetching or updating push token', error)
                     );
+                  setGroups((await backend.getGroupListAPI()) ?? []);
                 }}
               />
             )}
@@ -60,10 +64,12 @@ export default function App(): React.ReactElement {
   }
 
   // If the user is logged in return the stack with all the information
+  const user: User = backendService.getUser();
+  user.groupList = groups;
 
   return (
     <NavigationContainer>
-      <UserContext.Provider value={backendService.getUser()}>
+      <UserContext.Provider value={user}>
         <BLEContext.Provider value={bleService}>
           <BackendContext.Provider value={backendService}>
             <Stack.Navigator

@@ -5,28 +5,16 @@ import { Alert } from 'react-native';
 import Group from './Group';
 
 export default class User {
-  private username: string;
+  username: string;
 
-  private userId: string;
+  userId: string;
 
-  private groupList: Group[];
+  groupList: Group[];
 
   constructor(username: string, userId: string, groupList: Group[]) {
     this.username = username;
     this.userId = userId; // Should always be from authorization token
     this.groupList = groupList;
-  }
-
-  get getUsername(): string {
-    return this.username;
-  }
-
-  get getUserId(): string {
-    return this.userId;
-  }
-
-  get getGroupList(): Group[] {
-    return this.groupList;
   }
 
   getGroupFromId(groupId: string) {

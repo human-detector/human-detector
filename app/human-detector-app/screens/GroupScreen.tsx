@@ -74,7 +74,7 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {userContext.getGroupList.map((item) => (
+        {userContext.groupList.map((item) => (
           <View key={item.getGroupId}>
             <TouchableOpacity
               style={styles.menuItem}

@@ -7,7 +7,7 @@ import { decodeJwt } from 'jose';
  */
 export function jwtFromAuthHeader(header: string | undefined): string {
   if (!header || !header.startsWith('Bearer ')) {
-    return undefined;
+    throw new Error('Malformed authorization header');
   }
   const jwt = header.split(' ')[1];
   // Attempt to decode the JWT, throwing if the structure is invalid

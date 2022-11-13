@@ -2,24 +2,30 @@ import {
   Controller,
   ForbiddenException,
   Get,
-  Inject,
   Param,
+  Res,
+  StreamableFile,
+  UseGuards,
 } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
+import { SnapshotAuthGuard } from './snapshot-auth.guard';
 import { SnapshotsService } from './snapshots.service';
+import { Response } from 'express';
 
-// TODO: auth, maybe?
 @Controller('snapshots')
+@UseGuards(SnapshotAuthGuard)
 export class SnapshotsController {
-  constructor(
-    @Inject()
-    private snapshotsService: SnapshotsService,
-  ) {}
+  constructor(private snapshotsService: SnapshotsService) {}
 
   @Get(':id')
-  async getSnapshot(@Param('id') snapshotId: string) {
+  public async getSnapshot(
+    @Param('id') snapshotId: string,
+    @Res() res: Response,
+  ): Promise<StreamableFile> {
     try {
-      return this.snapshotsService.getSnapshotImage(snapshotId);
+      const image = await this.snapshotsService.getSnapshotImage(snapshotId);
+      res.set('Content-Type', 'image/jpeg');
+      return new StreamableFile(image);
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();

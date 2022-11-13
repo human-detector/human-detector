@@ -32,6 +32,8 @@ export default class BackendService {
   }
 
   public getUser(): User {
+    // const groups = this.getGroupListAPI();
+    // console.log(groups);
     return this.tokenManager.getUser();
   }
 
@@ -98,6 +100,7 @@ export default class BackendService {
    */
   public async getGroupListAPI(): Promise<Group[] | null> {
     try {
+      console.log('test');
       const apiLinkWithExtension: string =
         ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().getUserId);
 

@@ -5,7 +5,6 @@ import { GroupRegParamList } from '../../src/navigation/groupRegParamList';
 import { BackendContext } from '../../contexts/backendContext';
 import Group from '../../classes/Group';
 import { UserContext } from '../../contexts/userContext';
-import Camera from '../../classes/Camera';
 
 const styles = StyleSheet.create({
   container: {
@@ -57,12 +56,15 @@ export default function GroupRegInfoScreen({ route, navigation }: Props): React.
       <Button
         title="Add Group"
         onPress={async () => {
-          const groupId: string | null = await backendContext.registerGroupAPI(groupName);
-          if (!groupId) {
-            console.error('Error in getting the groupId!');
-            throw new Error('Error in group registration');
-          }
-          const newGroup = new Group(groupName, groupId, []);
+          /**
+           * Upon button press, register a group
+           */
+          // const groupId: string | null = await backendContext.registerGroupAPI(groupName);
+          // if (!groupId) {
+          //   console.error('Error in getting the groupId!');
+          //   throw new Error('Error in group registration');
+          // }
+          const newGroup = new Group(groupName, '84923843294823984', []);
           userContext.addGroupToList(newGroup);
           console.log(userContext.getGroupList);
           navigation.goBack();

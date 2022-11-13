@@ -6,6 +6,7 @@ import {
   StreamableFile,
   UseGuards,
 } from '@nestjs/common';
+import { bufferMimeTypes } from '../cameras/image-buffer';
 import { NotFoundError } from '../errors.types';
 import { SnapshotAuthGuard } from './snapshot-auth.guard';
 import { SnapshotsService } from './snapshots.service';
@@ -21,7 +22,7 @@ export class SnapshotsController {
   ): Promise<StreamableFile> {
     try {
       const image = await this.snapshotsService.getSnapshotImage(snapshotId);
-      return new StreamableFile(image, { type: 'image/jpeg' });
+      return new StreamableFile(image, { type: bufferMimeTypes(image)[0] });
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();

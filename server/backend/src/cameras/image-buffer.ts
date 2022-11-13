@@ -14,6 +14,12 @@ export const DEFAULT_ACCEPTED_IMAGE_MIME_TYPES = new Set([
   'image/png',
 ]);
 
+export function bufferMimeTypes(buffer: Buffer): string[] {
+  return filetype(buffer)
+    .map((guess) => guess.mime)
+    .filter((mime) => mime !== undefined);
+}
+
 /**
  * Validates that the given buffer contains an image and converts it to a checked type.
  * @param buffer image bytes
@@ -25,11 +31,9 @@ export function imageBufferFromBuffer(
   buffer: Buffer,
   acceptedMimeTypes = DEFAULT_ACCEPTED_IMAGE_MIME_TYPES,
 ): ImageBuffer {
-  const guessedTypes = filetype(buffer);
+  const guessedTypes = bufferMimeTypes(buffer);
   const isImage =
-    guessedTypes.find(
-      (guess) => guess.mime && acceptedMimeTypes.has(guess.mime),
-    ) !== undefined;
+    guessedTypes.find((mime) => acceptedMimeTypes.has(mime)) !== undefined;
   if (!isImage) {
     const acceptableTypesString = Array.from(acceptedMimeTypes).join(', ');
     const guessedTypesString = guessedTypes.join(', ');

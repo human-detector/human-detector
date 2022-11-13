@@ -22,6 +22,7 @@ export type GetGroupsOutput = {
     notifications: {
       id: string;
       timestamp: string;
+      snapshotId: string;
     }[];
   }[];
 }[];
@@ -54,6 +55,7 @@ export class UsersController {
           notifications: camera.notifications.map((notification) => ({
             id: notification.id,
             timestamp: notification.timestamp,
+            snapshotId: notification.snapshot.id,
           })),
         })),
       }));

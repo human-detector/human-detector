@@ -76,7 +76,7 @@ defineFeature(feature, (test) => {
     then('I receive the image data', () => {
       expect(res.statusCode).toBe(200);
       expect(res.headers['content-type']).toBe('image/jpeg');
-      expect(res.body).toBe(snapshot.image);
+      expect(res.body).toStrictEqual(snapshot.image);
     });
   });
 

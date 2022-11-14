@@ -30,7 +30,7 @@ describe(BackendService, () => {
     it('should return code 200 for successful token sending', async () => {
       mockTokenManager.getUser.mockReturnValue(newUser);
       nock(ServerConfig.apiLink)
-        .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.getUserId))
+        .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userId))
         .reply(200, 'success');
 
       await backendService.sendNotifyTokenAPI('ExponentPushToken[0000000000]');
@@ -39,7 +39,7 @@ describe(BackendService, () => {
     it("should return code 401 if user id doesn't exist", async () => {
       mockTokenManager.getUser.mockReturnValue(newUser);
       nock(ServerConfig.apiLink)
-        .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.getUserId))
+        .put(ServerConfig.getSendNotifKeyUrlExtension(newUser.userId))
         .reply(401, 'fail');
 
       await expect(
@@ -55,7 +55,7 @@ describe(BackendService, () => {
     it('should return null if there is an error', async () => {
       mockTokenManager.getUser.mockReturnValue(newUser);
       nock(ServerConfig.apiLink)
-        .get(ServerConfig.getGroupsListUrlExtension(newUser.getUserId))
+        .get(ServerConfig.getGroupsListUrlExtension(newUser.userId))
         .reply(401, 'error');
 
       const result = await backendService.getGroupListAPI();
@@ -66,25 +66,38 @@ describe(BackendService, () => {
     it('should return list of groups when successful', async () => {
       mockTokenManager.getUser.mockReturnValue(newUser);
 
-      const groupObj: Group = new Group('Group 1', 'ID', []);
-      groupObj.addCameraToGroup(new Camera('Camera 1', '473843'));
-      groupObj.addCameraToGroup(new Camera('Camera 2', '74837483'));
+      const groupMock = {
+        id: 'id',
+        name: 'group1',
+        cameras: [
+          { id: '4324324', name: 'cameraname', notifications: [] },
+          {
+            id: '473843',
+            name: 'cameraname2',
+            notifications: [
+              { id: '48374834', timestamp: '2022-06-14T03:24:00', snapshotId: 'test' },
+            ],
+          },
+        ],
+      };
 
-      const groupObj2: Group = new Group('Grosefsefup 1', 'ID333', []);
-      groupObj2.addCameraToGroup(new Camera('Camesfsefera 1', '4837483'));
-      groupObj2.addCameraToGroup(new Camera('Camefesfra 2', '489384384'));
-
-      const groups: Array<Group> = [];
-      groups.push(groupObj);
-      groups.push(groupObj2);
+      const groups = [groupMock];
+      const groupResult: Group[] = [
+        new Group('group1', 'id', [
+          new Camera('cameraname', '4324324', []),
+          new Camera('cameraname2', '473843', [
+            new Notification('48374834', new Date('2022-06-14T03:24:00'), 'test'),
+          ]),
+        ]),
+      ];
 
       nock(ServerConfig.apiLink)
-        .get(ServerConfig.getGroupsListUrlExtension(newUser.getUserId))
+        .get(ServerConfig.getGroupsListUrlExtension(newUser.userId))
         .reply(200, JSON.stringify(groups));
 
       const result = await backendService.getGroupListAPI();
 
-      expect(result).toEqual(groups);
+      expect(groupResult).toEqual(result);
     });
   });
 
@@ -95,7 +108,7 @@ describe(BackendService, () => {
     it('should return null if there is an error', async () => {
       mockTokenManager.getUser.mockReturnValue(newUser);
       nock(ServerConfig.apiLink)
-        .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.getUserId))
+        .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.userId))
         .reply(401, 'error');
 
       const result = await backendService.getNotificationHistoryAPI();
@@ -107,24 +120,13 @@ describe(BackendService, () => {
       mockTokenManager.getUser.mockReturnValue(newUser);
 
       // make notification array
-      const cam: Camera = new Camera('testCamera', '9999');
-      const notif1: Notification = new Notification(
-        'e',
-        new Date('2022-06-14T03:24:00'),
-        cam,
-        'bee'
-      );
-      const notif2: Notification = new Notification(
-        'a',
-        new Date('2007-12-27T00:00:00'),
-        cam,
-        'wawa'
-      );
+      const notif1: Notification = new Notification('e', '2022-06-14T03:24:00', 'bee');
+      const notif2: Notification = new Notification('a', '2007-12-27T00:00:00', 'wawa');
 
       const notifHistory: Notification[] = [notif1, notif2];
 
       nock(ServerConfig.apiLink)
-        .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.getUserId))
+        .get(ServerConfig.getNotificationHistoryUrlExtension(newUser.userId))
         .reply(200, JSON.stringify(notifHistory));
 
       const result = await backendService.getNotificationHistoryAPI();

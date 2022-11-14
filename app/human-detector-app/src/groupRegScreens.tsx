@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoadingScreen from '../screens/CameraRegistration/LoadingScreen';
 import GroupRegInfoScreen from '../screens/GroupRegistration/GroupRegInfoScreen';
 import { GroupRegParamList } from './navigation/groupRegParamList';
-import { RootStackParamList } from './navigation/stackParamList';
 
 const Stack = createNativeStackNavigator<GroupRegParamList>();
 

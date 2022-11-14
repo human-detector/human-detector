@@ -4,7 +4,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import { UserContext } from '../contexts/userContext';
-import Notification from '../classes/Notification';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
@@ -58,6 +57,7 @@ const styles = StyleSheet.create({
 type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>;
 export default function CameraScreen({ navigation, route }: Props): React.ReactElement {
   const userContext = React.useContext(UserContext);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isFocused = useIsFocused();
   const { groupId } = route.params;
 
@@ -69,31 +69,23 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
   if (!groupToView) {
     throw new Error('Group to view not valid');
   }
-  const [listOfCameras] = React.useState(groupToView.cameras);
 
   return (
     <View style={styles.container}>
       <ScrollView>
         {groupToView?.cameras.map((item) => (
-          <View key={item.getCameraId}>
+          <View key={item.cameraId}>
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
                 // FIXME: don't hardcode the notifications!
                 navigation.navigate('Notifications', {
-                  notifications: [
-                    new Notification(
-                      'FIXME',
-                      new Date('2020'),
-                      item,
-                      '1a072775-0fe2-4029-b1b7-466e9e3344e4'
-                    ),
-                  ],
+                  notifications: item.notifications,
                 });
               }}
             >
-              <Text style={styles.menuButtonText}> {item.getCameraName} </Text>
-              <CameraSettingsButton cameraId={item.getCameraId} />
+              <Text style={styles.menuButtonText}> {item.cameraName} </Text>
+              <CameraSettingsButton cameraId={item.cameraId} />
             </TouchableOpacity>
           </View>
         ))}

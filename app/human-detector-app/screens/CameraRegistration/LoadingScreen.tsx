@@ -8,7 +8,6 @@ import { ConnectionStatus, ConnectionNotification, FailReason } from '../../src/
 import { BLEContext } from '../../contexts/bleContext';
 import { BLEParamList } from '../../src/navigation/bleParamList';
 import { UserContext } from '../../contexts/userContext';
-import Camera from '../../classes/Camera';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
 

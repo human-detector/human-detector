@@ -6,9 +6,9 @@ import Notification from '../../classes/Notification';
 export type RootStackParamList = {
   Login: undefined;
   Groups: undefined;
-  Cameras: undefined;
+  Cameras: { groupId: string };
   Notifications: { notifications: Notification[] };
   Snapshot: { snapshotId: string };
-  CameraRegistration: NavigatorScreenParams<BLEParamList>;
+  CameraRegistration: { groupId: string; paramList: NavigatorScreenParams<BLEParamList> };
   GroupRegistration: NavigatorScreenParams<GroupRegParamList>;
 };

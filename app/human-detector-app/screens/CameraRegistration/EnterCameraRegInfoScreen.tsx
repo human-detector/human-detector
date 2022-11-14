@@ -52,7 +52,6 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
   const [pass, setPass] = React.useState('');
 
   const { groupId } = route.params;
-  console.log(groupId, 'In Camera Reg');
 
   const backendContext = React.useContext(BackendContext);
   const bleContext = React.useContext(BLEContext);

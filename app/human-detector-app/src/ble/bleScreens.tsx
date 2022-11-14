@@ -12,8 +12,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'CameraRegistration'>;
 export default function BLEScreens({ route }: Props) {
   const { groupId } = route.params;
 
-  console.log(groupId);
-
   return (
     <Stack.Navigator
       initialRouteName="BluetoothDeviceList"

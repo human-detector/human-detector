@@ -104,7 +104,6 @@ export default class BackendService {
         ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().userId);
 
       const response = await this.axiosInstance.get(apiLinkWithExtension);
-      console.log(BackendService.responseIntoGroupArray(response.data));
       return BackendService.responseIntoGroupArray(response.data);
     } catch (error) {
       console.error(`Error in getGroupListAPI status code:`, error);
@@ -188,7 +187,12 @@ export default class BackendService {
   private static responseIntoGroupArray(response: any): Group[] {
     return response.map((group: any) => {
       // TODO: Get notification array
-      const newCamArr = group.cameras.map((cam: any) => new Camera(cam.name, cam.id));
+      const newCamArr = group.cameras.map((cam: any) => {
+        const newNotifArr = cam.notifications.map(
+          (notif: any) => new Notification(notif.id, new Date(notif.timestamp), notif.snapshotId)
+        );
+        return new Camera(cam.name, cam.id, newNotifArr);
+      });
       return new Group(group.name, group.id, newCamArr);
     });
   }

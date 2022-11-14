@@ -3,28 +3,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line import/no-cycle
 import Group from './Group';
+// eslint-disable-next-line import/no-cycle
+import Notification from './Notification';
 
 export default class Camera {
   // field
-  private cameraId: string;
+  cameraId: string;
 
-  private cameraName: string;
+  cameraName: string;
+
+  notifications: Notification[];
 
   // constructor
-  constructor(cameraName: string, cameraId: string) {
+  constructor(cameraName: string, cameraId: string, notifications: Notification[]) {
     this.cameraId = cameraId;
     this.cameraName = cameraName;
-  }
-
-  get getCameraName() {
-    return this.cameraName;
-  }
-
-  get getCameraId() {
-    return this.cameraId;
-  }
-
-  set setCameraName(cameraName: string) {
-    this.cameraName = cameraName;
+    this.notifications = notifications;
   }
 }

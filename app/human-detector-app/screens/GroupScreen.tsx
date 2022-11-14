@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import CameraSettingsButton from '../components/CameraSettingsButton';
-import Group from '../classes/Group';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 import { UserContext } from '../contexts/userContext';
-import { NavigationHelpersContext, useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
   container: {
@@ -59,6 +57,7 @@ const styles = StyleSheet.create({
 type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>;
 export default function GroupScreen({ navigation }: Props): React.ReactElement {
   const userContext = React.useContext(UserContext);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isFocused = useIsFocused();
 
   if (!userContext) {

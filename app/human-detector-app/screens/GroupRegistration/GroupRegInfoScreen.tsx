@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
 });
 
 type Props = NativeStackScreenProps<GroupRegParamList, 'GroupRegistrationInfo'>;
-export default function GroupRegInfoScreen({ route, navigation }: Props): React.ReactElement {
+export default function GroupRegInfoScreen({ navigation }: Props): React.ReactElement {
   const [groupName, setGroupName] = React.useState('');
   const backendContext = React.useContext(BackendContext);
   const userContext = React.useContext(UserContext);

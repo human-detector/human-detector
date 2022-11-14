@@ -99,7 +99,7 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
           console.error(error);
           navigation.navigate('BluetoothDeviceList');
         });
-        userContext.getGroupFromId(groupId)?.cameras.push(new Camera(cameraName, uuid));
+        userContext.getGroupFromId(groupId)?.cameras.push(new Camera(cameraName, uuid, []));
         navigation.navigate('Loading');
       })
       .catch((error) => {

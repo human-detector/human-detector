@@ -83,7 +83,6 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
           return;
         }
 
-        // TODO: Talk to server
         const uuid = await backendContext.registerCamera(
           cameraName,
           serial.Serial,

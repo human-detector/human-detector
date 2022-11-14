@@ -31,6 +31,15 @@ export enum ConnectionStatus {
   CONNECTING = 2,
   SUCCESS = 3,
   FAIL = 4,
+  ATTEMPTING_PING = 5,
+}
+
+export enum FailReason {
+  NONE = 0,
+  NETWORK_NOT_FOUND = 1,
+  INCORRECT_SECRETS = 2,
+  FORBIDDEN = 3,
+  BACKEND_DOWN = 4,
 }
 
 // Notification JSON recieved from camera

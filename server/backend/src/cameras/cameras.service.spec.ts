@@ -6,6 +6,7 @@ import { NotFoundError } from '../errors.types';
 import { Notification } from './notification.entity';
 import { ConfigModule } from '@nestjs/config';
 import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from './push-notifications/push-notifications-service.interface';
+import { ImageBuffer } from './image-buffer';
 
 const validCamID = '4fa660b3-bc2d-4d12-b427-32283ca04a07';
 const invalidCamID = 'c5fde899-ac02-465a-ae8b-7e082f1789c8';
@@ -46,9 +47,9 @@ describe('CamerasService', () => {
   describe('sendNotification(invalidCamID)', () => {
     it('should not add a new notification to the list', () => {
       mockedCameraRepository.findOne.mockResolvedValueOnce(null);
-      expect(camerasService.sendNotification(invalidCamID)).rejects.toThrow(
-        NotFoundError,
-      );
+      expect(
+        camerasService.sendNotification(invalidCamID, null as ImageBuffer),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 

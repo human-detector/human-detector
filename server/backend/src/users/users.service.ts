@@ -24,7 +24,13 @@ export class UsersService {
   public async getGroups(userId: string): Promise<Collection<Group>> {
     const user = await this.usersRepository.findOne(
       { id: userId },
-      { populate: ['groups.cameras'] },
+      {
+        populate: [
+          'groups.cameras',
+          'groups.cameras.notifications',
+          'groups.cameras.notifications.snapshot.id',
+        ],
+      },
     );
     if (user === null) {
       throw new NotFoundError(`User with ID "${userId}" does not exist.`);

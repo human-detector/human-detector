@@ -2,7 +2,6 @@ import { INestApplication } from '@nestjs/common';
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import request from 'supertest';
 import { Camera } from '../../src/cameras/camera.entity';
-import { Notification } from '../../src/cameras/notification.entity';
 import {
   buildTestStack,
   TestStack,
@@ -16,6 +15,7 @@ import { User } from '../../src/users/user.entity';
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
 import { GetNotificationsOutput } from 'src/cameras/cameras.controller';
 import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from '../../src/cameras/push-notifications/push-notifications-service.interface';
+import { notificationWithDummySnapshot } from '../helpers/notification';
 
 const feature = loadFeature('test/features/get-notifications.feature');
 
@@ -66,8 +66,8 @@ defineFeature(feature, (test) => {
       token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     and('the ID has 2 notifications associated with it', async () => {
-      cameraA.notifications.add(new Notification());
-      cameraA.notifications.add(new Notification());
+      cameraA.notifications.add(notificationWithDummySnapshot());
+      cameraA.notifications.add(notificationWithDummySnapshot());
       await cameraRepository.flush();
     });
     when('I request to get the notifications', async () => {
@@ -120,7 +120,7 @@ defineFeature(feature, (test) => {
       tokenA = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     and('camera A has 1 notification', async () => {
-      cameraA.notifications.add(new Notification());
+      cameraA.notifications.add(notificationWithDummySnapshot());
       await cameraRepository.flush();
     });
     and('camera B is registered', async () => {
@@ -183,7 +183,7 @@ defineFeature(feature, (test) => {
       cameraA = camera;
       cameraA.group = new Group('g');
       cameraA.group.user = new User();
-      cameraA.notifications.add(new Notification());
+      cameraA.notifications.add(notificationWithDummySnapshot());
       await cameraRepository.persistAndFlush(cameraA);
       tokenA = getCameraAuthToken(cameraA, keyPair.privateKey);
     });

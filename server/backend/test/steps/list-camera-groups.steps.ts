@@ -13,6 +13,7 @@ import {
   TEST_STACK_TIMEOUT,
 } from '../helpers/test-stack';
 import { UsersModule } from '../../src/users/users.module';
+import { notificationWithDummySnapshot } from '../helpers/notification';
 
 defineFeature(
   loadFeature('test/features/list-camera-groups.feature'),
@@ -54,6 +55,9 @@ defineFeature(
         user.groups[0].cameras.add(
           new Camera('My camera :)', 'wajebawk', 'definitely a serial'),
         );
+        user.groups[0].cameras[0].notifications.add(
+          notificationWithDummySnapshot(),
+        );
         await userRepository.flush();
         token = tokenSet.access_token;
       });
@@ -73,6 +77,16 @@ defineFeature(
                 {
                   id: user.groups[0].cameras[0].id,
                   name: user.groups[0].cameras[0].name,
+                  notifications: [
+                    {
+                      id: user.groups[0].cameras[0].notifications[0].id,
+                      timestamp: new Date(
+                        user.groups[0].cameras[0].notifications[0].timestamp,
+                      ).toISOString(),
+                      snapshotId:
+                        user.groups[0].cameras[0].notifications[0].snapshot.id,
+                    },
+                  ],
                 },
               ],
             },

@@ -11,8 +11,10 @@ import BackendService from './services/backendService';
 import { BackendContext } from './contexts/backendContext';
 import { BLEContext } from './contexts/bleContext';
 import { BLEService } from './src/ble/bleServices';
-import BLEScreens from './src/ble/bleScreens'
+import BLEScreens from './src/ble/bleScreens';
 import { RootStackParamList } from './src/navigation/stackParamList';
+import NotifScreen from './screens/NotifScreen';
+import SnapshotScreen from './screens/SnapshotScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());
@@ -80,12 +82,9 @@ export default function App(): React.ReactElement {
               headerTitleStyle: {
                 fontWeight: 'bold',
               },
-            }}>
-            <Stack.Screen
-              name="Groups"
-              component={GroupScreen}
-              options={{ title: 'EyeSpy' }}
-            />
+            }}
+          >
+            <Stack.Screen name="Groups" component={GroupScreen} options={{ title: 'EyeSpy' }} />
             <Stack.Screen
               name="Cameras"
               component={CameraScreen}
@@ -99,9 +98,11 @@ export default function App(): React.ReactElement {
               name="CameraRegistration"
               component={BLEScreens}
               options={{
-                headerShown: false
+                headerShown: false,
               }}
             />
+            <Stack.Screen name="Notifications" component={NotifScreen} />
+            <Stack.Screen name="Snapshot" component={SnapshotScreen} />
           </Stack.Navigator>
         </BackendContext.Provider>
       </BLEContext.Provider>

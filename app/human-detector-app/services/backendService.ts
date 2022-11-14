@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { ImageURISource } from 'react-native';
 import Group from '../classes/Group';
 import Notification from '../classes/Notification';
 import User from '../classes/User';
@@ -37,7 +38,7 @@ export default class BackendService {
 
   /**
    * Registers the camera in the backend and returns the UUID of it.
-   * 
+   *
    * @param name New camera name
    * @param serial New camera serial
    * @param publicKey New camera's public key
@@ -50,18 +51,15 @@ export default class BackendService {
     publicKey: string,
     groupId: string
   ): Promise<string | null> {
-    const apiLinkWithExtension: string = 
+    const apiLinkWithExtension: string =
       ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().userID, groupId);
-    
+
     try {
-      const response = await this.axiosInstance.put(
-        apiLinkWithExtension,
-        {
-          name,
-          serial,
-          publicKey
-        }
-      );
+      const response = await this.axiosInstance.put(apiLinkWithExtension, {
+        name,
+        serial,
+        publicKey,
+      });
 
       return response.data.id;
     } catch (error) {
@@ -144,5 +142,22 @@ export default class BackendService {
       console.error(`Error in getNotificationHistoryAPI status code:`, error);
       return null;
     }
+  }
+
+  /**
+   * Construct an image URI for use in React's Image component with added authorization headers.
+   * Snapshots are access-controlled, so we need to inject the authorization header into requests.
+   * @param snapshotId snapshot ID
+   * @returns source with authorization header injected
+   */
+  public async getSnapshotSource(snapshotId: string): Promise<ImageURISource> {
+    const accessToken = await this.tokenManager.getAccessToken();
+    const uri = `${ServerUrl.apiLink}${ServerUrl.snapshotUrl(snapshotId)}`;
+    return {
+      uri,
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    };
   }
 }

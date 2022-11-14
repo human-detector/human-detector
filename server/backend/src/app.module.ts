@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 
 import appConfig from '../config';
 import dbConfig from '../mikro-orm.config';
+import { SnapshotsModule } from './snapshots/snapshots.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import dbConfig from '../mikro-orm.config';
     MikroOrmModule.forRoot(dbConfig),
     CamerasModule,
     UsersModule,
+    SnapshotsModule,
   ],
 })
 export class AppModule {}

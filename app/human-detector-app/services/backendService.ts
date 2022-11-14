@@ -103,6 +103,7 @@ export default class BackendService {
         ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().userId);
 
       const response = await this.axiosInstance.get(apiLinkWithExtension);
+      console.log(BackendService.responseIntoGroupArray(response.data));
       return BackendService.responseIntoGroupArray(response.data);
     } catch (error) {
       console.error(`Error in getGroupListAPI status code:`, error);

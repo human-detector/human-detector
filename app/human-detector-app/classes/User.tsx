@@ -18,7 +18,7 @@ export default class User {
   }
 
   getGroupFromId(groupId: string) {
-    return this.groupList.find((group) => group.getGroupId === groupId);
+    return this.groupList.find((group) => group.groupId === groupId);
   }
 
   addGroupToList(newGroup: Group): boolean {
@@ -27,7 +27,7 @@ export default class User {
   }
 
   removeGroupFromList(groupIndex: number): boolean {
-    if (this.groupList[groupIndex].getCameras.length > 0) {
+    if (this.groupList[groupIndex].cameras.length > 0) {
       Alert.alert("Can't remove group that has cameras!  Move cameras before removing!");
       return false;
     }

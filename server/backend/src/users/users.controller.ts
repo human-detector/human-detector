@@ -19,6 +19,11 @@ export type GetGroupsOutput = {
   cameras: {
     id: string;
     name: string;
+    notifications: {
+      id: string;
+      timestamp: string;
+      snapshotId: string;
+    }[];
   }[];
 }[];
 
@@ -51,6 +56,11 @@ export class UsersController {
         cameras: group.cameras.map((camera) => ({
           id: camera.id,
           name: camera.name,
+          notifications: camera.notifications.map((notification) => ({
+            id: notification.id,
+            timestamp: notification.timestamp,
+            snapshotId: notification.snapshot.id,
+          })),
         })),
       }));
     } catch (error) {

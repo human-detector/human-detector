@@ -9,6 +9,8 @@ import {
   IPushNotificationsService,
   IPUSH_NOTIFICATIONS_SERVICE_TOKEN,
 } from './push-notifications/push-notifications-service.interface';
+import { Snapshot } from '../snapshots/snapshot.entity';
+import { ImageBuffer } from './image-buffer';
 
 @Injectable()
 export class CamerasService {
@@ -25,8 +27,13 @@ export class CamerasService {
    * Sends a notification to the user's phone and adds it to the
    * collection of notifications the user has.
    * @param idCam
+   * @param frame Image to associate with this notification. No validation is done on this
+   * frame data, so check your buffer beforehand.
    */
-  public async sendNotification(idCam: string): Promise<boolean> {
+  public async sendNotification(
+    idCam: string,
+    frame: ImageBuffer,
+  ): Promise<boolean> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
       { populate: ['group.user'] },
@@ -52,8 +59,8 @@ export class CamerasService {
       console.error('Error sending push notification', error);
     }
 
-    cam.notifications.add(new Notification());
-    this.cameraRepository.flush();
+    cam.notifications.add(new Notification(new Snapshot(frame)));
+    await this.cameraRepository.flush();
     return true;
   }
 
@@ -66,7 +73,7 @@ export class CamerasService {
   ): Promise<Collection<Notification>> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
-      { populate: ['notifications'] },
+      { populate: ['notifications', 'notifications.camera.id'] },
     );
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);

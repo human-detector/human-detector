@@ -4,6 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import { UserContext } from '../contexts/userContext';
+import Notification from '../classes/Notification';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
@@ -65,6 +66,10 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
     throw new Error('no user context in camera screen');
   }
   const groupToView = userContext.getGroupFromId(groupId);
+  if (!groupToView) {
+    throw new Error('Group to view not valid');
+  }
+  const [listOfCameras] = React.useState(groupToView.cameras);
 
   return (
     <View style={styles.container}>
@@ -74,7 +79,17 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                console.log('You clicked on a camera!');
+                // FIXME: don't hardcode the notifications!
+                navigation.navigate('Notifications', {
+                  notifications: [
+                    new Notification(
+                      'FIXME',
+                      new Date('2020'),
+                      item,
+                      '1a072775-0fe2-4029-b1b7-466e9e3344e4'
+                    ),
+                  ],
+                });
               }}
             >
               <Text style={styles.menuButtonText}> {item.getCameraName} </Text>

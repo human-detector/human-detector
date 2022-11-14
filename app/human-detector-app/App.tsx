@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Notifications from 'expo-notifications';
 import { BleManager } from 'react-native-ble-plx';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
@@ -16,9 +17,19 @@ import GroupRegistrationScreen from './src/groupRegScreens';
 import { RootStackParamList } from './src/navigation/stackParamList';
 import User from './classes/User';
 import Group from './classes/Group';
+import NotifScreen from './screens/NotifScreen';
+import SnapshotScreen from './screens/SnapshotScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);
@@ -107,6 +118,8 @@ export default function App(): React.ReactElement {
                   headerShown: false,
                 }}
               />
+              <Stack.Screen name="Notifications" component={NotifScreen} />
+              <Stack.Screen name="Snapshot" component={SnapshotScreen} />
             </Stack.Navigator>
           </BackendContext.Provider>
         </BLEContext.Provider>

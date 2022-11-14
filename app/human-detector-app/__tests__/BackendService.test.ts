@@ -108,8 +108,18 @@ describe(BackendService, () => {
 
       // make notification array
       const cam: Camera = new Camera('testCamera', '9999');
-      const notif1: Notification = new Notification('2022-06-14T03:24:00', cam);
-      const notif2: Notification = new Notification('2007-12-27T00:00:00', cam);
+      const notif1: Notification = new Notification(
+        'e',
+        new Date('2022-06-14T03:24:00'),
+        cam,
+        'bee'
+      );
+      const notif2: Notification = new Notification(
+        'a',
+        new Date('2007-12-27T00:00:00'),
+        cam,
+        'wawa'
+      );
 
       const notifHistory: Notification[] = [notif1, notif2];
 

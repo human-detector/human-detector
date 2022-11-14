@@ -14,3 +14,4 @@ export const getNotificationHistoryUrlExtension = (userId: string): string =>
 export const registerCameraUrlExtension = (userId: string, groupId: string): string =>
   `/users/${userId}/groups/${groupId}/cameras`;
 export const registerGroupUrlExtension = (userId: string): string => `/users/${userId}/groups`;
+export const snapshotUrl = (snapshotId: string): string => `/snapshots/${snapshotId}`;

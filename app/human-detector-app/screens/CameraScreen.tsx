@@ -78,7 +78,6 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                // FIXME: don't hardcode the notifications!
                 navigation.navigate('Notifications', {
                   notifications: item.notifications,
                 });

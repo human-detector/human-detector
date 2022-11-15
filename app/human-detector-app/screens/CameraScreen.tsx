@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
-import Camera from '../classes/Camera';
-import Notification from '../classes/Notification';
+import { UserContext } from '../contexts/userContext';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 
 const styles = StyleSheet.create({
@@ -56,31 +55,31 @@ const styles = StyleSheet.create({
 });
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>;
-export default function CameraScreen({ navigation }: Props): React.ReactElement {
-  const cameraOne: Camera = new Camera('123', "AAAAA's Camera", '99');
-  const cameraTwo: Camera = new Camera('124', "BBBBB's Camera", '725');
-  const cameraThree: Camera = new Camera('125', "CCCCC's Camera", '400');
+export default function CameraScreen({ navigation, route }: Props): React.ReactElement {
+  const userContext = React.useContext(UserContext);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const isFocused = useIsFocused();
+  const { groupId } = route.params;
 
-  const [listOfCameras] = useState([cameraOne, cameraTwo, cameraThree]);
+  if (!userContext) {
+    console.error('no user context in camera screen!');
+    throw new Error('no user context in camera screen');
+  }
+  const groupToView = userContext.getGroupFromId(groupId);
+  if (!groupToView) {
+    throw new Error('Group to view not valid');
+  }
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        {listOfCameras.map((item) => (
+        {groupToView?.cameras.map((item) => (
           <View key={item.cameraId}>
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                // FIXME: don't hardcode the notifications!
                 navigation.navigate('Notifications', {
-                  notifications: [
-                    new Notification(
-                      'FIXME',
-                      new Date('2020'),
-                      item,
-                      '1a072775-0fe2-4029-b1b7-466e9e3344e4'
-                    ),
-                  ],
+                  notifications: item.notifications,
                 });
               }}
             >
@@ -95,7 +94,10 @@ export default function CameraScreen({ navigation }: Props): React.ReactElement 
             style={[styles.menuItem, styles.addButtonItem]}
             onPress={() => {
               // Start camera registration process
-              navigation.navigate('CameraRegistration', { screen: 'BluetoothDeviceList' });
+              navigation.navigate('CameraRegistration', {
+                screen: 'BluetoothDeviceList',
+                groupId,
+              });
             }}
           >
             <Text style={styles.addButtonText}> + </Text>

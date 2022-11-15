@@ -14,15 +14,15 @@ export interface CameraSerial {
 }
 
 export enum WifiSecType {
-  WPA2_802_1X = "KEY_802_1X",
-  WPA2_PSK = "KEY_PSK",
-  OPEN = "OPEN",
-  UNSUPPORTED = "UNSUPPORTED",
-  UNKNOWN = "",
+  WPA2_802_1X = 'KEY_802_1X',
+  WPA2_PSK = 'KEY_PSK',
+  OPEN = 'OPEN',
+  UNSUPPORTED = 'UNSUPPORTED',
+  UNKNOWN = '',
 }
 
 /**
- * BLE Notification 
+ * BLE Notification
  */
 
 export enum ConnectionStatus {
@@ -31,12 +31,21 @@ export enum ConnectionStatus {
   CONNECTING = 2,
   SUCCESS = 3,
   FAIL = 4,
+  ATTEMPTING_PING = 5,
+}
+
+export enum FailReason {
+  NONE = 0,
+  NETWORK_NOT_FOUND = 1,
+  INCORRECT_SECRETS = 2,
+  FORBIDDEN = 3,
+  BACKEND_DOWN = 4,
 }
 
 // Notification JSON recieved from camera
 export interface ConnectionNotification {
-  State: ConnectionStatus,
-  Reason: number,
+  State: ConnectionStatus;
+  Reason: number;
 }
 
 export type NotificationCallback = (
@@ -73,7 +82,7 @@ export class BLEService {
         }
       }
     });
-  };
+  }
 
   /**
    * Stop scanning for new devices
@@ -85,7 +94,7 @@ export class BLEService {
 
   /**
    * Returns all scanned devices found
-   * 
+   *
    * @returns Array of scanned devices
    */
   public getDevices() {
@@ -94,7 +103,7 @@ export class BLEService {
 
   /**
    * Currently connected device
-   * 
+   *
    * @returns Device
    */
   public getCurrentConnectedDevice() {
@@ -110,7 +119,7 @@ export class BLEService {
     if (await device.isConnected()) return;
     const deviceConnection = await device.connect();
     this.connectedDevice = await deviceConnection.discoverAllServicesAndCharacteristics();
-  };
+  }
 
   /**
    * Disconnect from current device
@@ -134,13 +143,11 @@ export class BLEService {
       EyeSpyUUID.SERIAL_UUID
     );
 
-    if (!characteristic.value)
-      throw new Error('ERROR: No value in characteristic!');
+    if (!characteristic.value) throw new Error('ERROR: No value in characteristic!');
 
     const serialValues = base64ToJson(characteristic.value);
 
-    if (!serialValues.Serial || !serialValues.PubKey)
-      throw new Error('ERROR: No serial value!');
+    if (!serialValues.Serial || !serialValues.PubKey) throw new Error('ERROR: No serial value!');
 
     // Get characteristic values (Serial values)
     const { Serial, PubKey } = serialValues;
@@ -150,7 +157,6 @@ export class BLEService {
     };
   }
 
-  
   /**
    * This method will write to the write to EyeSpy Wifi to write
    * @param device
@@ -209,10 +215,10 @@ export class BLEService {
         EyeSpyUUID.WIFI_CHECK_UUID
       );
 
-      if (!checkChar.value) 
+      if (!checkChar.value)
         throw new Error('ERROR: No value in checkChar.value in checkWifiType()!');
 
-      const wifiTypeJson: {Type: WifiSecType} = base64ToJson(checkChar.value);
+      const wifiTypeJson: { Type: WifiSecType } = base64ToJson(checkChar.value);
       return wifiTypeJson.Type;
     } catch (error) {
       console.error('Error in checkWifiType(): ', error);
@@ -228,18 +234,14 @@ export class BLEService {
   public async checkCameraNotification(
     onCameraNotificationUpdate: NotificationCallback
   ): Promise<Subscription> {
-
-    const bleCallback = (
-      error: BleError | null,
-      characteristic: Characteristic | null
-    ): void => {
+    const bleCallback = (error: BleError | null, characteristic: Characteristic | null): void => {
       let returnVal: ConnectionNotification | null = null;
       if (error === null && characteristic?.value != null) {
         returnVal = base64ToJson(characteristic.value);
       }
 
       onCameraNotificationUpdate(error, returnVal);
-    }
+    };
 
     return this.connectedDevice!.monitorCharacteristicForService(
       EyeSpyUUID.BLE_SERVICE_UUID,

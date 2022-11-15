@@ -1,5 +1,5 @@
 export type BLEParamList = {
-    BluetoothDeviceList: undefined,
-    CameraRegistrationInfo: undefined,
-    Loading: undefined
+  BluetoothDeviceList: undefined;
+  CameraRegistrationInfo: undefined;
+  Loading: undefined;
 };

@@ -1,41 +1,37 @@
 // FIXME: re-evaluate methods and remove these
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { Alert } from 'react-native';
+import Group from './Group';
+
 export default class User {
   username: string;
 
-  userID: string;
+  userId: string;
 
-  loggedIn: boolean;
+  groupList: Group[];
 
-  constructor(username: string, userID: string, loggedIn: boolean) {
+  constructor(username: string, userId: string, groupList: Group[]) {
     this.username = username;
-    this.userID = userID; // Should always be from authorization token
-    this.loggedIn = loggedIn;
+    this.userId = userId; // Should always be from authorization token
+    this.groupList = groupList;
   }
 
-  set setUserID(userID: string) {
-    this.userID = userID;
+  getGroupFromId(groupId: string) {
+    return this.groupList.find((group) => group.groupId === groupId);
   }
-}
 
-// will look through database
-export function isValidUsername(username: string): boolean {
-  return false;
-}
+  addGroupToList(newGroup: Group): boolean {
+    this.groupList.push(newGroup);
+    return true;
+  }
 
-export function isValidPassword(password: string): boolean {
-  return false;
-}
-
-export function authenticateLogin(username: string, password: string): boolean {
-  return false;
-}
-
-export function loginUser(): User {
-  return new User('name', 'ID', false);
-}
-
-export function isSnoozeOn(user: User): boolean {
-  return true;
+  removeGroupFromList(groupIndex: number): boolean {
+    if (this.groupList[groupIndex].cameras.length > 0) {
+      Alert.alert("Can't remove group that has cameras!  Move cameras before removing!");
+      return false;
+    }
+    this.groupList.splice(groupIndex);
+    return true;
+  }
 }

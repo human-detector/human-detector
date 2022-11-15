@@ -37,6 +37,10 @@ export type RegisterCameraResponse = {
   id: string;
 };
 
+export type RegisterGroupResponse = {
+  id: string;
+};
+
 @Controller('users')
 @UseGuards(JwtIdentityGuard)
 export class UsersController {
@@ -59,6 +63,28 @@ export class UsersController {
           })),
         })),
       }));
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  @Put(':id/groups')
+  async registerGroup(
+    @Param('id') userId: string,
+    @Body('name') groupName: string,
+  ): Promise<RegisterGroupResponse> {
+    if (groupName === undefined) {
+      throw new BadRequestException();
+    }
+
+    try {
+      const group = await this.usersService.registerGroup(userId, groupName);
+
+      return { id: group.id };
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();

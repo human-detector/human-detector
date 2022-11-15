@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { ImageURISource } from 'react-native';
+import Camera from '../classes/Camera';
 import Group from '../classes/Group';
 import Notification from '../classes/Notification';
 import User from '../classes/User';
@@ -32,7 +33,7 @@ export default class BackendService {
     });
   }
 
-  private getUser(): User {
+  public getUser(): User {
     return this.tokenManager.getUser();
   }
 
@@ -52,7 +53,7 @@ export default class BackendService {
     groupId: string
   ): Promise<string | null> {
     const apiLinkWithExtension: string =
-      ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().userID, groupId);
+      ServerUrl.apiLink + ServerUrl.registerCameraUrlExtension(this.getUser().userId, groupId);
 
     try {
       const response = await this.axiosInstance.put(apiLinkWithExtension, {
@@ -69,6 +70,28 @@ export default class BackendService {
   }
 
   /**
+   * registerGroupAPI() will register a group in the backend to the user.
+   *
+   * @param name Group name (user input)
+   * @returns
+   */
+  public async registerGroupAPI(name: string): Promise<string | null> {
+    const apiLinkWithExtension: string =
+      ServerUrl.apiLink + ServerUrl.registerGroupUrlExtension(this.getUser().userId);
+
+    try {
+      const response = await this.axiosInstance.put(apiLinkWithExtension, {
+        name,
+      });
+
+      return response.data.id;
+    } catch (error) {
+      console.error('Error in registerGroup status code:', error);
+      return null;
+    }
+  }
+
+  /**
    * This method is used to get the group list that is connected to a user.  This group list
    * will contain cameras and other information that will be stored as a group object.
    *
@@ -78,10 +101,10 @@ export default class BackendService {
   public async getGroupListAPI(): Promise<Group[] | null> {
     try {
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().userID);
+        ServerUrl.apiLink + ServerUrl.getGroupsListUrlExtension(this.getUser().userId);
 
       const response = await this.axiosInstance.get(apiLinkWithExtension);
-      return response.data;
+      return BackendService.responseIntoGroupArray(response.data);
     } catch (error) {
       console.error(`Error in getGroupListAPI status code:`, error);
       return null;
@@ -103,7 +126,7 @@ export default class BackendService {
         },
       };
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(this.getUser().userID);
+        ServerUrl.apiLink + ServerUrl.getSendNotifKeyUrlExtension(this.getUser().userId);
 
       await this.axiosInstance.put(
         apiLinkWithExtension,
@@ -129,7 +152,7 @@ export default class BackendService {
   public async getNotificationHistoryAPI(): Promise<Notification[] | null> {
     try {
       const apiLinkWithExtension: string =
-        ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(this.getUser().userID);
+        ServerUrl.apiLink + ServerUrl.getNotificationHistoryUrlExtension(this.getUser().userId);
       const config = {
         headers: {
           Accept: 'application/json',
@@ -159,5 +182,18 @@ export default class BackendService {
         authorization: `Bearer ${accessToken}`,
       },
     };
+  }
+
+  private static responseIntoGroupArray(response: any): Group[] {
+    return response.map((group: any) => {
+      // TODO: Get notification array
+      const newCamArr = group.cameras.map((cam: any) => {
+        const newNotifArr = cam.notifications.map(
+          (notif: any) => new Notification(notif.id, new Date(notif.timestamp), notif.snapshotId)
+        );
+        return new Camera(cam.name, cam.id, newNotifArr);
+      });
+      return new Group(group.name, group.id, newCamArr);
+    });
   }
 }

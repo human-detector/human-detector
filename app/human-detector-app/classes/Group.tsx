@@ -10,17 +10,17 @@ export default class Group {
 
   cameras: Camera[];
 
-  constructor(groupName: string, groupID: string) {
+  constructor(groupName: string, groupID: string, cameras: Camera[]) {
     this.groupName = groupName;
     this.groupId = groupID;
-    this.cameras = [];
+    this.cameras = cameras;
   }
-}
 
-export function renameGroup(newName: string, group: Group): Group {
-  return new Group('name', 'ID');
-}
+  addCameraToGroup(newCam: Camera) {
+    this.cameras.push(newCam);
+  }
 
-export function addToGroup(newCam: Camera, group: Group): Group {
-  return new Group('name', 'ID');
+  removeCameraFromGroup(camerasIndex: number) {
+    this.cameras.splice(camerasIndex);
+  }
 }

@@ -18,20 +18,21 @@ export default class User {
   }
 
   getGroupFromId(groupId: string) {
-    return this.groupList.find((group) => group.groupId === groupId);
-  }
-
-  addGroupToList(newGroup: Group): boolean {
-    this.groupList.push(newGroup);
-    return true;
-  }
-
-  removeGroupFromList(groupIndex: number): boolean {
-    if (this.groupList[groupIndex].cameras.length > 0) {
-      Alert.alert("Can't remove group that has cameras!  Move cameras before removing!");
-      return false;
+    if (this.groupList.find((group) => group.groupId === groupId)) {
+      return this.groupList.find((group) => group.groupId === groupId);
     }
-    this.groupList.splice(groupIndex);
-    return true;
+    throw new Error("Group doesn't exist!");
+  }
+
+  removeGroupFromList(groupIndex: number): Group {
+    if (groupIndex > this.groupList.length) {
+      throw new Error('Invalid index');
+    }
+    if (this.groupList[groupIndex].cameras.length > 0) {
+      throw new Error("Can't remove group that has cameras!  Move cameras before removing!");
+    }
+    const groupRemoved = this.groupList[groupIndex];
+    this.groupList.splice(groupIndex, 1);
+    return groupRemoved;
   }
 }

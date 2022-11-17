@@ -21,6 +21,6 @@ export default class Group {
   }
 
   removeCameraFromGroup(camerasIndex: number) {
-    this.cameras.splice(camerasIndex);
+    this.cameras.splice(camerasIndex, 1);
   }
 }

@@ -1,13 +1,7 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-
-const styles = StyleSheet.create({
-  menuItemSettingsButton: {
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-});
+import { styles } from '../src/styles';
 
 export default function CameraSettingsButton(props: { cameraId: string }): React.ReactElement {
   const { cameraId } = props;

@@ -1,33 +1,11 @@
 import * as React from 'react';
-import { TextInput, View, StyleSheet, Button } from 'react-native';
+import { TextInput, View, Button } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GroupRegParamList } from '../../src/navigation/groupRegParamList';
 import { BackendContext } from '../../contexts/backendContext';
 import Group from '../../classes/Group';
 import { UserContext } from '../../contexts/userContext';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'flex-end',
-    padding: 20,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#777',
-    padding: 8,
-  },
-  input: {
-    height: 40,
-    marginBottom: 10,
-    borderWidth: 1,
-    padding: 10,
-  },
-  button: {
-    marginTop: 20,
-  },
-});
+import { styles } from '../../src/styles';
 
 type Props = NativeStackScreenProps<GroupRegParamList, 'GroupRegistrationInfo'>;
 export default function GroupRegInfoScreen({ navigation }: Props): React.ReactElement {
@@ -44,7 +22,7 @@ export default function GroupRegInfoScreen({ navigation }: Props): React.ReactEl
     throw new Error('no user context');
   }
   return (
-    <View>
+    <View style={styles.regContainer}>
       <TextInput
         style={styles.input}
         onChangeText={setGroupName}
@@ -63,7 +41,7 @@ export default function GroupRegInfoScreen({ navigation }: Props): React.ReactEl
             throw new Error('Error in group registration');
           }
           const newGroup = new Group(groupName, groupId, []);
-          userContext.addGroupToList(newGroup);
+          userContext.groupList.push(newGroup);
           navigation.goBack();
         }}
       />

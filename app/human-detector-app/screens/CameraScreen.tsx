@@ -5,6 +5,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CameraSettingsButton from '../components/CameraSettingsButton';
 import { UserContext } from '../contexts/userContext';
 import { RootStackParamList } from '../src/navigation/stackParamList';
+import { styles } from '../src/styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>;
 export default function CameraScreen({ navigation, route }: Props): React.ReactElement {

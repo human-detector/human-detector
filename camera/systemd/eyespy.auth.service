@@ -1,0 +1,11 @@
+[Unit]
+Description=Eyespy Auth BLE Service
+After=dbus-org.bluez.service
+
+[Install]
+WantedBy=bluetooth.target
+
+[Service]
+ExecStart=/usr/bin/python /usr/local/bin/eyespy/auth/main.py
+Restart=on-failure
+User=eyespy

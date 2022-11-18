@@ -57,3 +57,23 @@ make bdd
 ```
 
 These tests assume that `python3` is installed and that both `python3` and `pip3` both are valid commands.
+
+## Systemd
+
+Basic instructions
+
+```
+# Create an eyespy system account to run services under
+sudo useradd -r -s /bin/false eyespy
+
+# Copy the src folders of detector and auth to /usr/local/bin
+# /usr/local/bin/eyespy/detector/main.py
+# /usr/local/bin/eyespy/auth/main.py
+
+# Copy service files to /etc/systemd/system
+
+# Enable auth service, which will control the detector service
+sudo systemctl enable eyespy.auth.service
+
+# Reboot
+```

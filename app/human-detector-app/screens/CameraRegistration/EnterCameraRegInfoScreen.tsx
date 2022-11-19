@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, TextInput, Button, KeyboardAvoidingView } from 'react-native';
+import { View, TextInput, Button, KeyboardAvoidingView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WifiSecType, CameraSerial } from '../../src/ble/bleServices';
 import { BackendContext } from '../../contexts/backendContext';
@@ -7,6 +7,7 @@ import { BLEContext } from '../../contexts/bleContext';
 import { BLEParamList } from '../../src/navigation/bleParamList';
 import { UserContext } from '../../contexts/userContext';
 import Camera from '../../classes/Camera';
+import { styles } from '../../src/styles';
 
 /**
  * The EnterCameraRegInfoScreen will allow the user
@@ -19,29 +20,6 @@ import Camera from '../../classes/Camera';
  * The camera reg info screen will be determined by what information the camera
  * will need for WiFi.
  */
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'flex-end',
-    padding: 20,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#777',
-    padding: 8,
-  },
-  input: {
-    height: 40,
-    marginBottom: 10,
-    borderWidth: 1,
-    padding: 10,
-  },
-  button: {
-    marginTop: 20,
-  },
-});
 
 type Props = NativeStackScreenProps<BLEParamList, 'CameraRegistrationInfo'>;
 export default function EnterCameraRegInfoScreen({ navigation, route }: Props): React.ReactElement {
@@ -127,7 +105,7 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
   }, [currentDevice]);
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView style={styles.regContainer}>
       <TextInput
         style={styles.input}
         onChangeText={setCameraName}

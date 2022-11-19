@@ -1,38 +1,8 @@
 import * as React from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Text, ScrollView, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, ScrollView, View, TouchableOpacity } from 'react-native';
 import { RootStackParamList } from '../src/navigation/stackParamList';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  pads: {
-    padding: 10,
-  },
-  boldHeader: {
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  menuItem: {
-    marginTop: 24,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 30,
-    backgroundColor: '#E0FFFF',
-    fontSize: 24,
-    borderWidth: 2,
-    borderColor: '#D3D3D3',
-  },
-  menuButtonText: {
-    fontSize: 24,
-    marginTop: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+import { styles } from '../src/styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notifications'>;
 

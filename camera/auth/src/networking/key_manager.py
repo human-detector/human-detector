@@ -7,7 +7,7 @@ Serial is from the Raspberry Pi's device tree
 
 import uuid
 import base64
-from os import makedirs
+from os import makedirs, remove
 from os.path import exists
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -25,11 +25,22 @@ class Keys():
         uid = str(uuid.uuid4())
         return Keys(key, uid)
 
-    def __init__(self, priv_key = None, uid = None):
-        self.priv_key: Ed25519PrivateKey = _load_key() if priv_key is None else priv_key
-        self.uuid = _load_uuid() if uid is None else uid
+    @staticmethod
+    def create_key_from_disk():
+        """Create keys from stored private key and UUID"""
+        priv_key = _load_key()
+        uid = _load_uuid()
+        if priv_key is None or uid is None:
+            return None
+        return Keys(priv_key, uid)
+
+    def __init__(self, priv_key, uid):
+        self.priv_key: Ed25519PrivateKey = priv_key
+        self.uuid: str = uid
 
     def _sign(self, data):
+        if self.priv_key is None:
+            raise Exception("Private Key does not exist")
         return self.priv_key.sign(data)
 
     def get_auth_token(self):
@@ -53,6 +64,16 @@ class Keys():
         with open(_DEFAULT_UUID_LOC, 'w', encoding="utf8") as file:
             file.write(self.uuid)
 
+    def destroy_keys(self):
+        """Delete UUID and Private Key from disk"""
+        self.uuid = None
+        self.priv_key = None
+
+        if exists(_DEFAULT_KEY_LOC):
+            remove(_DEFAULT_KEY_LOC)
+        if exists(_DEFAULT_UUID_LOC):
+            remove(_DEFAULT_UUID_LOC)
+
 
 class KeyManager():
     """
@@ -65,9 +86,14 @@ class KeyManager():
         """Creates and return a key manager with random keys"""
         return KeyManager(Keys.create_random_key(), serial)
 
-    def __init__(self, keys = None, serial = None):
-        self.keys = keys if keys is not None else Keys()
-        self.serial = serial if serial is not None else _get_serial()
+    @staticmethod
+    def create_key_manager_from_disk():
+        """Create a key manager from keys on disk"""
+        return KeyManager(Keys.create_key_from_disk, _get_serial())
+
+    def __init__(self, keys, serial):
+        self.keys: Keys = keys
+        self.serial: str = serial
 
     def gen_keys(self):
         """
@@ -76,6 +102,13 @@ class KeyManager():
         """
         self.keys = Keys.create_random_key()
         self.keys.persist()
+
+    def clear_keys(self):
+        """
+        Destroy key if camera is dissassociated from an account
+        """
+        self.keys.destroy_keys()
+        self.keys = None
 
     def get_public_key(self):
         """Get the public part of the private/public key pair"""

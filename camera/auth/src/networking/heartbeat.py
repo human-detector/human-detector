@@ -3,6 +3,7 @@ Heartbeat
 """
 from threading import Thread, Event
 from time import time
+from .connection_status import provide_ping_state
 
 class Heartbeat:
     """
@@ -27,10 +28,11 @@ class Heartbeat:
         """Thread method which sends heartbeat messages"""
         while not self.exit.is_set():
             cur_time = time()
-            success, _ = self.net_requests.send_heartbeat(cur_time)
+            success, req = self.net_requests.send_heartbeat(cur_time)
             if success:
                 self.last_heartbeat = cur_time
 
+            provide_ping_state(success, req.status_code == 403)
             self.exit.wait(self.heartbeat_delay)
 
     def is_connected(self):

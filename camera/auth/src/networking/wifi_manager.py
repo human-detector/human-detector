@@ -30,6 +30,8 @@ class WifiManager:
             print("No wifi devices found!")
             sys.exit(-1)
 
+        self.seconds_between_pings = 5
+        self.keys = keys
         self.net_requests = NetRequests(keys)
         self.dev.OnStateChanged(self.state_changed_callback)
         self.thread = Thread(target=self._attempt_heartbeat_thread, daemon=True)
@@ -46,10 +48,10 @@ class WifiManager:
         print("State change! ", adapted_state.name, reason)
         provide_net_state(adapted_state, adapted_reason)
 
-        if adapted_state == DeviceState.ATTEMPTING_PING:
-            self.ping = True
-            with self.condition_lock:
-                self.condition_lock.notify()
+        if adapted_state == DeviceState.FAIL:
+            self._fail_connect()
+        elif adapted_state == DeviceState.ATTEMPTING_PING:
+            self.attempt_heartbeat(5)
 
     def _get_reason_val(self, reason):
         if reason == NetworkManager.NM_DEVICE_STATE_REASON_SSID_NOT_FOUND:
@@ -111,7 +113,7 @@ class WifiManager:
         """Returns whether device is connected to a network or not"""
         return self.dev.state == NetworkManager.NM_DEVICE_STATE_ACTIVATED
 
-    def _delete_old_config(self):
+    def delete_old_config(self):
         """Delete all old wifi connections so they do not interefere"""
 
         #pylint: disable=no-member
@@ -122,7 +124,7 @@ class WifiManager:
 
     def connect_open(self, ssid):
         """Connect to an open 80211 network with no security"""
-        self._delete_old_config()
+        self.delete_old_config()
 
         new_connection = {
             '802-11-wireless': {
@@ -146,7 +148,7 @@ class WifiManager:
 
     def connect_enterprise(self, ssid, user, passkey):
         """Connect to an Enterprise 802-1X network with ssid, username, and password"""
-        self._delete_old_config()
+        self.delete_old_config()
 
         new_connection = {
             '802-11-wireless': {
@@ -179,7 +181,7 @@ class WifiManager:
 
     def connect_psk(self, ssid, passkey):
         """Connnect to a WPA-PSK network with SSID and password"""
-        self._delete_old_config()
+        self.delete_old_config()
 
         new_connection = {
             '802-11-wireless': {
@@ -204,22 +206,3 @@ class WifiManager:
         NetworkManager.NetworkManager.AddAndActivateConnection(
             new_connection, self.dev, "/"
         )
-
-    def _attempt_heartbeat(self):
-        for _ in range(0, 5):
-            sleep(5)
-            cur_time = time()
-            success, req =  self.net_requests.send_heartbeat(cur_time)
-            if success:
-                provide_net_state(DeviceState.SUCCESS, FailReason.NONE)
-                return
-
-        fail_reason = FailReason.FORBIDDEN if req.status_code == 403 else FailReason.BACKEND_DOWN
-        provide_net_state(DeviceState.FAIL, fail_reason)
-
-    def _attempt_heartbeat_thread(self):
-        while True:
-            with self.condition_lock:
-                self.condition_lock.wait_for(lambda : self.ping)
-                self._attempt_heartbeat()
-                self.ping = False

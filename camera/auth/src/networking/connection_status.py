@@ -24,6 +24,7 @@ class FailReason(Enum):
 
 
 __callbacks = []
+__pingcount: int = 0
 
 network_state = {
     "State": DeviceState.DISCONNECTED,
@@ -36,12 +37,36 @@ def register_net_state_callback(callback):
     """
     __callbacks.append(callback)
 
+def provide_ping_state(could_connect, forbidden):
+    """
+    Helper to create a state from a heartbeat
+    """
+
+    # pylint: disable=invalid-name,global-statement
+    global __pingcount
+    __pingcount += 1
+
+    # Heartbeat is always running and giving us state, so we should
+    # only distribute success when changing into a succesful state
+    if could_connect:
+        if network_state["State"] == DeviceState.ATTEMPTING_PING:
+            provide_net_state(DeviceState.SUCCESS, FailReason.NONE)
+    elif forbidden and network_state["State"] != DeviceState.FAIL:
+        provide_net_state(DeviceState.FAIL, FailReason.FORBIDDEN)
+    elif __pingcount >= 5 and network_state["State"] != DeviceState.FAIL:
+        provide_net_state(DeviceState.FAIL, FailReason.BACKEND_DOWN)
+
 def provide_net_state(new_state, new_reason):
     """
     Provide new state to advertise to consumers
     """
 
     old_state = network_state["State"]
+
+    # pylint: disable=invalid-name,global-statement
+    global __pingcount
+    if new_state == DeviceState.ATTEMPTING_PING:
+        __pingcount = 0
 
     # Make sure we're still connected to wifi before reporting success
     if (old_state != DeviceState.ATTEMPTING_PING and

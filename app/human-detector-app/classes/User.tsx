@@ -3,6 +3,7 @@
 
 import { Alert } from 'react-native';
 import Group from './Group';
+import Notification from './Notification';
 
 export default class User {
   username: string;
@@ -35,4 +36,17 @@ export default class User {
     this.groupList.splice(groupIndex, 1);
     return groupRemoved;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  getAllNotifications(allNotifications: Notification[], groups: Group[]): Notification[] {
+    for (let i = 0; i < groups.length; i += 1) {
+      for (let j = 0; j < groups[i].cameras.length; j += 1) {
+        for (let k = 0; k < groups[i].cameras[j].notifications.length; k += 1) {
+          allNotifications.push(groups[i].cameras[j].notifications[k]);
+        }
+      }
+    }
+    return allNotifications;
+  }
+
 }

@@ -1,4 +1,5 @@
 // FIXME: re-evaluate methods and remove these
+/* eslint-disable array-callback-return */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { Alert } from 'react-native';
@@ -39,13 +40,15 @@ export default class User {
 
   // eslint-disable-next-line class-methods-use-this
   getAllNotifications(allNotifications: Notification[], groups: Group[]): Notification[] {
-    for (let i = 0; i < groups.length; i += 1) {
-      for (let j = 0; j < groups[i].cameras.length; j += 1) {
-        for (let k = 0; k < groups[i].cameras[j].notifications.length; k += 1) {
-          allNotifications.push(groups[i].cameras[j].notifications[k]);
-        }
-      }
-    }
+    groups.map((group) => {
+      group.cameras.map((cam) => {
+        cam.notifications.map((notif) => {
+          if (!allNotifications.includes(notif)) {
+            allNotifications.push(notif);
+          }
+        })
+      })
+    })
     return allNotifications;
   }
 

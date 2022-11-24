@@ -101,7 +101,10 @@ export default function App(): React.ReactElement {
                 }}/>
               })}
             >
-              <Stack.Screen name="Groups" component={GroupScreen} options={{ title: 'Groups' }} />
+              <Stack.Screen 
+                name="Groups" 
+                component={GroupScreen} 
+                options={{ title: 'Groups' }} />
               <Stack.Screen
                 name="Cameras"
                 component={CameraScreen}
@@ -125,8 +128,20 @@ export default function App(): React.ReactElement {
                   headerShown: false,
                 }}
               />
-              <Stack.Screen name="Notifications" component={NotifScreen} />
-              <Stack.Screen name="Snapshot" component={SnapshotScreen} />
+              <Stack.Screen 
+                name="Notifications" 
+                component={NotifScreen} 
+                options={{
+                  headerRight: () => null,
+                }}
+              />
+              <Stack.Screen 
+                name="Snapshot" 
+                component={SnapshotScreen}
+                options={{
+                  headerRight: () => null,
+                }} 
+              />
             </Stack.Navigator>
           </BackendContext.Provider>
         </BLEContext.Provider>

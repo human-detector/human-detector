@@ -1,9 +1,10 @@
 import { makeRedirectUri } from 'expo-auth-session';
 import Constants from 'expo-constants';
 import * as React from 'react';
-import { Button, View } from 'react-native';
+import { Button, View, Text } from 'react-native';
 import TokenFetcher from '../src/auth/tokenFetcher';
 import TokenManager from '../src/auth/tokenManager';
+import { styles } from '../src/styles';
 
 interface Props {
   onSuccessfulLogin(tokenManager: TokenManager): void;
@@ -18,7 +19,8 @@ interface Props {
  */
 export default function LoginScreen({ onSuccessfulLogin }: Props): React.ReactElement<Props> {
   return (
-    <View>
+    <View style={styles.centerIcon}>
+      <Text style={styles.loginText}> Login to EyeSpy </Text>
       <Button
         title="Login"
         onPress={() => {

@@ -9,7 +9,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Notifications'>;
 export default function NotifScreen({ navigation, route }: Props): React.ReactElement<Props> {
   const { notifications } = route.params;
   const sortedNotifications = notifications.sort(
-    (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+    (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
   );
   return (
     <View style={styles.container}>

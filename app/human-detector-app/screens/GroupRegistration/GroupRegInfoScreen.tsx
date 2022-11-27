@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput, View, Button } from 'react-native';
+import { TextInput, View, Button, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GroupRegParamList } from '../../src/navigation/groupRegParamList';
 import { BackendContext } from '../../contexts/backendContext';
@@ -36,12 +36,14 @@ export default function GroupRegInfoScreen({ navigation }: Props): React.ReactEl
            * Upon button press, register a group
            */
           const groupId: string | null = await backendContext.registerGroupAPI(groupName);
-          if (!groupId) {
+          if (groupId) {
+            const newGroup = new Group(groupName, groupId, []);
+            userContext.groupList.push(newGroup);
+          } else {
             console.error('Error in getting the groupId!');
-            throw new Error('Error in group registration');
+            Alert.alert('Error when adding a group!');
+            navigation.goBack();
           }
-          const newGroup = new Group(groupName, groupId, []);
-          userContext.groupList.push(newGroup);
           navigation.goBack();
         }}
       />

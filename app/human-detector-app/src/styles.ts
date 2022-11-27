@@ -72,4 +72,9 @@ export const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
+  loginText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    margin: 20,
+  },
 });

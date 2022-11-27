@@ -45,13 +45,7 @@ export default function App(): React.ReactElement {
             name="Login"
             options={{
               title: 'EyeSpy',
-              headerStyle: {
-                backgroundColor: '#1E90FF',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
+              headerShown: false,
             }}
           >
             {() => (
@@ -99,7 +93,7 @@ export default function App(): React.ReactElement {
                 name="Cameras"
                 component={CameraScreen}
                 options={{
-                  title: 'EyeSpy',
+                  title: 'Cameras',
                   headerBackTitleVisible: false,
                   headerBackVisible: true,
                 }}

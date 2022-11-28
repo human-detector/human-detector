@@ -6,7 +6,6 @@ import uuid
 import sys
 from enum import Enum, auto
 import NetworkManager
-from .net_requests import NetRequests
 
 class WifiState(Enum):
     """Internal network state"""
@@ -35,7 +34,7 @@ class SecType(Enum):
 class WifiManager:
     """Monitors connection status and connects to Enterprise and WPA2-PSK networks"""
 
-    def __init__(self, eyespy_service, keys, heartbeat):
+    def __init__(self, heartbeat):
         self._wifi_adapter = self._get_wifi_adapter()
         if self._wifi_adapter is None:
             print("No wifi devices found!")
@@ -45,13 +44,8 @@ class WifiManager:
         self._ping_count = 0
 
         self._callbacks = []
-        self._seconds_between_pings = 5
-        self._keys = keys
-        self._eyespy_service = eyespy_service
-        self._net_requests = NetRequests(keys)
         self._wifi_adapter.OnStateChanged(self._state_changed_callback)
-        self._heartbeat = heartbeat
-        self._heartbeat.register_heartbeat_callback(self._heart_callback)
+        heartbeat.register_heartbeat_callback(self._heart_callback)
 
     def _heart_callback(self, could_connect, forbidden):
         # Heartbeat is always running and giving us state, so we should

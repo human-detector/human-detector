@@ -9,6 +9,7 @@ import dbus
 import dbus.mainloop.glib
 from gi.repository import GLib
 from networking import KeyManager, Heartbeat, NetRequests
+from networking.wifi_manager import WifiManager
 
 from eyespy_service import EyeSpyService
 
@@ -40,7 +41,8 @@ def main():
 
     keys = KeyManager.create_key_manager_from_disk()
     heartbeat = Heartbeat(NetRequests(keys))
-    EyeSpyService(keys, heartbeat)
+    wifi = WifiManager(heartbeat)
+    EyeSpyService(keys, heartbeat, wifi)
 
     main_loop.run()
 

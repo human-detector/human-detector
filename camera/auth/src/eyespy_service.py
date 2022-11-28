@@ -30,7 +30,7 @@ class EyeSpyService:
     # heartbeat helpers
     _pingcount = 0
 
-    def __init__(self, keys: KeyManager, heartbeat: Heartbeat):
+    def __init__(self, keys: KeyManager, heartbeat: Heartbeat, wifi_manager: WifiManager):
         # NetworkManager must be started before importing
         # Otherwise the NetworkManager dbus package dies trying to talk to NetworkManager
         # pylint: disable=import-outside-toplevel,no-name-in-module
@@ -38,7 +38,7 @@ class EyeSpyService:
 
         self.detector = DetectorSystemdUnit()
         self.keys = keys
-        self.wifi = WifiManager(self, keys, heartbeat)
+        self.wifi = wifi_manager
         self.heartbeat = heartbeat
         self.boot_time = time()
         self.bluez_manager = BluezManager.create_manager(self.wifi, keys)

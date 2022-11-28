@@ -10,7 +10,6 @@ import dbus
 import dbus.mainloop.glib
 from gi.repository import GLib
 from networking import KeyManager, Heartbeat, NetRequests
-from networking.wifi_manager import WifiManager
 
 from eyespy_service import EyeSpyService
 
@@ -18,8 +17,13 @@ logger = logging.getLogger(__name__)
 
 MainLoop = GLib.MainLoop
 
-# pylint: disable=missing-function-docstring
 def main():
+    """Entry point, creates an Eyespy Service after making sure NetworkManager is started"""
+
+    if os.geteuid() != 0:
+        logger.error ("Must be ran as root!")
+        sys.exit(-1)
+
     # This needs to be run before WifiManager is imported by BluezManager!
     ret = subprocess.run(["systemctl", "start", "NetworkManager.service"],
                         capture_output=True, check=False)
@@ -38,9 +42,8 @@ def main():
 
     main_loop = MainLoop()
 
-    if os.geteuid() != 0:
-        logger.error ("Must be ran as root!")
-        sys.exit(-1)
+    # pylint: disable=import-outside-toplevel
+    from networking.wifi_manager import WifiManager
 
     keys = KeyManager.create_key_manager_from_disk()
     heartbeat = Heartbeat(NetRequests(keys))

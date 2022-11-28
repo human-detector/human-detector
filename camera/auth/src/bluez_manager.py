@@ -79,8 +79,8 @@ class BluezManager():
         Unregister BLE services and turn off bluetooth adapter
         """
         try:
-            self.ad_manager.UnregisterAdvertisement(self.eyespy_ad.get_path(), {})
-            self.gatt_manager.UnregisterApplication(self.app.get_path(), {})
+            self.ad_manager.UnregisterAdvertisement(self.eyespy_ad.get_path())
+            self.gatt_manager.UnregisterApplication(self.app.get_path())
         except dbus.DBusException:
             # Do nothing. Exception either means it's an invalid object or already stopped
             pass

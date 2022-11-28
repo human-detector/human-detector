@@ -2,7 +2,7 @@
 EyeSpy Service which handles all state changes and can start up the detector service
 """
 
-from time import time
+from time import time, sleep
 import logging
 from enum import Enum, auto
 from networking import KeyManager, Heartbeat
@@ -18,9 +18,9 @@ INSTANCE = None
 
 class CameraState(Enum):
     """Represents the state of all services on the camera"""
-    BOOT = auto
-    BLE_UP = auto
-    DETECTOR_UP = auto
+    BOOT = auto()
+    BLE_UP = auto()
+    DETECTOR_UP = auto()
 
 class EyeSpyService:
     """

@@ -6,7 +6,7 @@ from time import time
 import logging
 from enum import Enum, auto
 from networking import KeyManager, Heartbeat
-from networking.wifi_manager import WifiManager, WifiState
+from networking.wifi_manager import WifiManager, WifiState, FailReason
 from systemd.detector_unit import DetectorSystemdUnit
 
 logger = logging.getLogger(__name__)
@@ -46,24 +46,24 @@ class EyeSpyService:
         self.boot_time = time()
         self.bluez_manager = BluezManager.create_manager(self.wifi, keys)
 
-        self.wifi.register_wifi_state_callback(self.on_wifi_state_change)
-
         # No keys exist, revert to OOTB state
         if keys.keys is None:
             self.on_camera_state_change(CameraState.BLE_UP)
         else:
             self.on_camera_state_change(CameraState.BOOT)
 
-    # pylint: disable=unused-argument
+        self.wifi.register_wifi_state_callback(self.on_wifi_state_change)
+
     def on_wifi_state_change(self, new_state, new_reason):
         """Called when wifi state changes - this includes heartbeats"""
         if new_state == WifiState.FAIL:
-            self.keys.clear_keys()
             # We wait a bit during boot before allowing a failure to cause a state change
             # in case the PI is booting from a power outage (and the wifi router is slow)
             # or some other weird state
-            if time() - self.boot_time > START_TIMEOUT:
+            if ((self.state == CameraState.BOOT and time() - self.boot_time > START_TIMEOUT)
+                or new_reason == FailReason.FORBIDDEN):
                 self.on_camera_state_change(CameraState.BLE_UP)
+                self.keys.clear_keys()
 
         elif new_state == WifiState.ATTEMPTING_PING:
             self.heartbeat.stop()
@@ -83,6 +83,7 @@ class EyeSpyService:
 
         self.state = new_state
         if self.state == CameraState.BLE_UP:
+            self.heartbeat.stop()
             self.bluez_manager.start_ble()
             self.detector.stop()
         elif self.state == CameraState.DETECTOR_UP:

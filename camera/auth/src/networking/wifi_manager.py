@@ -85,7 +85,7 @@ class WifiManager:
 
         # The main interested parties should be BLE notifications and Eyespy Service
         for callback in self._callbacks:
-            callback(new_reason, new_reason)
+            callback(new_state, new_reason)
 
     # pylint: disable=unused-argument
     def _state_changed_callback(self, net_manager, interface, **kwargs):

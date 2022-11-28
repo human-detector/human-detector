@@ -43,7 +43,11 @@ class WifiManager:
             logger.error("No wifi devices found!")
             sys.exit(-1)
 
-        self.wifi_state = WifiState.DISCONNECTED
+        if self._wifi_adapter.State == NetworkManager.NM_DEVICE_STATE_ACTIVATED:
+            self.wifi_state = WifiState.ATTEMPTING_PING
+        else:
+            self.wifi_state = WifiState.DISCONNECTED
+
         self._ping_count = 0
 
         self._callbacks = []
@@ -72,6 +76,7 @@ class WifiManager:
     def register_wifi_state_callback(self, callback):
         """Register callback for wifi state changes"""
         self._callbacks.append(callback)
+        callback(self.wifi_state, FailReason.NONE)
 
     # pylint: disable=unused-argument
     def _state_changed_callback(self, net_manager, interface, **kwargs):

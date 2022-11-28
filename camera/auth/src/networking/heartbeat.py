@@ -24,7 +24,7 @@ class Heartbeat:
 
     def stop(self):
         """Stop heartbeat thread"""
-        if hasattr(self, 'thread'):
+        if self.thread is not None:
             self.exit.set()
             self.thread.join()
 

@@ -89,7 +89,7 @@ class KeyManager():
     @staticmethod
     def create_key_manager_from_disk():
         """Create a key manager from keys on disk"""
-        return KeyManager(Keys.create_key_from_disk, _get_serial())
+        return KeyManager(Keys.create_key_from_disk(), _get_serial())
 
     def __init__(self, keys, serial):
         self.keys: Keys = keys

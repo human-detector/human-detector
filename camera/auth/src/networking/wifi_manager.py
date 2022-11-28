@@ -65,18 +65,27 @@ class WifiManager:
         if could_connect:
             if self.wifi_state == WifiState.ATTEMPTING_PING:
                 self._ping_count = 0
-                self._state_changed_callback(WifiState.SUCCESS, FailReason.NONE)
+                self._new_wifi_state(WifiState.SUCCESS, FailReason.NONE)
         elif forbidden and self.wifi_state != WifiState.FAIL:
             self._ping_count = 0
-            self._state_changed_callback(WifiState.FAIL, FailReason.FORBIDDEN)
+            self._new_wifi_state(WifiState.FAIL, FailReason.FORBIDDEN)
         elif self._ping_count >= 5 and self.wifi_state != WifiState.FAIL:
             self._ping_count = 0
-            self._state_changed_callback(WifiState.FAIL, FailReason.BACKEND_DOWN)
+            self._new_wifi_state(WifiState.FAIL, FailReason.BACKEND_DOWN)
 
     def register_wifi_state_callback(self, callback):
         """Register callback for wifi state changes"""
         self._callbacks.append(callback)
         callback(self.wifi_state, FailReason.NONE)
+
+    def _new_wifi_state(self, new_state, new_reason):
+        self.wifi_state = new_state
+
+        logger.info("Wifi State change! %s - %s", new_state.name, new_reason.name)
+
+        # The main interested parties should be BLE notifications and Eyespy Service
+        for callback in self._callbacks:
+            callback(new_reason, new_reason)
 
     # pylint: disable=unused-argument
     def _state_changed_callback(self, net_manager, interface, **kwargs):
@@ -85,13 +94,7 @@ class WifiManager:
         reason = kwargs['reason']
         adapted_state = self._get_state_val(new_state)
         adapted_reason = self._get_reason_val(reason)
-        self.wifi_state = adapted_state
-
-        logger.info("Wifi State change! %s - %s", adapted_state.name, reason)
-
-        # The main interested parties should be BLE notifications and Eyespy Service
-        for callback in self._callbacks:
-            callback(adapted_reason, adapted_reason)
+        self._new_wifi_state(adapted_state, adapted_reason)
 
     def _get_reason_val(self, reason):
         if reason == NetworkManager.NM_DEVICE_STATE_REASON_SSID_NOT_FOUND:

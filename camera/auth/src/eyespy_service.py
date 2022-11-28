@@ -2,7 +2,7 @@
 EyeSpy Service which handles all state changes and can start up the detector service
 """
 
-from time import time, sleep
+from time import time
 import logging
 from enum import Enum, auto
 from networking import KeyManager, Heartbeat

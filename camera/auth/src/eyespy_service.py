@@ -3,10 +3,13 @@ EyeSpy Service which handles all state changes and can start up the detector ser
 """
 
 from time import time
+import logging
 from enum import Enum, auto
 from networking import KeyManager, Heartbeat
 from networking.wifi_manager import WifiManager, WifiState
 from systemd.detector_unit import DetectorSystemdUnit
+
+logger = logging.getLogger(__name__)
 
 SECONDS_PER_MINUTE = 60
 START_TIMEOUT = 10 * SECONDS_PER_MINUTE
@@ -59,10 +62,13 @@ class EyeSpyService:
             # We wait a bit during boot before allowing a failure to cause a state change
             # in case the PI is booting from a power outage (and the wifi router is slow)
             # or some other weird state
+            if time() - self.boot_time > START_TIMEOUT:
+                self.on_camera_state_change(CameraState.BLE_UP)
 
         elif new_state == WifiState.ATTEMPTING_PING:
             self.heartbeat.stop()
             self.heartbeat.start(5)
+
         elif new_state == WifiState.SUCCESS:
             self.heartbeat.stop()
             self.heartbeat.start(60)
@@ -72,6 +78,8 @@ class EyeSpyService:
         """Called to change detector and BLE state"""
         if self.state == new_state:
             return
+
+        logger.info('New Camera State: %s', new_state.value)
 
         self.state = new_state
         if self.state == CameraState.BLE_UP:

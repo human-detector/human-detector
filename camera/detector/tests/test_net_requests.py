@@ -24,7 +24,7 @@ class TestNetRequests(unittest.TestCase):
                 "Authorization": self.key_manager.get_auth_token()
             },
             json={
-                "Frame": base64_frame.decode()
+                "frame": base64_frame.decode()
             }
         )
 

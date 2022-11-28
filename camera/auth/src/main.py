@@ -2,6 +2,7 @@
 Bootstrap script which makes sure NetworkManager is started before instantiating BluezManager
 """
 
+import logging
 import sys
 import os
 import subprocess
@@ -13,6 +14,8 @@ from networking.wifi_manager import WifiManager
 
 from eyespy_service import EyeSpyService
 
+logger = logging.getLogger(__name__)
+
 MainLoop = GLib.MainLoop
 
 # pylint: disable=missing-function-docstring
@@ -22,21 +25,21 @@ def main():
                         capture_output=True, check=False)
 
     if ret.returncode != 0:
-        print("Failed to enable NetworkManager!")
-        print("stderr: {}", ret.stderr)
+        logger.error("Failed to enable NetworkManager!")
+        logger.error("stderr: %s", ret.stderr)
         sys.exit(-1)
 
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     if ret.returncode != 0:
-        print("Failed to enable NetworkManager!")
-        print("stderr: {}", ret.stderr)
+        logger.error("Failed to enable NetworkManager!")
+        logger.error("stderr: %s", ret.stderr)
         sys.exit(-1)
 
     main_loop = MainLoop()
 
     if os.geteuid() != 0:
-        print ("Must be ran as root!")
+        logger.error ("Must be ran as root!")
         sys.exit(-1)
 
     keys = KeyManager.create_key_manager_from_disk()

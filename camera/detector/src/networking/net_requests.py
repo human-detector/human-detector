@@ -25,7 +25,7 @@ class NetRequests:
         }
 
         data = {
-            "Frame": frame.decode()
+            "frame": frame.decode()
         }
 
         response = requests.put(

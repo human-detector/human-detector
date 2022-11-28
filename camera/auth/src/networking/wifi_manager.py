@@ -2,10 +2,13 @@
 Wifi Manager
 """
 
+import logging
 import uuid
 import sys
 from enum import Enum, auto
 import NetworkManager
+
+logger = logging.getLogger(__name__)
 
 class WifiState(Enum):
     """Internal network state"""
@@ -37,7 +40,7 @@ class WifiManager:
     def __init__(self, heartbeat):
         self._wifi_adapter = self._get_wifi_adapter()
         if self._wifi_adapter is None:
-            print("No wifi devices found!")
+            logger.error("No wifi devices found!")
             sys.exit(-1)
 
         self.wifi_state = WifiState.DISCONNECTED
@@ -79,7 +82,7 @@ class WifiManager:
         adapted_reason = self._get_reason_val(reason)
         self.wifi_state = adapted_state
 
-        print("State change! ", adapted_state.name, reason)
+        logger.info("Wifi State change! %s - %s", adapted_state.name, reason)
 
         # The main interested parties should be BLE notifications and Eyespy Service
         for callback in self._callbacks:

@@ -2,9 +2,12 @@
 Detector Systemd Unit
 """
 
+import logging
 import dbus
 
 DETECTOR_UNIT_NAME = "eyespy.detector.service"
+
+logger = logging.getLogger(__name__)
 
 class DetectorSystemdUnit:
     """Simple wrapper around Systemd to start and stop the Detector servce"""
@@ -21,9 +24,9 @@ class DetectorSystemdUnit:
     def start(self):
         """Start Detector"""
         self.manager.StartUnit(DETECTOR_UNIT_NAME)
-        print("Detector started")
+        logger.info("Detector started")
 
     def stop(self):
         """Stop Detector"""
         self.manager.StopUnit(DETECTOR_UNIT_NAME)
-        print("Detector stopped :(")
+        logger.info("Detector stopped :(")

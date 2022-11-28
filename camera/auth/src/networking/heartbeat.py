@@ -2,7 +2,7 @@
 Heartbeat
 """
 from threading import Thread, Event
-from time import time
+from time import time, sleep
 
 class Heartbeat:
     """
@@ -11,10 +11,11 @@ class Heartbeat:
     """
     def __init__(self, net_requests):
         self.net_requests = net_requests
-        self.exit = Event()
+        self.heartbeat_evt = Event()
         self.last_heartbeat = time()
         self.heartbeat_delay = 0
-        self.thread = None
+        self.thread = Thread(target=self.update, args=(), daemon=True)
+        self.thread.start()
 
         self.callbacks = []
 
@@ -25,19 +26,17 @@ class Heartbeat:
     def stop(self):
         """Stop heartbeat thread"""
         if self.thread is not None:
-            self.exit.set()
-            self.thread.join()
+            self.heartbeat_evt.clear()
 
     def start(self, heartbeat_delay=5):
         """Start heartbeat thread with timeout"""
         self.heartbeat_delay = heartbeat_delay
-        self.exit.clear()
-        self.thread = Thread(target=self.update, args=())
-        self.thread.start()
+        self.heartbeat_evt.set()
 
     def update(self):
         """Thread method which sends heartbeat messages"""
-        while not self.exit.is_set():
+        while True:
+            self.heartbeat_evt.wait(None)
             cur_time = time()
             success, req = self.net_requests.send_heartbeat(cur_time)
             if success:
@@ -45,7 +44,8 @@ class Heartbeat:
 
             for callback in self.callbacks:
                 callback(success, req.status_code == 403)
-            self.exit.wait(self.heartbeat_delay)
+
+            sleep(self.heartbeat_delay)
 
     def is_connected(self):
         """Returns whether recent heartbeats have been succesfull"""

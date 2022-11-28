@@ -5,9 +5,9 @@ EyeSpy serial number and public key Characteristic
 import json
 import cryptography.hazmat.primitives.serialization as Serialization
 from networking.key_manager import KeyManager
+from networking.wifi_manager import WifiState, WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_errors import InProgressException
-from networking.connection_status import DeviceState, network_state
 
 class EyeSpySerialCharacteristic(Characteristic):
     """
@@ -26,6 +26,7 @@ class EyeSpySerialCharacteristic(Characteristic):
         )
 
         self.key_manager: KeyManager = kwargs["key_manager"]
+        self.wifi_manager: WifiManager = kwargs["wifi_manager"]
 
     def ReadValue(self, options):
         """
@@ -39,7 +40,7 @@ class EyeSpySerialCharacteristic(Characteristic):
         try:
             # Prohibit reads when the camera is trying to connect
             # Reads generate new keys and persist them, which is *bad* when trying to connect
-            if network_state["State"] == DeviceState.CONNECTING:
+            if self.wifi_manager.wifi_state == WifiState.CONNECTING:
                 raise InProgressException()
 
             self.key_manager.gen_keys()

@@ -4,7 +4,6 @@ Wifi Connection Status Characteristic
 
 import json
 import dbus
-from networking.connection_status import register_net_state_callback
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_names import BLUEZ_GATT_CHARACTERISTIC
 
@@ -29,9 +28,9 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
             index   = kwargs["index"]
         )
         self.is_notifying = False
-        register_net_state_callback(self.state_change_callback)
+        kwargs["wifi_manager"].register_wifi_state_callback(self._state_change_callback)
 
-    def state_change_callback(self, new_state):
+    def _state_change_callback(self, new_state, new_reason):
         """
         This will send notifications to the phone when the NetworkManager state changes
         """
@@ -40,8 +39,8 @@ class EyeSpyConnStatusCharacteristic(Characteristic):
             return
 
         json_bytes = json.dumps({
-            "State": new_state["State"].value,
-            "Reason": new_state["Reason"].value
+            "State": new_state.value,
+            "Reason": new_reason.value
         }).encode("ascii")
         new_value = dbus.ByteArray(json_bytes)
 

@@ -5,12 +5,25 @@ Wifi Manager
 import uuid
 import sys
 from enum import Enum, auto
-from threading import Condition, Thread
-from time import sleep, time
 import NetworkManager
 from .net_requests import NetRequests
-from .key_manager import KeyManager
-from .connection_status import DeviceState, FailReason, provide_net_state
+
+class WifiState(Enum):
+    """Internal network state"""
+    INTERNAL_ERROR = 0
+    DISCONNECTED = 1
+    CONNECTING = 2
+    SUCCESS = 3
+    FAIL = 4
+    ATTEMPTING_PING = 5
+
+class FailReason(Enum):
+    """Failure reason for connecting"""
+    NONE = 0
+    SSID_NOT_FOUND = 1
+    INCORRECT_SECRETS = 2
+    FORBIDDEN = 3
+    BACKEND_DOWN = 4
 
 class SecType(Enum):
     """Wifi Security Type"""
@@ -21,37 +34,62 @@ class SecType(Enum):
 
 class WifiManager:
     """Monitors connection status and connects to Enterprise and WPA2-PSK networks"""
-    condition_lock = Condition()
-    ping = False
 
-    def __init__(self, keys: KeyManager):
-        self.dev = self._get_wifi_adapter()
-        if self.dev is None:
+    def __init__(self, eyespy_service, keys, heartbeat):
+        self._wifi_adapter = self._get_wifi_adapter()
+        if self._wifi_adapter is None:
             print("No wifi devices found!")
             sys.exit(-1)
 
-        self.seconds_between_pings = 5
-        self.keys = keys
-        self.net_requests = NetRequests(keys)
-        self.dev.OnStateChanged(self.state_changed_callback)
-        self.thread = Thread(target=self._attempt_heartbeat_thread, daemon=True)
-        self.thread.start()
+        self.wifi_state = WifiState.DISCONNECTED
+        self._ping_count = 0
+
+        self._callbacks = []
+        self._seconds_between_pings = 5
+        self._keys = keys
+        self._eyespy_service = eyespy_service
+        self._net_requests = NetRequests(keys)
+        self._wifi_adapter.OnStateChanged(self._state_changed_callback)
+        self._heartbeat = heartbeat
+        self._heartbeat.register_heartbeat_callback(self._heart_callback)
+
+    def _heart_callback(self, could_connect, forbidden):
+        # Heartbeat is always running and giving us state, so we should
+        # only distribute success when changing into a succesful state
+        # or have failed to connect over a long period of time
+
+        if not could_connect:
+            self._ping_count += 1
+
+        if could_connect:
+            if self.wifi_state == WifiState.ATTEMPTING_PING:
+                self._ping_count = 0
+                self._state_changed_callback(WifiState.SUCCESS, FailReason.NONE)
+        elif forbidden and self.wifi_state != WifiState.FAIL:
+            self._ping_count = 0
+            self._state_changed_callback(WifiState.FAIL, FailReason.FORBIDDEN)
+        elif self._ping_count >= 5 and self.wifi_state != WifiState.FAIL:
+            self._ping_count = 0
+            self._state_changed_callback(WifiState.FAIL, FailReason.BACKEND_DOWN)
+
+    def register_wifi_state_callback(self, callback):
+        """Register callback for wifi state changes"""
+        self._callbacks.append(callback)
 
     # pylint: disable=unused-argument
-    def state_changed_callback(self, net_manager, interface, **kwargs):
+    def _state_changed_callback(self, net_manager, interface, **kwargs):
         """Network Manager callback when network state changes"""
         new_state = kwargs['new_state']
         reason = kwargs['reason']
         adapted_state = self._get_state_val(new_state)
         adapted_reason = self._get_reason_val(reason)
+        self.wifi_state = adapted_state
 
         print("State change! ", adapted_state.name, reason)
-        provide_net_state(adapted_state, adapted_reason)
 
-        if adapted_state == DeviceState.FAIL:
-            self._fail_connect()
-        elif adapted_state == DeviceState.ATTEMPTING_PING:
-            self.attempt_heartbeat(5)
+        # The main interested parties should be BLE notifications and Eyespy Service
+        for callback in self._callbacks:
+            callback(adapted_reason, adapted_reason)
 
     def _get_reason_val(self, reason):
         if reason == NetworkManager.NM_DEVICE_STATE_REASON_SSID_NOT_FOUND:
@@ -64,18 +102,18 @@ class WifiManager:
         if state in (NetworkManager.NM_DEVICE_STATE_UNAVAILABLE,
                      NetworkManager.NM_DEVICE_STATE_UNMANAGED,
                      NetworkManager.NM_DEVICE_STATE_UNAVAILABLE):
-            return DeviceState.INTERNAL_ERROR
+            return WifiState.INTERNAL_ERROR
 
         if state == NetworkManager.NM_DEVICE_STATE_DISCONNECTED:
-            return DeviceState.DISCONNECTED
+            return WifiState.DISCONNECTED
 
         if state == NetworkManager.NM_DEVICE_STATE_FAILED:
-            return DeviceState.FAIL
+            return WifiState.FAIL
 
         if state == NetworkManager.NM_DEVICE_STATE_ACTIVATED:
-            return DeviceState.ATTEMPTING_PING
+            return WifiState.ATTEMPTING_PING
 
-        return DeviceState.CONNECTING
+        return WifiState.CONNECTING
 
     def _get_wifi_adapter(self):
         """Get wifi adapter from NetworkManager"""
@@ -90,7 +128,7 @@ class WifiManager:
         Currently supports 802_1X (Enterprise) and WPA2_PSK (Personal WPA2)
         If the SSID is not found, the tuple (None, SecType.UNSUPPORTED) is returned
         """
-        for access_point in self.dev.GetAllAccessPoints():
+        for access_point in self._wifi_adapter.GetAllAccessPoints():
             if access_point.Ssid != ssid:
                 continue
 
@@ -111,7 +149,7 @@ class WifiManager:
 
     def is_connected(self):
         """Returns whether device is connected to a network or not"""
-        return self.dev.state == NetworkManager.NM_DEVICE_STATE_ACTIVATED
+        return self._wifi_adapter.state == NetworkManager.NM_DEVICE_STATE_ACTIVATED
 
     def delete_old_config(self):
         """Delete all old wifi connections so they do not interefere"""
@@ -143,7 +181,7 @@ class WifiManager:
 
         #pylint: disable=no-member
         NetworkManager.NetworkManager.AddAndActivateConnection(
-            new_connection, self.dev, "/"
+            new_connection, self._wifi_adapter, "/"
         )
 
     def connect_enterprise(self, ssid, user, passkey):
@@ -176,7 +214,7 @@ class WifiManager:
 
         #pylint: disable=no-member
         NetworkManager.NetworkManager.AddAndActivateConnection(
-            new_connection, self.dev, "/"
+            new_connection, self._wifi_adapter, "/"
         )
 
     def connect_psk(self, ssid, passkey):
@@ -204,5 +242,5 @@ class WifiManager:
 
         #pylint: disable=no-member
         NetworkManager.NetworkManager.AddAndActivateConnection(
-            new_connection, self.dev, "/"
+            new_connection, self._wifi_adapter, "/"
         )

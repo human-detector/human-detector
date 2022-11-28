@@ -8,8 +8,6 @@ import dbus
 import ble.dbus_interface.dbus_bluez_names as BluezNames
 from ble import EyeSpyAdvertisement, EyeSpyService
 from ble.dbus_interface.dbus_bluez_interface import Application
-from networking.key_manager import KeyManager
-from networking.wifi_manager import WifiManager
 
 def register_gatt_cb():
     """Service registration success callback"""
@@ -38,10 +36,9 @@ class BluezManager():
     """
 
     @staticmethod
-    def create_manager():
+    def create_manager(wifi, key):
         """Returns a new BluezManager with keys and wifi managers passed in"""
-        key_manager = KeyManager()
-        return BluezManager(WifiManager(key_manager), key_manager)
+        return BluezManager(wifi, key)
 
     def __init__(self, wifi_manager, key_manager):
         self.bus = dbus.SystemBus()
@@ -77,7 +74,7 @@ class BluezManager():
             error_handler = register_ad_cb_error,
         )
 
-    def stop_blue(self):
+    def stop_ble(self):
         """
         Unregister BLE services and turn off bluetooth adapter
         """

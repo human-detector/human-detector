@@ -13,6 +13,7 @@ from networking import KeyManager, Heartbeat, NetRequests
 
 from eyespy_service import EyeSpyService
 
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 MainLoop = GLib.MainLoop

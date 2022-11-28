@@ -23,10 +23,10 @@ class DetectorSystemdUnit:
 
     def start(self):
         """Start Detector"""
-        self.manager.StartUnit(DETECTOR_UNIT_NAME)
+        self.manager.StartUnit(DETECTOR_UNIT_NAME, "replace")
         logger.info("Detector started")
 
     def stop(self):
         """Stop Detector"""
-        self.manager.StopUnit(DETECTOR_UNIT_NAME)
+        self.manager.StopUnit(DETECTOR_UNIT_NAME, "replace")
         logger.info("Detector stopped :(")

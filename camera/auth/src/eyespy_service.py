@@ -28,7 +28,7 @@ class EyeSpyService:
     """
     bluez_manager = None
     wifi_manager = None
-    state = CameraState.BOOT
+    state = None
 
     # heartbeat helpers
     _pingcount = 0
@@ -79,7 +79,7 @@ class EyeSpyService:
         if self.state == new_state:
             return
 
-        logger.info('New Camera State: %s', new_state.value)
+        logger.info('New Camera State: %s', new_state.name)
 
         self.state = new_state
         if self.state == CameraState.BLE_UP:

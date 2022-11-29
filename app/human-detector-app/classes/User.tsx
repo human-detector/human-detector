@@ -1,8 +1,6 @@
 // FIXME: re-evaluate methods and remove these
 /* eslint-disable array-callback-return */
 
-
-import * as React from 'react';
 import Group from './Group';
 import Notification from './Notification';
 
@@ -40,7 +38,7 @@ export default class User {
   }
 
   getAllNotifications(): Notification[] {
-    const [notifs] = React.useState<Notification[]>([]);
+    const notifs: Notification[] = []
 
     this.groupList.map((group) => {
       group.cameras.map((cam) => {

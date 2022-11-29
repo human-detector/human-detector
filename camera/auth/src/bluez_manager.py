@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def register_gatt_cb():
     """Service registration success callback"""
-    logger.debug("BLE Service registered")
+    logger.info("BLE Service registered")
 
 def register_gatt_cb_error(error):
     """Service registration error callback"""
@@ -24,7 +24,7 @@ def register_gatt_cb_error(error):
 
 def register_ad_cb():
     """Advertisement registration success callback"""
-    logger.debug("BLE Service registered")
+    logger.info("BLE Advertisement registered")
     print("BLE Advertisement registered")
 
 def register_ad_cb_error(error):

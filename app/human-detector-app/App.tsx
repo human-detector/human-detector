@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import { BleManager } from 'react-native-ble-plx';
@@ -23,6 +23,7 @@ import NotifScreen from './screens/NotifScreen';
 import SnapshotScreen from './screens/SnapshotScreen';
 import { zPushNotificationData } from './classes/PushNotificationData';
 
+const navigatorRef = createNavigationContainerRef<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());
 
@@ -36,6 +37,27 @@ export default function App(): React.ReactElement {
   React.useEffect(() => {
     groupsRef.current = groups;
   }, [groups]);
+
+  React.useEffect(() => {
+    Notifications.addNotificationResponseReceivedListener((event) => {
+      const notificationParse = zPushNotificationData.safeParse(
+        event.notification.request.content.data
+      );
+      if (!notificationParse.success) {
+        console.error('Failed to parse snapshot push notification', notificationParse.error);
+        return;
+      }
+
+      if (
+        event.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER &&
+        navigatorRef.isReady()
+      ) {
+        navigatorRef.navigate('Snapshot', {
+          snapshotId: notificationParse.data.notification.snapshotId,
+        });
+      }
+    });
+  }, []);
 
   // If the user isn't logged in
   if (backendService === null) {
@@ -129,7 +151,7 @@ export default function App(): React.ReactElement {
   user.groupList = groups;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigatorRef}>
       <UserContext.Provider value={user}>
         <BLEContext.Provider value={bleService}>
           <BackendContext.Provider value={backendService}>

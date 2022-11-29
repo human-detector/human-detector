@@ -83,7 +83,6 @@ export default function App(): React.ReactElement {
                       console.error('Error fetching or updating push token', error)
                     );
                   setGroups((await backend.getGroupListAPI()) ?? []);
-                  // FIXME: this seems to be capturing the initial value of 'groups', which is just an empty list. :(
                   Notifications.setNotificationHandler({
                     handleNotification: async (pushNotification) => {
                       const ignoreNotificationBehavior: NotificationBehavior = {

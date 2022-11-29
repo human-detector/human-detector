@@ -43,7 +43,8 @@ class TestNetRequests(unittest.TestCase):
             }
         )
 
-        heartbeat = Heartbeat(self.net, heartbeat_delay=heartbeat_delay)
+        heartbeat = Heartbeat(self.net)
+        heartbeat.start(heartbeat_delay=heartbeat_delay)
         time.sleep(heartbeat_delay * call_count)
         heartbeat.stop()
         self.assertTrue(resp.call_count == call_count)
@@ -101,7 +102,8 @@ class TestNetRequests(unittest.TestCase):
             status=401
         )
 
-        heartbeat = Heartbeat(self.net, heartbeat_delay=heartbeat_delay)
+        heartbeat = Heartbeat(self.net)
+        heartbeat.start(heartbeat_delay=heartbeat_delay)
         time.sleep(heartbeat_delay * call_count)
         heartbeat.stop()
         self.assertFalse(heartbeat.is_connected())

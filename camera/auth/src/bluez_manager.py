@@ -3,32 +3,34 @@ BluezManager manages all BLE aspects of the Eyespy camera
 Before importing this module, make sure NetworkManager is started!
 """
 
+import logging
 import sys
 import dbus
 import ble.dbus_interface.dbus_bluez_names as BluezNames
 from ble import EyeSpyAdvertisement, EyeSpyService
 from ble.dbus_interface.dbus_bluez_interface import Application
-from networking.key_manager import KeyManager
-from networking.wifi_manager import WifiManager
+
+logger = logging.getLogger(__name__)
 
 def register_gatt_cb():
     """Service registration success callback"""
-    print("Service registered")
+    logger.info("BLE Service registered")
 
 def register_gatt_cb_error(error):
     """Service registration error callback"""
-    print("Error registering service")
-    print(error)
+    logger.error("BLE Service register failed!")
+    logger.error(error)
     sys.exit(-1)
 
 def register_ad_cb():
     """Advertisement registration success callback"""
-    print("Advertisement registered")
+    logger.info("BLE Advertisement registered")
+    print("BLE Advertisement registered")
 
 def register_ad_cb_error(error):
     """Advertisement registration error callback"""
-    print("Error registering ad")
-    print(error)
+    logger.error("BLE Advertisement register failed!")
+    logger.error(error)
     sys.exit(-1)
 
 class BluezManager():
@@ -38,9 +40,9 @@ class BluezManager():
     """
 
     @staticmethod
-    def create_manager():
+    def create_manager(wifi, key):
         """Returns a new BluezManager with keys and wifi managers passed in"""
-        return BluezManager(WifiManager(), KeyManager())
+        return BluezManager(wifi, key)
 
     def __init__(self, wifi_manager, key_manager):
         self.bus = dbus.SystemBus()
@@ -54,7 +56,7 @@ class BluezManager():
         self.ad_manager = dbus.Interface(bluez_service, BluezNames.BLUEZ_LE_AD_MANAGER)
 
         # Create advertisement and EyeSpy services which phone talks to
-        self.eyespy_ad = EyeSpyAdvertisement(self.bus, 0)
+        self.eyespy_ad = EyeSpyAdvertisement(self.bus, 0, key_manager)
         self.app = Application(self.bus) # GATT requires an application to manage the service
         self.app.add_service(EyeSpyService(self.bus, 0, wifi_manager, key_manager))
 
@@ -76,13 +78,13 @@ class BluezManager():
             error_handler = register_ad_cb_error,
         )
 
-    def stop_blue(self):
+    def stop_ble(self):
         """
         Unregister BLE services and turn off bluetooth adapter
         """
         try:
-            self.ad_manager.UnregisterAdvertisement(self.eyespy_ad.get_path(), {})
-            self.gatt_manager.UnregisterApplication(self.app.get_path(), {})
+            self.ad_manager.UnregisterAdvertisement(self.eyespy_ad.get_path())
+            self.gatt_manager.UnregisterApplication(self.app.get_path())
         except dbus.DBusException:
             # Do nothing. Exception either means it's an invalid object or already stopped
             pass

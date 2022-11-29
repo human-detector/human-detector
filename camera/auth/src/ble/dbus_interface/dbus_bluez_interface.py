@@ -164,6 +164,7 @@ class Advertisement(dbus.service.Object):
             "ServiceUUIDs": dbus.Array([], signature="s"),
             "Includes": dbus.Array(["tx-power"], signature='s'),
             "LocalName": name,
+            "ManufacturerData": dbus.Dictionary({}, signature='qv')
         }
         self.local_name = None
         dbus.service.Object.__init__(self, bus, self.path)
@@ -179,6 +180,10 @@ class Advertisement(dbus.service.Object):
     def add_service_uuid(self, uuid):
         """Add Service UUID to advertise"""
         self.props["ServiceUUIDs"].append(dbus.String(uuid))
+
+    def add_manufacturer_data(self, manufacturer, data):
+        """Add manufacturer specific data to advertisement"""
+        self.props["ManufacturerData"][manufacturer] = dbus.Array(data, signature='y')
 
     @dbus.service.method(DBUS_PROPS, in_signature="s", out_signature="a{sv}")
     def GetAll(self, interface):

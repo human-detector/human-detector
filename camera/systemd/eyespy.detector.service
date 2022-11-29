@@ -2,6 +2,6 @@
 Description=Eyespy Detection Service
 
 [Service]
-ExecStart=/usr/bin/python /usr/local/bin/eyespy/detector/main.py
+ExecStart=/usr/bin/python /usr/local/bin/eyespy/detector/main.py --net --model /usr/local/bin/eyespy/detector/model
 Restart=on-failure
 User=eyespy

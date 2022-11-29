@@ -2,7 +2,7 @@
 EyeSpy Service which handles all state changes and can start up the detector service
 """
 
-from time import time
+from time import time, sleep
 import logging
 from enum import Enum, auto
 from networking import KeyManager, Heartbeat
@@ -87,5 +87,6 @@ class EyeSpyService:
             self.bluez_manager.start_ble()
             self.detector.stop()
         elif self.state == CameraState.DETECTOR_UP:
+            sleep(1)
             self.bluez_manager.stop_ble()
             self.detector.start()

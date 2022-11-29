@@ -52,7 +52,7 @@ class BluezManager():
         self.ad_manager = dbus.Interface(bluez_service, BluezNames.BLUEZ_LE_AD_MANAGER)
 
         # Create advertisement and EyeSpy services which phone talks to
-        self.eyespy_ad = EyeSpyAdvertisement(self.bus, 0)
+        self.eyespy_ad = EyeSpyAdvertisement(self.bus, 0, key_manager)
         self.app = Application(self.bus) # GATT requires an application to manage the service
         self.app.add_service(EyeSpyService(self.bus, 0, wifi_manager, key_manager))
 

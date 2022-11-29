@@ -64,13 +64,20 @@ Basic instructions
 
 ```
 # Create an eyespy system account to run services under
-sudo useradd -r -s /bin/false eyespy
+sudo useradd -r -s /bin/false -G video eyespy
 
 # Copy the src folders of detector and auth to /usr/local/bin
-# /usr/local/bin/eyespy/detector/main.py
-# /usr/local/bin/eyespy/auth/main.py
+sudo cp -r ./src/* /usr/local/bin/eyespy/detector/
+sudo cp -r ./src/* /usr/local/bin/eyespy/auth/
 
 # Copy service files to /etc/systemd/system
+sudo cp -r ./systemd/*.service /etc/systemd/system/
+
+# Install dependencies for both auth and detector
+cd ./detector
+sudo make pi-install
+cd ../auth
+sudo make pi-install
 
 # Enable auth service, which will control the detector service
 sudo systemctl enable eyespy.auth.service

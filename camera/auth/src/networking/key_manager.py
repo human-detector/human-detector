@@ -127,8 +127,8 @@ def _is_raspi():
             return True
     return False
 
-_DEFAULT_KEY_LOC = "/home/pi/.eyespy/key"
-_DEFAULT_UUID_LOC = "/home/pi/.eyespy/uuid"
+_DEFAULT_KEY_LOC = "/usr/local/bin/eyespy/detector/keys/key"
+_DEFAULT_UUID_LOC = "/usr/local/bin/eyespy/detector/keys/uuid"
 def _load_key(filename = _DEFAULT_KEY_LOC):
     if not exists(filename):
         return None

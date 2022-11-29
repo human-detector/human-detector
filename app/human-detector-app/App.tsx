@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import { BleManager } from 'react-native-ble-plx';
+import { FontAwesome } from '@expo/vector-icons';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -34,6 +35,7 @@ Notifications.setNotificationHandler({
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);
   const [groups, setGroups] = React.useState<Group[]>([]);
+ 
 
   // If the user isn't logged in
   if (backendService === null) {
@@ -78,7 +80,7 @@ export default function App(): React.ReactElement {
         <BLEContext.Provider value={bleService}>
           <BackendContext.Provider value={backendService}>
             <Stack.Navigator
-              screenOptions={{
+              screenOptions={({navigation}) => ({
                 headerStyle: {
                   backgroundColor: '#1E90FF',
                 },
@@ -86,9 +88,16 @@ export default function App(): React.ReactElement {
                 headerTitleStyle: {
                   fontWeight: 'bold',
                 },
-              }}
+                // eslint-disable-next-line react/no-unstable-nested-components
+                headerRight: () => <FontAwesome name = "bell" size={28} color="white" onPress={() => {
+                  navigation.navigate('Notifications', { notifications: user.getAllNotifications()});
+                }}/>
+              })}
             >
-              <Stack.Screen name="Groups" component={GroupScreen} options={{ title: 'EyeSpy' }} />
+              <Stack.Screen 
+                name="Groups" 
+                component={GroupScreen} 
+                options={{ title: 'Groups' }} />
               <Stack.Screen
                 name="Cameras"
                 component={CameraScreen}
@@ -112,8 +121,20 @@ export default function App(): React.ReactElement {
                   headerShown: false,
                 }}
               />
-              <Stack.Screen name="Notifications" component={NotifScreen} />
-              <Stack.Screen name="Snapshot" component={SnapshotScreen} />
+              <Stack.Screen 
+                name="Notifications" 
+                component={NotifScreen} 
+                options={{
+                  headerRight: () => null,
+                }}
+              />
+              <Stack.Screen 
+                name="Snapshot" 
+                component={SnapshotScreen}
+                options={{
+                  headerRight: () => null,
+                }} 
+              />
             </Stack.Navigator>
           </BackendContext.Provider>
         </BLEContext.Provider>

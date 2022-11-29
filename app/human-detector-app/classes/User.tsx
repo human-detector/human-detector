@@ -1,8 +1,8 @@
 // FIXME: re-evaluate methods and remove these
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable array-callback-return */
 
-import { Alert } from 'react-native';
 import Group from './Group';
+import Notification from './Notification';
 
 export default class User {
   username: string;
@@ -15,6 +15,7 @@ export default class User {
     this.username = username;
     this.userId = userId; // Should always be from authorization token
     this.groupList = groupList;
+    
   }
 
   getGroupFromId(groupId: string) {
@@ -35,4 +36,18 @@ export default class User {
     this.groupList.splice(groupIndex, 1);
     return groupRemoved;
   }
+
+  getAllNotifications(): Notification[] {
+    const notifs: Notification[] = []
+
+    this.groupList.map((group) => {
+      group.cameras.map((cam) => {
+        cam.notifications.map((notif) => {
+          notifs.push(notif);
+        })
+      })
+    })
+    return notifs;
+  }
+
 }

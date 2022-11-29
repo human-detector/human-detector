@@ -63,9 +63,6 @@ These tests assume that `python3` is installed and that both `python3` and `pip3
 Basic instructions
 
 ```
-# Create an eyespy system account to run services under
-# sudo useradd -r -s /bin/false -G video eyespy
-
 # Make services folders
 sudo mkdir -p /usr/local/bin/eyespy/detector/model
 sudo mkdir -p /usr/local/bin/eyespy/auth

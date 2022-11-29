@@ -3,30 +3,34 @@ BluezManager manages all BLE aspects of the Eyespy camera
 Before importing this module, make sure NetworkManager is started!
 """
 
+import logging
 import sys
 import dbus
 import ble.dbus_interface.dbus_bluez_names as BluezNames
 from ble import EyeSpyAdvertisement, EyeSpyService
 from ble.dbus_interface.dbus_bluez_interface import Application
 
+logger = logging.getLogger(__name__)
+
 def register_gatt_cb():
     """Service registration success callback"""
-    print("Service registered")
+    logger.debug("BLE Service registered")
 
 def register_gatt_cb_error(error):
     """Service registration error callback"""
-    print("Error registering service")
-    print(error)
+    logger.error("BLE Service register failed!")
+    logger.error(error)
     sys.exit(-1)
 
 def register_ad_cb():
     """Advertisement registration success callback"""
-    print("Advertisement registered")
+    logger.debug("BLE Service registered")
+    print("BLE Advertisement registered")
 
 def register_ad_cb_error(error):
     """Advertisement registration error callback"""
-    print("Error registering ad")
-    print(error)
+    logger.error("BLE Advertisement register failed!")
+    logger.error(error)
     sys.exit(-1)
 
 class BluezManager():

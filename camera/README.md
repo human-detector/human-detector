@@ -64,11 +64,16 @@ Basic instructions
 
 ```
 # Create an eyespy system account to run services under
-sudo useradd -r -s /bin/false -G video eyespy
+# sudo useradd -r -s /bin/false -G video eyespy
+
+# Make services folders
+sudo mkdir -p /usr/local/bin/eyespy/detector/model
+sudo mkdir -p /usr/local/bin/eyespy/auth
 
 # Copy the src folders of detector and auth to /usr/local/bin
-sudo cp -r ./src/* /usr/local/bin/eyespy/detector/
-sudo cp -r ./src/* /usr/local/bin/eyespy/auth/
+sudo cp -r ./detector/src/* /usr/local/bin/eyespy/detector/
+sudo cp -r ./detector/model/* /usr/local/bin/eyespy/model/
+sudo cp -r ./auth/src/* /usr/local/bin/eyespy/auth/
 
 # Copy service files to /etc/systemd/system
 sudo cp -r ./systemd/*.service /etc/systemd/system/

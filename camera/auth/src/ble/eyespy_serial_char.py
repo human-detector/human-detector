@@ -2,12 +2,15 @@
 EyeSpy serial number and public key Characteristic
 """
 
+import logging
 import json
 import cryptography.hazmat.primitives.serialization as Serialization
 from networking.key_manager import KeyManager
 from networking.wifi_manager import WifiState, WifiManager
 from .dbus_interface.dbus_bluez_interface import Characteristic
 from .dbus_interface.dbus_bluez_errors import InProgressException
+
+logger = logging.getLogger(__name__)
 
 class EyeSpySerialCharacteristic(Characteristic):
     """
@@ -54,5 +57,6 @@ class EyeSpySerialCharacteristic(Characteristic):
 
             return out_str.encode("ascii")
         except Exception as exc:
-            print(exc)
+            logger.error("Failed to get Serial over BLE")
+            logger.error(exc)
             raise exc

@@ -51,7 +51,7 @@ export class CamerasService {
     const pushNotification: IPushNotification = {
       sound: 'default',
       title: `${cam.name} has detected movement!`,
-      body: 'This is a test notification',
+      body: 'Tap for more info',
       data: {
         groupId: cam.group.id,
         cameraId: cam.id,

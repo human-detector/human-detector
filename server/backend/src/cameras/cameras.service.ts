@@ -36,19 +36,31 @@ export class CamerasService {
   ): Promise<boolean> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
-      { populate: ['group.user'] },
+      { populate: ['group.id', 'group.user'] },
     );
 
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
 
+    const notification = new Notification(new Snapshot(frame));
+    cam.notifications.add(notification);
+    await this.cameraRepository.flush();
+
     const pushToken = cam.group.user.expoToken;
     const pushNotification: IPushNotification = {
       sound: 'default',
       title: `${cam.name} has detected movement!`,
-      body: 'This is a test notification',
-      data: { withSome: 'data' },
+      body: 'Tap for more info',
+      data: {
+        groupId: cam.group.id,
+        cameraId: cam.id,
+        notification: {
+          id: notification.id,
+          timestamp: notification.timestamp,
+          snapshotId: notification.snapshot.id,
+        },
+      },
     };
     try {
       await this.pushNotificationsService.sendPushNotification(
@@ -59,8 +71,6 @@ export class CamerasService {
       console.error('Error sending push notification', error);
     }
 
-    cam.notifications.add(new Notification(new Snapshot(frame)));
-    await this.cameraRepository.flush();
     return true;
   }
 

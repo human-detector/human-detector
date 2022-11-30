@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import { BleManager } from 'react-native-ble-plx';
 import { FontAwesome } from '@expo/vector-icons';
+import { NotificationBehavior } from 'expo-notifications';
 import CameraScreen from './screens/CameraScreen';
 import GroupScreen from './screens/GroupScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -20,22 +21,43 @@ import User from './classes/User';
 import Group from './classes/Group';
 import NotifScreen from './screens/NotifScreen';
 import SnapshotScreen from './screens/SnapshotScreen';
+import { zPushNotificationData } from './classes/PushNotificationData';
 
+const navigatorRef = createNavigationContainerRef<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const bleService = new BLEService(new BleManager());
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
 
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);
   const [groups, setGroups] = React.useState<Group[]>([]);
  
+
+  // HACK: this ref is only necessary so the Notification handler has an up-to-date reference to 'groups'
+  const groupsRef = React.useRef<Group[]>(groups);
+  React.useEffect(() => {
+    groupsRef.current = groups;
+  }, [groups]);
+
+  React.useEffect(() => {
+    Notifications.addNotificationResponseReceivedListener((event) => {
+      const notificationParse = zPushNotificationData.safeParse(
+        event.notification.request.content.data
+      );
+      if (!notificationParse.success) {
+        console.error('Failed to parse snapshot push notification', notificationParse.error);
+        return;
+      }
+
+      if (
+        event.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER &&
+        navigatorRef.isReady()
+      ) {
+        navigatorRef.navigate('Snapshot', {
+          snapshotId: notificationParse.data.notification.snapshotId,
+        });
+      }
+    });
+  }, []);
 
   // If the user isn't logged in
   if (backendService === null) {
@@ -61,6 +83,59 @@ export default function App(): React.ReactElement {
                       console.error('Error fetching or updating push token', error)
                     );
                   setGroups((await backend.getGroupListAPI()) ?? []);
+                  Notifications.setNotificationHandler({
+                    handleNotification: async (pushNotification) => {
+                      const ignoreNotificationBehavior: NotificationBehavior = {
+                        shouldShowAlert: false,
+                        shouldPlaySound: false,
+                        shouldSetBadge: false,
+                      };
+
+                      const pushNotificationDataParseResult = zPushNotificationData.safeParse(
+                        pushNotification.request.content.data
+                      );
+                      if (!pushNotificationDataParseResult.success) {
+                        console.error(
+                          'Failed to parse push notification data',
+                          pushNotificationDataParseResult.error
+                        );
+                        return ignoreNotificationBehavior;
+                      }
+                      const pushNotificationData = pushNotificationDataParseResult.data;
+
+                      const group = groupsRef.current.find(
+                        (grp) => grp.groupId === pushNotificationData.groupId
+                      );
+                      const camera = group?.cameras.find(
+                        (cam) => cam.cameraId === pushNotificationData.cameraId
+                      );
+                      if (camera === undefined) {
+                        const notificationId = pushNotificationData.notification.id;
+                        console.log(
+                          `Received notification with ID "${notificationId}", which isn't associated with any known cameras.`
+                        );
+                        return ignoreNotificationBehavior;
+                      }
+
+                      // Don't notify again for a notification that has already been received
+                      if (
+                        camera.notifications.find(
+                          (notification) => notification.id === pushNotificationData.notification.id
+                        )
+                      ) {
+                        console.log('Ignoring notification', { pushNotificationData });
+                        return ignoreNotificationBehavior;
+                      }
+
+                      // FIXME: this doesn't cause a re-render if the notification is received while on the notifications screen
+                      camera.notifications.push(pushNotificationData.notification);
+                      return {
+                        shouldShowAlert: true,
+                        shouldPlaySound: true,
+                        shouldSetBadge: false,
+                      };
+                    },
+                  });
                 }}
               />
             )}
@@ -75,12 +150,12 @@ export default function App(): React.ReactElement {
   user.groupList = groups;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigatorRef}>
       <UserContext.Provider value={user}>
         <BLEContext.Provider value={bleService}>
           <BackendContext.Provider value={backendService}>
             <Stack.Navigator
-              screenOptions={({navigation}) => ({
+              screenOptions={({ navigation }) => ({
                 headerStyle: {
                   backgroundColor: '#1E90FF',
                 },

@@ -98,4 +98,10 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
   },
+  cameraRegisteringText: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 20,
+    color: '#696969',
+  },
 });

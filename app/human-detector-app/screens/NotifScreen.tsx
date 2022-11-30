@@ -22,7 +22,9 @@ export default function NotifScreen({ navigation, route }: Props): React.ReactEl
                 navigation.navigate('Snapshot', { snapshotId: notification.snapshotId });
               }}
             >
-              <Text style={styles.menuButtonText}> {notification.timestamp.toString()} </Text>
+              <Text style={styles.menuButtonText}>
+                {notification.timestamp.toLocaleString(undefined, { hour12: true })}
+              </Text>
             </TouchableOpacity>
           </View>
         ))}

@@ -30,7 +30,6 @@ const bleService = new BLEService(new BleManager());
 export default function App(): React.ReactElement {
   const [backendService, setBackendService] = React.useState<BackendService | null>(null);
   const [groups, setGroups] = React.useState<Group[]>([]);
- 
 
   // HACK: this ref is only necessary so the Notification handler has an up-to-date reference to 'groups'
   const groupsRef = React.useRef<Group[]>(groups);
@@ -164,15 +163,21 @@ export default function App(): React.ReactElement {
                   fontWeight: 'bold',
                 },
                 // eslint-disable-next-line react/no-unstable-nested-components
-                headerRight: () => <FontAwesome name = "bell" size={28} color="white" onPress={() => {
-                  navigation.navigate('Notifications', { notifications: user.getAllNotifications()});
-                }}/>
+                headerRight: () => (
+                  <FontAwesome
+                    name="bell"
+                    size={28}
+                    color="white"
+                    onPress={() => {
+                      navigation.navigate('Notifications', {
+                        notifications: user.getAllNotifications(),
+                      });
+                    }}
+                  />
+                ),
               })}
             >
-              <Stack.Screen 
-                name="Groups" 
-                component={GroupScreen} 
-                options={{ title: 'Groups' }} />
+              <Stack.Screen name="Groups" component={GroupScreen} options={{ title: 'Groups' }} />
               <Stack.Screen
                 name="Cameras"
                 component={CameraScreen}
@@ -196,19 +201,19 @@ export default function App(): React.ReactElement {
                   headerShown: false,
                 }}
               />
-              <Stack.Screen 
-                name="Notifications" 
-                component={NotifScreen} 
+              <Stack.Screen
+                name="Notifications"
+                component={NotifScreen}
                 options={{
                   headerRight: () => null,
                 }}
               />
-              <Stack.Screen 
-                name="Snapshot" 
+              <Stack.Screen
+                name="Snapshot"
                 component={SnapshotScreen}
                 options={{
                   headerRight: () => null,
-                }} 
+                }}
               />
             </Stack.Navigator>
           </BackendContext.Provider>

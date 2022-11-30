@@ -104,7 +104,7 @@ export default function LoadingScreen({ navigation }: Props): React.ReactElement
   }, []);
 
   return (
-    <View style={styles.centerIcon}>
+    <View style={{ flex: 1 }}>
       <LoadingIcon state={icon} />
       <Text style={styles.cameraRegisteringText}>{connString}</Text>
     </View>

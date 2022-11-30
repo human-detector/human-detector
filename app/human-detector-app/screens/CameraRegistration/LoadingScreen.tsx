@@ -8,6 +8,7 @@ import { ConnectionStatus, ConnectionNotification, FailReason } from '../../src/
 import { BLEContext } from '../../contexts/bleContext';
 import { BLEParamList } from '../../src/navigation/bleParamList';
 import { UserContext } from '../../contexts/userContext';
+import { styles } from '../../src/styles';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
 
@@ -21,7 +22,7 @@ type Props = NativeStackScreenProps<BLEParamList, 'Loading'>;
 export default function LoadingScreen({ navigation }: Props): React.ReactElement {
   const [connState, setConnState] = useState<ConnectionNotification>();
   const [bleSub, setBleSub] = useState<Subscription>();
-  const [connString, setConnString] = useState<String>('AAAAAA');
+  const [connString, setConnString] = useState<String>('Connecting to WiFi');
   const [icon, setIcon] = useState<LoadingState>(LoadingState.Loading);
 
   const bleContext = useContext(BLEContext);
@@ -105,7 +106,7 @@ export default function LoadingScreen({ navigation }: Props): React.ReactElement
   return (
     <View style={{ flex: 1 }}>
       <LoadingIcon state={icon} />
-      <Text style={{ fontWeight: 'bold' }}>{connString}</Text>
+      <Text style={styles.cameraRegisteringText}>{connString}</Text>
     </View>
   );
 }

@@ -71,6 +71,7 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
           .map((item) => (
           <View key={item.manufacturerData}>
             <TouchableOpacity
+              style={styles.registerCamButton} 
               onPress={() => {
                 if (connecting) return;
                 setConnecting(true);

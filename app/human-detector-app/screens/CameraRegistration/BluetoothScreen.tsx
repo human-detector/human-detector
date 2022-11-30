@@ -45,8 +45,7 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
       val *= 0x100;
       val += bytes[i];
     }
-        
-    console.log(val.toString(16))
+
     return `${device.name} - ${val.toString(16)}`;
   }     
 

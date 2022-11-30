@@ -55,7 +55,11 @@ export class CamerasService {
       data: {
         groupId: cam.group.id,
         cameraId: cam.id,
-        notificationId: notification.id,
+        notification: {
+          id: notification.id,
+          timestamp: notification.timestamp,
+          snapshotId: notification.snapshot.id,
+        },
       },
     };
     try {

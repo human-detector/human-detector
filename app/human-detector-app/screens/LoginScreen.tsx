@@ -20,7 +20,7 @@ interface Props {
 export default function LoginScreen({ onSuccessfulLogin }: Props): React.ReactElement<Props> {
   return (
     <View style={styles.centerIcon}>
-      <Text style={styles.loginText}> Login to EyeSpy </Text>
+      <Text style={styles.loginText}> Welcome to EyeSpy </Text>
       <Button
         title="Login"
         onPress={() => {

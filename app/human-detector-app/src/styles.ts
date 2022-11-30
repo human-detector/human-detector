@@ -77,4 +77,25 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     margin: 20,
   },
+  registerCamText: {
+    fontSize: 20,
+    color: '#696969',
+    marginTop: 8,
+    marginRight: 4,
+    marginLeft: 4,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  registerCamButton: {
+    margin: 20,
+    marginTop: 0,
+    padding: 14,
+    borderWidth: 2,
+    borderColor: '#525252',
+    backgroundColor: '#C5C5C5',
+  },
+  registerCamButtonText: {
+    fontSize: 20,
+    textAlign: 'center',
+  },
 });

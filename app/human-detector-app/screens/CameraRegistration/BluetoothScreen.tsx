@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ScrollView, Button, Text, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Device } from 'react-native-ble-plx';
@@ -7,7 +7,7 @@ import { enc } from 'crypto-js';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
 import { BLEParamList } from '../../src/navigation/bleParamList';
 import { BLEContext } from '../../contexts/bleContext';
-import { requestPermissions, base64ToJson } from '../../src/ble/helpers';
+import { requestPermissions } from '../../src/ble/helpers';
 import { styles } from '../../src/styles';
 
 /**

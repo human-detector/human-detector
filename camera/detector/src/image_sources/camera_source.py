@@ -1,5 +1,6 @@
 from distutils.log import error
 import cv2
+import time
 
 class NoCameraException(Exception):
     """Raised when a camera could not be opened"""
@@ -20,8 +21,9 @@ class CameraSource:
 
         # Open the default webcam (Raspberry Pi should only have one)
         camera = cv2.VideoCapture(0)
-        if not camera.isOpened():
-            raise NoCameraException
+        while(not camera.isOpened()):
+            time.sleep(5) 
+            camera = cv2.VideoCapture(0)
 
         # Webcams usually give higher framerate options using MJPG vs other standards
         camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))

@@ -63,9 +63,8 @@ class WifiManager:
             self._ping_count += 1
 
         if could_connect:
-            if self.wifi_state == WifiState.ATTEMPTING_PING:
-                self._ping_count = 0
-                self._new_wifi_state(WifiState.SUCCESS, FailReason.NONE)
+            self._ping_count = 0
+            self._new_wifi_state(WifiState.SUCCESS, FailReason.NONE)
         elif forbidden and self.wifi_state != WifiState.FAIL:
             self._ping_count = 0
             self._new_wifi_state(WifiState.FAIL, FailReason.FORBIDDEN)

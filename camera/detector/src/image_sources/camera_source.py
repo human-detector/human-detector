@@ -39,8 +39,9 @@ class CameraSource:
     def get_frame(self):
         success, frame = self.camera.read()
 
-        if not success:
+        while not success:
             self.camera.release()
             self.camera = self.open_camera(self.resolution, self.fps)
+            success, frame = self.camera.read()
         
         return frame

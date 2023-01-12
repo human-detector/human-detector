@@ -4,7 +4,6 @@ import time
 
 class NoCameraException(Exception):
     """Raised when a camera could not be opened"""
-    pass
 
 class RuntimeCameraException(Exception):
     """Raised when the camera returns a failure trying to capture a frame"""
@@ -12,6 +11,8 @@ class RuntimeCameraException(Exception):
 class CameraSource:
     def __init__(self, resolution=(1920, 1080), fps=30):
         self.camera = self.open_camera(resolution, fps)
+        self.resolution = resolution
+        self.fps = fps
     
     def __del__(self):
         self.running = False
@@ -39,6 +40,7 @@ class CameraSource:
         success, frame = self.camera.read()
 
         if not success:
-            raise RuntimeCameraException
+            self.camera.release()
+            self.camera = self.open_camera(self.resolution, self.fps)
         
         return frame

@@ -40,11 +40,14 @@ class NetRequests:
             "Timestamp": NetRequests.seconds_to_milliseconds(time)
         }
 
-        response = requests.put(
-            url=url,
-            headers=headers,
-            json=data,
-            timeout=REQUESTS_TIMEOUT_SECONDS
-        )
+        try:
+            response = requests.put(
+                url=url,
+                headers=headers,
+                json=data,
+                timeout=REQUESTS_TIMEOUT_SECONDS
+            )
+        except requests.exceptions.ConnectionError:
+            return False, None
 
         return response.status_code == 200, response

@@ -43,7 +43,7 @@ class Heartbeat:
                 self.last_heartbeat = cur_time
 
             for callback in self.callbacks:
-                callback(success, req.status_code == 403)
+                callback(success, req.status_code == 403 if req is not None else False)
 
             sleep(self.heartbeat_delay)
 

@@ -73,7 +73,6 @@ class WifiManager:
         elif self._ping_count >= 5 and self.wifi_state != WifiState.FAIL:
             self._ping_count = 0
             self._new_wifi_state(WifiState.FAIL, FailReason.BACKEND_DOWN)
-            self.delete_old_config()
 
     def register_wifi_state_callback(self, callback):
         """Register callback for wifi state changes"""

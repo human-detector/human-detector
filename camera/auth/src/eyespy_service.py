@@ -21,6 +21,7 @@ class CameraState(Enum):
     BOOT = auto()
     BLE_UP = auto()
     DETECTOR_UP = auto()
+    BACKEND_DOWN = auto()
 
 class EyeSpyService:
     """
@@ -60,7 +61,9 @@ class EyeSpyService:
             # We wait a bit during boot before allowing a failure to cause a state change
             # in case the PI is booting from a power outage (and the wifi router is slow)
             # or some other weird state
-            if ((self.state == CameraState.BOOT and time() - self.boot_time > START_TIMEOUT)
+            if new_reason == FailReason.BACKEND_DOWN:
+                self.on_camera_state_change(CameraState.BACKEND_DOWN)
+            elif ((self.state == CameraState.BOOT and time() - self.boot_time > START_TIMEOUT)
                 or new_reason == FailReason.FORBIDDEN):
                 self.on_camera_state_change(CameraState.BLE_UP)
                 self.keys.clear_keys()
@@ -90,3 +93,5 @@ class EyeSpyService:
             sleep(1)
             self.bluez_manager.stop_ble()
             self.detector.start()
+        elif self.state == CameraState.BACKEND_DOWN:
+            self.detector.stop()

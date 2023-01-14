@@ -15,7 +15,7 @@ Create an SD card with Raspian Lite 64-bit. Then run the below on the Pi:
 # Update everything on the pi to latest
 sudo apt update && sudo apt upgrade
 # Install required packages
-sudo apt-get install git ffmpeg
+sudo apt-get install git ffmpeg python3-pip
 sudo apt-get install build-essential libcairo2-dev libgirepository1.0-dev libdbus-glib-1-dev
 
 

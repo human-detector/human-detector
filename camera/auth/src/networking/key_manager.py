@@ -57,7 +57,7 @@ class Keys():
         )
 
         # Make sure eyespy directory exists
-        makedirs("/home/pi/.eyespy", exist_ok=True)
+        makedirs("/usr/local/bin/eyespy/detector/keys", exist_ok=True)
         with open(_DEFAULT_KEY_LOC, 'wb') as file:
             file.write(priv_bytes)
 

@@ -1,6 +1,5 @@
 import { BleError, Characteristic, Device, Subscription, BleManager } from 'react-native-ble-plx';
 import NetInfo from '@react-native-community/netinfo';
-import { useNavigation } from '@react-navigation/native';
 import * as EyeSpyUUID from '../../config/BLEConfig';
 import { base64ToJson, isDuplicateDevice, jsonToBase64, postBLEAlert } from './helpers';
 
@@ -70,8 +69,7 @@ export class BLEService {
    * scans for our specific devices.  It will also add it to a list which can be displayed to the user.
    */
   public scanForDevices(callback: (devices: Device[]) => void) {
-    // EyeSpyUUID.BLE_SERVICE_UUID
-    this.bleManager.startDeviceScan([], null, (error, device) => {
+    this.bleManager.startDeviceScan([EyeSpyUUID.BLE_SERVICE_UUID], null, (error, device) => {
       if (error) {
         console.error(error.message);
         postBLEAlert(error);

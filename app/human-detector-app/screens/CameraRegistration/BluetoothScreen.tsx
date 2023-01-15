@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Device } from 'react-native-ble-plx';
 import { enc } from 'crypto-js';
@@ -25,6 +25,8 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
   const [allDevices, setAllDevices] = React.useState<Device[]>([]);
   const bleService = React.useContext(BLEContext);
 
+  const isFocused = useIsFocused();
+
   function getTitle(device: Device): string {
     if (device.manufacturerData == null) return 'Invalid Device';
     const base64CryptoWord = enc.Base64.parse(device.manufacturerData);
@@ -47,25 +49,18 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
     return `${device.name} - ${val.toString(16)}`;
   }
 
-  useFocusEffect(() => {
+  React.useEffect(() => {
     requestPermissions().then((isGranted: boolean) => {
       if (isGranted) {
-        try {
-          bleService.scanForDevices(setAllDevices);
-        } catch (err) {
-          console.log('test');
-        }
-      } else {
-        Alert.alert(
-          'Please allow location permissions for the app. This allows you to connect your camera to your mobile device.'
-        );
+        bleService.scanForDevices(setAllDevices);
       }
     });
 
-    // return () => {
-    //   bleService.stopScanForDevices();
-    // }
-  });
+    return () => {
+      bleService.stopScanForDevices();
+      console.log('SCANNING STOPPED');
+    };
+  }, [isFocused]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -91,7 +86,6 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
                     .then(() => {
                       // Connecting to camera was successful, so stop scanning
                       setConnecting(false);
-                      bleService.stopScanForDevices();
                       navigation.navigate('CameraRegistrationInfo');
                     })
                     .catch((error) => {

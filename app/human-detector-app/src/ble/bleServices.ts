@@ -1,8 +1,8 @@
 import { BleError, Characteristic, Device, Subscription, BleManager } from 'react-native-ble-plx';
 import NetInfo from '@react-native-community/netinfo';
+import { useNavigation } from '@react-navigation/native';
 import * as EyeSpyUUID from '../../config/BLEConfig';
-import { base64ToJson, isDuplicateDevice, jsonToBase64 } from './helpers';
-import { Alert } from 'react-native';
+import { base64ToJson, isDuplicateDevice, jsonToBase64, postBLEAlert } from './helpers';
 
 /**
  * This file includes all of the camera bluetooth services that the mobile app
@@ -71,33 +71,27 @@ export class BLEService {
    */
   public scanForDevices(callback: (devices: Device[]) => void) {
     // EyeSpyUUID.BLE_SERVICE_UUID
+    this.bleManager.startDeviceScan([], null, (error, device) => {
+      if (error) {
+        console.error(error.message);
+        postBLEAlert(error);
+      }
 
-    try {
-      this.bleManager.startDeviceScan([], null, (error, device) => {
-        if (error) {
-          console.error(error.message);
-          throw error;
+      if (device) {
+        // Add Device
+        if (!isDuplicateDevice(this.devices, device)) {
+          this.devices = [...this.devices, device];
+          callback(this.devices);
         }
-
-        if (device) {
-          // Add Device
-          if (!isDuplicateDevice(this.devices, device)) {
-            this.devices = [...this.devices, device];
-            callback(this.devices);
-          }
-        }
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
+      }
+    });
   }
 
   /**
    * Stop scanning for new devices
    */
   public stopScanForDevices() {
-    // this.devices = [];
+    this.devices = [];
     this.bleManager.stopDeviceScan();
   }
 
@@ -257,38 +251,5 @@ export class BLEService {
       EyeSpyUUID.CONNECTION_UUID,
       bleCallback
     );
-  }
-
-  private postBLEAlert(err: BleError) {
-    // Check code
-
-    // 102: Bluetooth connection on the mobile device is turned off
-
-    switch (err.errorCode) {
-      case 102:
-        Alert.alert(
-          'Bluetooth is turned off on your device.  Please turn on bluetooth in your phone settings to connect a camera.'
-        );
-        break;
-
-      case 600:
-        Alert.alert('Scanning failed. Please try again');
-        break;
-
-      case 601:
-        Alert.alert(
-          'Please turn on location services for the EyeSpy app in your phone settings to connect a camera.'
-        );
-        break;
-
-      default:
-        Alert.alert(err.message);
-    }
-
-    // 600: Scan start failed
-
-    // 602: If location services are turned off on the mobile device.
-
-    // Any other error will add the message code on the error to the alert
   }
 }

@@ -26,20 +26,18 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
   const bleService = React.useContext(BLEContext);
 
   function getTitle(device: Device): string {
-    if (device.manufacturerData == null) return "Invalid Device";
+    if (device.manufacturerData == null) return 'Invalid Device';
     const base64CryptoWord = enc.Base64.parse(device.manufacturerData);
     const hexStr = base64CryptoWord.toString(enc.Hex);
-       
+
     const bytes = [];
     for (let i = hexStr.length; i > 0; i -= 2) {
       bytes.push(parseInt(hexStr.substring(i - 2, i), 16));
     }
-    
-    if (bytes.length < 2 || 
-        bytes[bytes.length - 1] !== 0xFF || 
-        bytes[bytes.length - 2] !== 0xFF)
-      return "Invalid manufacturer";
-        
+
+    if (bytes.length < 2 || bytes[bytes.length - 1] !== 0xff || bytes[bytes.length - 2] !== 0xff)
+      return 'Invalid manufacturer';
+
     let val = 0;
     for (let i = 0; i < bytes.length - 2; i += 1) {
       val *= 0x100;
@@ -47,9 +45,9 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
     }
 
     return `${device.name} - ${val.toString(16)}`;
-  }     
+  }
 
-  useFocusEffect(() => {
+  const focusEffect = React.useCallback(() => {
     requestPermissions().then((isGranted: boolean) => {
       if (isGranted) {
         bleService.scanForDevices(setAllDevices);
@@ -59,39 +57,46 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
     return () => {
       bleService.stopScanForDevices();
     };
-  });
+  }, []);
+
+  useFocusEffect(focusEffect);
 
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
-      <Text style={styles.registerCamText}> To register a camera, click on the desired camera in the list below This list will update automatically. </Text>
+        <Text style={styles.registerCamText}>
+          {' '}
+          To register a camera, click on the desired camera in the list below This list will update
+          automatically.{' '}
+        </Text>
         {allDevices
           .filter((dev) => dev.manufacturerData != null)
           .map((item) => (
-          <View key={item.manufacturerData}>
-            <TouchableOpacity
-              style={styles.registerCamButton} 
-              onPress={() => {
-                if (connecting) return;
-                setConnecting(true);
+            <View key={item.manufacturerData}>
+              <TouchableOpacity
+                style={styles.registerCamButton}
+                onPress={() => {
+                  if (connecting) return;
+                  setConnecting(true);
 
-                // This button will connect device
-                bleService
-                  .connectToDevice(item)
-                  .then(() => {
-                    setConnecting(false);
-                    navigation.navigate('CameraRegistrationInfo');
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                    setConnecting(false);
-                  });
-              }}
-            >
-              <Text style={styles.registerCamButtonText}> {getTitle(item)} </Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+                  // This button will connect device
+                  bleService
+                    .connectToDevice(item)
+                    .then(() => {
+                      // Connecting to camera was successful, so stop scanning
+                      setConnecting(false);
+                      navigation.navigate('CameraRegistrationInfo');
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      setConnecting(false);
+                    });
+                }}
+              >
+                <Text style={styles.registerCamButtonText}> {getTitle(item)} </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
       </ScrollView>
       {connecting && <LoadingIcon state={LoadingState.Loading} background />}
     </View>

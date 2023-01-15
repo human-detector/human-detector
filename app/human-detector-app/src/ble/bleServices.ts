@@ -1,7 +1,7 @@
 import { BleError, Characteristic, Device, Subscription, BleManager } from 'react-native-ble-plx';
 import NetInfo from '@react-native-community/netinfo';
 import * as EyeSpyUUID from '../../config/BLEConfig';
-import { base64ToJson, isDuplicateDevice, jsonToBase64 } from './helpers';
+import { base64ToJson, isDuplicateDevice, jsonToBase64, postBLEAlert } from './helpers';
 
 /**
  * This file includes all of the camera bluetooth services that the mobile app
@@ -71,7 +71,8 @@ export class BLEService {
   public scanForDevices(callback: (devices: Device[]) => void) {
     this.bleManager.startDeviceScan([EyeSpyUUID.BLE_SERVICE_UUID], null, (error, device) => {
       if (error) {
-        console.error(error.errorCode);
+        console.error(error.message);
+        postBLEAlert(error);
       }
 
       if (device) {

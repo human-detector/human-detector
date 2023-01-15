@@ -51,13 +51,11 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
     requestPermissions().then((isGranted: boolean) => {
       if (isGranted) {
         bleService.scanForDevices(setAllDevices);
-        console.log('START');
       }
     });
 
     return () => {
       bleService.stopScanForDevices();
-      console.log('STOP');
     };
   }, []);
 

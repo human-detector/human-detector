@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { View, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Device } from 'react-native-ble-plx';
 import { enc } from 'crypto-js';
@@ -25,8 +25,6 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
   const [allDevices, setAllDevices] = React.useState<Device[]>([]);
   const bleService = React.useContext(BLEContext);
 
-  const isFocused = useIsFocused();
-
   function getTitle(device: Device): string {
     if (device.manufacturerData == null) return 'Invalid Device';
     const base64CryptoWord = enc.Base64.parse(device.manufacturerData);
@@ -49,17 +47,21 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
     return `${device.name} - ${val.toString(16)}`;
   }
 
-  React.useEffect(() => {
+  const focusEffect = React.useCallback(() => {
     requestPermissions().then((isGranted: boolean) => {
       if (isGranted) {
         bleService.scanForDevices(setAllDevices);
+        console.log('START');
       }
     });
 
     return () => {
       bleService.stopScanForDevices();
+      console.log('STOP');
     };
-  }, [isFocused]);
+  }, []);
+
+  useFocusEffect(focusEffect);
 
   return (
     <View style={{ flex: 1 }}>

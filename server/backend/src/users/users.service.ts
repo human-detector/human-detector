@@ -71,6 +71,45 @@ export class UsersService {
   }
 
   /**
+   * Deletes a given group from the user's list of created groups.
+   *
+   * @param userId the user's ID
+   * @param groupObj the Group that the user wants to delete
+   */
+  public async deleteGroup(
+    userId: string,
+    groupObj: Group, // it would be ideal to send the Group object and not the Group id/name since we need the object for removing it from mikroorm.
+  ): Promise<Boolean> {
+    // find and populate user.groups and user.groups.cameras
+    const user = await this.usersRepository.findOne(
+      { id: userId },
+      { populate: ['groups', 'groups.cameras'] },
+    )
+
+    if (user == null) {
+      throw new NotFoundError(`User with ID "${userId}" does not exist`);
+    }
+
+    if (user.id != userId) {
+      throw new NotFoundError(`Pulled user with wrong ID!`);
+    }
+    // checks if the groupObj is not in the list of groups for the user.
+    if (!user.groups.contains(groupObj)) {
+      throw new NotFoundError(`Group "${groupObj.name}" was not found in the list of groups`)
+    }
+    // ensures that no cameras are in the group.
+    if (groupObj.cameras.length != 0) {
+      throw new Error(`Group "${groupObj.name}" is not empty and still has cameras associated with it on the backend.`)
+    } 
+ 
+    //user.groups.remove(groupObj);
+    this.usersRepository.remove(groupObj);
+    await this.usersRepository.flush();
+
+    return true;
+  }
+
+  /**
    * Register a camera to the given user and group
    *
    * @param userId the user's ID.

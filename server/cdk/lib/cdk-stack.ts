@@ -1,21 +1,18 @@
+import * as path from "path";
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as rds from "aws-cdk-lib/aws-rds";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as cognito from "aws-cdk-lib/aws-cognito";
-import * as s3 from "aws-cdk-lib/aws-s3";
-import * as codedeploy from "aws-cdk-lib/aws-codedeploy";
+import * as assets from "aws-cdk-lib/aws-s3-assets";
+import { readFileSync } from "fs";
+import { cwd } from "process";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // TODO: figure out how the webapp is going to be deployed to EC2 (manual? bundle here and upload at deploy-time?)
-    //       Solution: might need to push to S3 anyways for database endpoint, so maybe push bundled code as well?
-    // TODO: figure out how the webapp is going to refer to the DB by hostname (if it even can) (db.dbInstanceEndpointAddress gives IP!)
-    //       Solution: push endpoint to S3 bucket, pull during userdata init script in EC2 instance?
-    //       Better solution: Make the database it's own Cloudformation Stack, output the database endpoint (CfnOutput), import in app stack?
     // TODO: setup cognito (user pools, clients, domain names etc.)
     // TODO: write sync-user lambda
     // TODO: add simple API gateway routes directed at EC2 instance
@@ -24,34 +21,11 @@ export class CdkStack extends cdk.Stack {
       natGateways: 0, // NAT Gateways are billed by the hour, so we don't want any
     });
 
-    // Deployment assets needed on app instance creation. There's probably a
-    // better way to do this that I'm not seeing right now.
-    const appDeployAssets = new s3.Bucket(this, "AppDeployAssets");
-
-    const appDeployment = new codedeploy.ServerApplication(
-      this,
-      "AppDeployment",
-      {}
-    );
-
-    /* App webserver */
-    const app = new ec2.Instance(this, "AppServer", {
-      vpc,
-      vpcSubnets: {
-        subnetType: ec2.SubnetType.PUBLIC,
-      },
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
-        ec2.InstanceSize.MICRO
-      ),
-      machineImage: ec2.MachineImage.latestAmazonLinux(),
-    });
-    app.connections.allowFromAnyIpv4(
-      ec2.Port.tcp(443),
-      "Allow inbound HTTPS from anyone"
-    );
-
     /* Database */
+    // TODO: upload database schema ("../database/init/01-create.sql") as an S3 asset, then,
+    //       pull it in a lambda function custom resource (https://docs.aws.amazon.com/cdk/v2/guide/cfn_layer.html#cfn_layer_custom)
+    //       at deploy-time to initialize the database. (might also need some mechanism for verifying the database
+    //       is empty *before* nuking the entire thing?)
     const dbPort = 5432;
     const db = new rds.DatabaseInstance(this, "Database", {
       vpc,
@@ -65,6 +39,54 @@ export class CdkStack extends cdk.Stack {
         ec2.InstanceSize.MICRO
       ),
     });
+
+    /* App webserver */
+    const appSourceBundle = new assets.Asset(this, "AppSource", {
+      path: path.join(cwd(), "..", "backend"),
+    });
+    const appSystemdUnit = new assets.Asset(this, "AppSystemdUnit", {
+      path: path.join(cwd(), "assets", "app.service"),
+    });
+
+    const appEnvironment = {
+      DB_HOST: db.dbInstanceEndpointAddress,
+      DB_NAME: "TODO",
+      DB_USER: "postgres",
+      AUTH_HOST: "TODO",
+      EXPO_ACCESS_TOKEN: "TODO how we gonna do this one? CDK config file?",
+    };
+    const userData = readFileSync(path.join(cwd(), "assets", "userdata.sh"))
+      .toString()
+      .replace("$APP_SOURCE_S3_OBJ_URL", appSourceBundle.s3ObjectUrl)
+      .replace("$APP_SYSTEMD_SERVICE_S3_OBJ_URL", appSystemdUnit.s3ObjectUrl)
+      .replace("$APP_DB_PASSWORD_SECRET_ARN", db.secret?.secretFullArn!)
+      .replace(
+        "$INSERT_ENVIRONMENTFILE_HERE",
+        "cat << EOF\n" +
+          Array.from(Object.entries(appEnvironment))
+            .map(([key, val]) => `${key}=${val}`)
+            .join("\n") +
+          "\nEOF\n"
+      );
+
+    const app = new ec2.Instance(this, "AppServer", {
+      vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC,
+      },
+      instanceType: ec2.InstanceType.of(
+        ec2.InstanceClass.T3,
+        ec2.InstanceSize.MICRO
+      ),
+      machineImage: ec2.MachineImage.latestAmazonLinux({
+        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+        userData: ec2.UserData.custom(userData),
+      }),
+    });
+    app.connections.allowFromAnyIpv4(
+      ec2.Port.tcp(443),
+      "Allow inbound HTTPS from anyone"
+    );
     db.connections.allowFrom(
       app,
       ec2.Port.tcp(dbPort),

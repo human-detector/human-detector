@@ -1,0 +1,9 @@
+[Unit]
+Description=It's the backend
+Requires=network.target
+After=network.target
+
+[Service]
+WorkingDirectory=/usr/src/app
+ExecStart=node /usr/src/app/dist/index.js
+EnvironmentFile=/etc/sysconfig/app

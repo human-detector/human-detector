@@ -98,6 +98,10 @@ export class CdkStack extends cdk.Stack {
       ec2.Port.tcp(dbPort),
       "Allow database connections from webserver"
     );
+    // Permissions needed for bootstrapping in userdata
+    db.secret?.grantRead(app.role);
+    appSourceBundle.grantRead(app.role);
+    appSystemdUnit.grantRead(app.role);
 
     /* Cognito */
     const syncLambda = new lambda.Function(this, "SyncUsersLambda", {

@@ -12,9 +12,11 @@ export NVM_DIR="$HOME/.nvm"
 nvm install 16
 
 # Install up-to-date AWS CLI (https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+pushd /tmp
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
+popd
 
 # Install jq for processing AWS CLI output
 yum install -y jq

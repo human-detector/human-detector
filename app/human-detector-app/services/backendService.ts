@@ -69,6 +69,21 @@ export default class BackendService {
     }
   }
 
+
+  // ADD deleteNotificationAPI!!! 
+  public async deleteCameraAPI(groupId: string, cameraId: string): Promise<boolean | null> {
+    const apiLinkWithExtension: string = 
+      ServerUrl.apiLink + ServerUrl.removeCameraUrlExtension(this.getUser().userId, groupId, cameraId);
+
+    try {
+      const response = await this.axiosInstance.delete(apiLinkWithExtension);
+      return response.data;
+    } catch (error) {
+      console.error(`error in deleteCamera status code:`, error);
+      return null;
+    }
+  }
+
   /**
    * registerGroupAPI() will register a group in the backend to the user.
    *
@@ -87,6 +102,24 @@ export default class BackendService {
       return response.data.id;
     } catch (error) {
       console.error('Error in registerGroup status code:', error);
+      return null;
+    }
+  }
+
+  /**
+   * deleteGroupAOI() will delete a group in the backend for the user.
+   * 
+   * @param groupId Group ID to be deleted
+   * @returns true or error
+   */
+  public async deleteGroupAPI(groupId: string): Promise<boolean | null> {
+    const apiLinkWithExtension: string = 
+    ServerUrl.apiLink + ServerUrl.removeGroupUrlExtension(this.getUser().userId, groupId);
+    try {
+      const response = await this.axiosInstance.delete(apiLinkWithExtension);
+      return response.data;
+    } catch (error) {
+      console.error(`error in deleteGroup status code:`, error);
       return null;
     }
   }

@@ -95,32 +95,30 @@ export class CamerasService {
    * Removes all notifications associated with Camera idCam.
    * @param idCam
    */
-  public async removeNotifications(
-    idCam: string,
-  ): Promise<Boolean> {
+  public async removeNotifications(idCam: string): Promise<boolean> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
-      { populate: ['notifications', 'notifications.camera.id'] },
+      {
+        populate: [
+          'notifications',
+          'notifications.camera',
+          'notifications.camera.id',
+        ],
+      },
     );
 
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
-
-    // First goes through and removes the notifs one-by-one
-    // Check to see if this works on a collection of notifs.
+    /*
     for (const notif of cam.notifications) {
       cam.notifications.remove(notif);
       await this.cameraRepository.flush();
     }
+    */
 
-    // This is to check that no more notifications from the given camera are still in the repository.
-    const notifications = await this.notificationRepository.findAll();
-    for (const newNotif of notifications) {
-      if (newNotif.camera.id === idCam) {
-        throw new Error(`During removal of '${cam.name}'s notifications, a notification affiliated with said camera was found.`)
-      }
-    }
+    cam.notifications.removeAll();
+    await this.cameraRepository.flush();
 
     return true;
   }
@@ -129,25 +127,31 @@ export class CamerasService {
    * Removes a given camera from one of the user's groups.
    * @param idCam
    */
-  public async removeCamera(
-    idCam: string,
-  ): Promise<Boolean> {
+  public async removeCamera(idCam: string): Promise<boolean> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
-      { populate: ['group.cameras'] },
+      {
+        populate: [
+          'group.cameras',
+          'notifications',
+          'notifications.camera',
+          'notifications.camera.id',
+        ],
+      },
     );
 
     if (cam === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
     // removes notifications before removing the camera.
-    if (this.removeNotifications(idCam)) {
+    if (await this.removeNotifications(idCam)) {
       //cam.group.cameras.remove(cam);
-      this.cameraRepository.remove(cam)
+      this.cameraRepository.remove(cam);
       await this.cameraRepository.flush();
-    }
-    else {
-      throw new Error(`During the removal of notifications, there was an error and the deletion of the camera will not proceed.`);
+    } else {
+      throw new Error(
+        `During the removal of notifications, there was an error and the deletion of the camera will not proceed.`,
+      );
     }
 
     return true;

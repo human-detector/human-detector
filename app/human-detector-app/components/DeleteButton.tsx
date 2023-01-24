@@ -4,8 +4,22 @@ import { TouchableOpacity, Alert } from 'react-native';
 // AND ADD TO CAMERA SIDE TO TEST IF THE showAlert() function works
 import {  FontAwesome5 } from '@expo/vector-icons'; 
 import { styles } from '../src/styles';
+import { BackendContext } from '../contexts/backendContext';
+import { UserContext } from '../contexts/userContext';
 
 const showAlert = (objectId: string, objectType: string) => {
+  const backendContext = React.useContext(BackendContext);
+  const userContext = React.useContext(UserContext);
+
+  if (!backendContext) {
+    console.error('no backend context!');
+    throw new Error('no backend context');
+  }
+  if (!userContext) {
+    console.error('no user context!');
+    throw new Error('no user context');
+  }
+
   if (objectType === "Group") {
     Alert.alert(
       "Delete Group",
@@ -17,8 +31,24 @@ const showAlert = (objectId: string, objectType: string) => {
           style: "cancel"
         },
         {
-          text: "Acknowledge",
-          onPress: () => console.log("OK pressed")
+          text: "Delete",
+          onPress: () => {async () => {
+            const response: boolean | null = await backendContext.deleteGroupAPI(objectId);
+            if (response) {
+              for (let i = 0; i < userContext.groupList.length; i++) {
+                if (userContext.groupList[i].groupId === objectId) {
+                  userContext.removeGroupFromList(i);
+                  break;
+                }
+                if (i == userContext.groupList.length-1) {
+                  throw new Error(`Group ID was not found in the user's group list.`);
+                }
+              }
+            } else {
+              console.error('Error when removing the groupId');
+              Alert.alert('Error when removing the group!');
+            }
+          }}
         }
       ]
     );

@@ -1,6 +1,6 @@
 import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
 import { Camera } from '../cameras/camera.entity';
 import { Group } from '../groups/group.entity';
@@ -74,36 +74,33 @@ export class UsersService {
    * Deletes a given group from the user's list of created groups.
    *
    * @param userId the user's ID
-   * @param groupObj the Group that the user wants to delete
+   * @param groupId the group ID that is going to be deleted
    */
-  public async deleteGroup(
-    userId: string,
-    groupObj: Group, // it would be ideal to send the Group object and not the Group id/name since we need the object for removing it from mikroorm.
-  ): Promise<Boolean> {
-    // find and populate user.groups and user.groups.cameras
-    const user = await this.usersRepository.findOne(
-      { id: userId },
-      { populate: ['groups', 'groups.cameras'] },
-    )
+  public async deleteGroup(userId: string, groupId: string): Promise<boolean> {
+    // finds user and then groupObj from the parameters.
+    const user = await this.usersRepository.findOne({ id: userId });
 
     if (user == null) {
       throw new NotFoundError(`User with ID "${userId}" does not exist`);
     }
 
-    if (user.id != userId) {
-      throw new NotFoundError(`Pulled user with wrong ID!`);
+    const groupObj = await this.groupRepository.findOne(
+      { id: groupId },
+      { populate: ['cameras'] },
+    );
+
+    if (groupObj == null) {
+      throw new NotFoundError(`Group with ID "${groupId}" does not exist`);
     }
-    // checks if the groupObj is not in the list of groups for the user.
-    if (!user.groups.contains(groupObj)) {
-      throw new NotFoundError(`Group "${groupObj.name}" was not found in the list of groups`)
-    }
+
     // ensures that no cameras are in the group.
     if (groupObj.cameras.length != 0) {
-      throw new Error(`Group "${groupObj.name}" is not empty and still has cameras associated with it on the backend.`)
-    } 
- 
-    //user.groups.remove(groupObj);
-    this.usersRepository.remove(groupObj);
+      throw new Error(
+        `Group "${groupObj.name}" is not empty and still has cameras associated with it on the backend.`,
+      );
+    }
+
+    user.groups.remove(groupObj);
     await this.usersRepository.flush();
 
     return true;

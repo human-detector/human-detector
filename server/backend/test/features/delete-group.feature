@@ -9,10 +9,10 @@ Scenario: Deleting a group with no cameras in it
 Scenario: Deleting a group with 1 camera in it
   Given I have a valid group ID and 1 camera attached to it
   When I request to delete the group
-  Then I will receive an error
+  Then I will receive a Not Found Error
   And the group will still be active
 
 Scenario: Deleting a group with an invalid group ID
   Given I have an invalid group ID
   When I request to delete the group
-  Then I will receive an error
+  Then I will receive a Not Found Error

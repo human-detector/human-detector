@@ -29,7 +29,9 @@ export class Camera {
   @ManyToOne(() => Group)
   group: Group;
 
-  @OneToMany(() => Notification, (notification) => notification.camera)
+  @OneToMany(() => Notification, (notification) => notification.camera, {
+    orphanRemoval: true,
+  })
   notifications = new Collection<Notification>(this);
 
   constructor(name: string, publicKey: string, serial: string) {

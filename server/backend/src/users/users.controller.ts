@@ -7,11 +7,13 @@ import {
   Inject,
   Param,
   Put,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
 import { JwtIdentityGuard } from '../auth/jwt-identity.guard';
 import { NotFoundError } from '../errors.types';
 import { UsersService } from './users.service';
+import { UnauthorizedException } from '@nestjs/common/exceptions';
 
 export type GetGroupsOutput = {
   id: string;
@@ -88,6 +90,23 @@ export class UsersController {
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  @Delete(':id/groups')
+  async deleteGroup(
+    @Param('id') userId: string,
+    @Body('name') groupId: string,
+  ): Promise<boolean> {
+    try {
+      const groupRemoved = await this.usersService.deleteGroup(userId, groupId);
+      return groupRemoved;
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new UnauthorizedException();
       } else {
         throw error;
       }

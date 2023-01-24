@@ -20,6 +20,6 @@ export class User {
   @Property({ nullable: true })
   expoToken?: string;
 
-  @OneToMany(() => Group, (group) => group.user)
+  @OneToMany(() => Group, (group) => group.user, { orphanRemoval: true })
   groups = new Collection<Group>(this);
 }

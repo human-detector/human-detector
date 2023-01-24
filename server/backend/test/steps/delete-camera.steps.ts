@@ -15,7 +15,6 @@ import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from '../../src/cameras/push-notifi
 import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
 import { notificationWithDummySnapshot } from '../helpers/notification';
 
-
 const feature = loadFeature('test/features/delete-camera.feature');
 
 defineFeature(feature, (test) => {
@@ -25,9 +24,11 @@ defineFeature(feature, (test) => {
   let em: EntityManager;
 
   beforeAll(async () => {
-    testStack = await buildTestStack({ imports: [CamerasModule] }, (builder) => 
+    testStack = await buildTestStack({ imports: [CamerasModule] }, (builder) =>
       Promise.resolve(
-        builder.overrideProvider(IPUSH_NOTIFICATIONS_SERVICE_TOKEN).useValue('bogus'),
+        builder
+          .overrideProvider(IPUSH_NOTIFICATIONS_SERVICE_TOKEN)
+          .useValue('bogus'),
       ),
     );
 
@@ -42,7 +43,7 @@ defineFeature(feature, (test) => {
     await app.close();
     await testStack.dbContainer.stop();
     await testStack.kcContainer.stop();
-  })
+  });
 
   test('Deleting a camera with 0 notifications', ({
     given,
@@ -56,7 +57,10 @@ defineFeature(feature, (test) => {
     let getRes: request.Response;
 
     given('I have a valid camera ID', async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'totally-legit');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'totally-legit',
+      );
       cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();
@@ -82,7 +86,7 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test('Deleting a camera with 3 notifications', ({
+  test('Deleting a camera with 2 notifications', ({
     given,
     and,
     when,
@@ -95,7 +99,10 @@ defineFeature(feature, (test) => {
     let getNotifRes: request.Response;
 
     given('I have a valid camera ID', async () => {
-      const { camera, keyPair } = createCameraWithKeyPair('Camera-A', 'totally-legit');
+      const { camera, keyPair } = createCameraWithKeyPair(
+        'Camera-A',
+        'totally-legit',
+      );
       cameraA = camera;
       cameraA.group = new Group('group');
       cameraA.group.user = new User();
@@ -110,7 +117,7 @@ defineFeature(feature, (test) => {
     when('I request to delete the camera', async () => {
       deleteRes = await request(app.getHttpServer())
         .delete(`/cameras/${cameraA.id}`)
-        .set('Authorization', token); // might need to also delete the notifications here as well.
+        .set('Authorization', token);
     });
     then('the camera will be deleted', () => {
       expect(deleteRes.status).toBe(200);
@@ -119,8 +126,8 @@ defineFeature(feature, (test) => {
       getNotifRes = await request(app.getHttpServer())
         .get(`/cameras/${cameraA.id}/notifications`)
         .set('Authorization', token);
-      expect(getNotifRes.status).toBe(404);
-    })
+      expect(getNotifRes.status).toBe(403);
+    });
     and('the camera is no longer on the backend', async () => {
       getCamRes = await request(app.getHttpServer())
         .get(`/cameras/${cameraA.id}`)
@@ -128,7 +135,7 @@ defineFeature(feature, (test) => {
       expect(getCamRes.status).toBe(404);
     });
   });
-  
+
   test('Trying to delete a camera that does not exist', ({
     given,
     when,
@@ -149,6 +156,6 @@ defineFeature(feature, (test) => {
     });
     then("a 'Forbidden' error will be received", () => {
       expect(res.status).toBe(403);
-    })
+    });
   });
 });

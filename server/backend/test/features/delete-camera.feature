@@ -7,7 +7,7 @@ Scenario: Deleting a camera with 0 notifications
   Then the camera will be deleted
   And the camera is no longer on the backend
 
-Scenario: Deleting a camera with 3 notifications
+Scenario: Deleting a camera with 2 notifications
   Given I have a valid camera ID
   And the camera has 2 notifications associated with it
   When I request to delete the camera

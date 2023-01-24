@@ -87,6 +87,12 @@ export class CdkStack extends cdk.Stack {
       ec2.Port.tcp(443),
       "Allow inbound HTTPS from anyone"
     );
+    // FIXME: this is hardcoded for us-west-2's Instance Connect range
+    app.connections.allowFrom(
+      ec2.Peer.ipv4("18.237.140.160/29"),
+      ec2.Port.tcp(22),
+      "EC2 Instance Connect"
+    );
     db.connections.allowFrom(
       app,
       ec2.Port.tcp(dbPort),

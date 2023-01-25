@@ -31,14 +31,14 @@ const showAlert = (groupId: string, cameraId: string) => {
         text: "Delete",
         onPress: () => {async () => {
           const response: boolean | null = await backendContext.deleteCameraAPI(groupId, cameraId);
-          if (response) {
+          if (response) { // if backend deletion was successful, moves onto deleting it for the user.
             const groupObj = userContext.getGroupFromId(groupId);
             if (groupObj) {
               const cameraObj = groupObj.getCameraFromId(cameraId);
-              if (cameraObj) {
-                cameraObj.notifications = [];
+              if (cameraObj) { // "removes" the notifications and the camera.
+                cameraObj.notifications = []; 
                 const camIndex = groupObj.cameras.indexOf(cameraObj);
-                groupObj.removeCameraFromGroup(camIndex); // can I do it like this or do i have to start with the userContext even though groupObj is from userContext
+                groupObj.removeCameraFromGroup(camIndex); 
               }
             }
           }
@@ -48,7 +48,8 @@ const showAlert = (groupId: string, cameraId: string) => {
   );
 };
 
-export default function DeleteButton(props: { groupId: string, cameraId: string }): React.ReactElement {
+export default function DeleteCameraButton(props: { groupId: string, cameraId: string }): React.ReactElement {
+  // MOVE USER CONTEXT AND BACKENDCONTEXT TO HERE AND ADD PARAMETERS
   const { groupId, cameraId } = props;
   return (
     <TouchableOpacity 

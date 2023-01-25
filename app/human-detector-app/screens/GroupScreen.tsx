@@ -2,10 +2,10 @@ import * as React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import DeleteButton from '../components/DeleteCameraButton';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 import { UserContext } from '../contexts/userContext';
 import { styles } from '../src/styles';
+import DeleteGroupButton from '../components/DeleteGroupButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>;
 export default function GroupScreen({ navigation }: Props): React.ReactElement {
@@ -35,7 +35,7 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
               }}
             >
               <Text style={styles.menuButtonText}> {item.groupName} </Text>
-              <DeleteButton objectId={item.groupId} />
+              <DeleteGroupButton groupId={item.groupId} />
             </TouchableOpacity>
           </View>
         ))}

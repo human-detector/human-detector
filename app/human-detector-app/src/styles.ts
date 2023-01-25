@@ -9,7 +9,8 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   menuItemSettingsButton: {
     alignSelf: 'flex-end',
-    alignItems: 'center',
+    padding: 7,
+    marginBottom: -7,
   },
   centerIcon: {
     alignItems: 'center',

@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import CameraSettingsButton from '../components/CameraSettingsButton';
 import { UserContext } from '../contexts/userContext';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 import { styles } from '../src/styles';
+import DeleteCameraButton from '../components/DeleteCameraButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>;
 export default function CameraScreen({ navigation, route }: Props): React.ReactElement {
@@ -37,7 +37,7 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
               }}
             >
               <Text style={styles.menuButtonText}> {item.cameraName} </Text>
-              <CameraSettingsButton cameraId={item.cameraId} />
+              <DeleteCameraButton groupId={groupId} cameraId={item.cameraId} />
             </TouchableOpacity>
           </View>
         ))}

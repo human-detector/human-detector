@@ -9,8 +9,21 @@ import * as assets from "aws-cdk-lib/aws-s3-assets";
 import { readFileSync } from "fs";
 import { cwd } from "process";
 
+export interface CdkStackConfig {
+  // Domain name that should point at the app
+  appDomainName: string;
+  // Hostname of the configured auth provider (e.g. URL of a Keycloak realm or Cognito user pool).
+  authProviderHostname: string;
+  expoAccessToken: string;
+}
+
 export class CdkStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    config: CdkStackConfig,
+    props?: cdk.StackProps
+  ) {
     super(scope, id, props);
 
     // TODO: setup cognito (user pools, clients, domain names etc.)
@@ -52,8 +65,8 @@ export class CdkStack extends cdk.Stack {
       DB_HOST: db.dbInstanceEndpointAddress,
       DB_NAME: "TODO",
       DB_USER: "postgres",
-      AUTH_HOST: "TODO",
-      EXPO_ACCESS_TOKEN: "TODO how we gonna do this one? CDK config file?",
+      AUTH_HOST: config.authProviderHostname,
+      EXPO_ACCESS_TOKEN: config.expoAccessToken ?? "",
     };
     const userData = readFileSync(path.join(cwd(), "assets", "userdata.sh"))
       .toString()

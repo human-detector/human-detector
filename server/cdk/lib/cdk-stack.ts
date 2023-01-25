@@ -6,6 +6,9 @@ import * as rds from "aws-cdk-lib/aws-rds";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as assets from "aws-cdk-lib/aws-s3-assets";
+import * as elb from "aws-cdk-lib/aws-elasticloadbalancingv2";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
+import * as autoscaling from "aws-cdk-lib/aws-autoscaling";
 import { readFileSync } from "fs";
 import { cwd } from "process";
 
@@ -81,39 +84,72 @@ export class CdkStack extends cdk.Stack {
           .join("\n")
       );
 
-    const app = new ec2.Instance(this, "AppServer", {
-      vpc,
-      vpcSubnets: {
-        subnetType: ec2.SubnetType.PUBLIC,
-      },
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
-        ec2.InstanceSize.MICRO
-      ),
-      machineImage: ec2.MachineImage.latestAmazonLinux({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
-        userData: ec2.UserData.custom(userData),
-      }),
-    });
-    app.connections.allowFromAnyIpv4(
-      ec2.Port.tcp(443),
-      "Allow inbound HTTPS from anyone"
+    const appScalingGroup = new autoscaling.AutoScalingGroup(
+      this,
+      "AppAutoScalingGroup",
+      {
+        // We really only want an ASG at the moment for NLB's TLS termination, so only create 1 EC2 instance
+        minCapacity: 1,
+        desiredCapacity: 1,
+        maxCapacity: 1,
+
+        vpc,
+        vpcSubnets: {
+          subnetType: ec2.SubnetType.PUBLIC,
+        },
+        instanceType: ec2.InstanceType.of(
+          ec2.InstanceClass.T3,
+          ec2.InstanceSize.MICRO
+        ),
+        machineImage: ec2.MachineImage.latestAmazonLinux({
+          generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+          userData: ec2.UserData.custom(userData),
+        }),
+      }
     );
     // FIXME: this is hardcoded for us-west-2's Instance Connect range
-    app.connections.allowFrom(
+    appScalingGroup.connections.allowFrom(
       ec2.Peer.ipv4("18.237.140.160/29"),
       ec2.Port.tcp(22),
       "EC2 Instance Connect"
     );
     db.connections.allowFrom(
-      app,
+      appScalingGroup,
       ec2.Port.tcp(dbPort),
       "Allow database connections from webserver"
     );
     // Permissions needed for bootstrapping in userdata
-    db.secret?.grantRead(app.role);
-    appSourceBundle.grantRead(app.role);
-    appSystemdUnit.grantRead(app.role);
+    db.secret?.grantRead(appScalingGroup.role);
+    appSourceBundle.grantRead(appScalingGroup.role);
+    appSystemdUnit.grantRead(appScalingGroup.role);
+
+    // Set up a load balancer for TLS termination
+    const loadBalancer = new elb.NetworkLoadBalancer(this, "AppNLB", {
+      vpc,
+      internetFacing: true,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC,
+      },
+    });
+    const appCert = new acm.Certificate(this, "AppCert", {
+      domainName: config.appDomainName,
+      validation: acm.CertificateValidation.fromDns(),
+    });
+    const tlsListener = new elb.NetworkListener(this, "TLSListener", {
+      loadBalancer,
+      port: 443,
+      certificates: [appCert],
+    });
+    const appPort = 3000;
+    tlsListener.addTargets("TCPListenerTargets", {
+      port: appPort,
+      targets: [appScalingGroup],
+    });
+    // NLB needs access
+    appScalingGroup.connections.allowFrom(
+      ec2.Peer.ipv4(vpc.vpcCidrBlock),
+      ec2.Port.tcp(3000)
+    );
 
     /* Cognito */
     const syncLambda = new lambda.Function(this, "SyncUsersLambda", {

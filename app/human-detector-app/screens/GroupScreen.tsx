@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import DeleteButton from '../components/DeleteButton';
+import DeleteButton from '../components/DeleteCameraButton';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 import { UserContext } from '../contexts/userContext';
 import { styles } from '../src/styles';
@@ -35,7 +35,7 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
               }}
             >
               <Text style={styles.menuButtonText}> {item.groupName} </Text>
-              <DeleteButton objectId={item.groupId} objectType="Group" />
+              <DeleteButton objectId={item.groupId} />
             </TouchableOpacity>
           </View>
         ))}

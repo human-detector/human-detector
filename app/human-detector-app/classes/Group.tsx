@@ -16,6 +16,13 @@ export default class Group {
     this.cameras = cameras;
   }
 
+  getCameraFromId(cameraId: string): Camera | undefined {
+    if (this.cameras.find((camera) => camera.cameraId === cameraId)) {
+      return this.cameras.find((camera) => camera.cameraId === cameraId);
+    }
+    throw new Error("Group doesn't exist!");
+  }
+
   addCameraToGroup(newCam: Camera) {
     this.cameras.push(newCam);
   }

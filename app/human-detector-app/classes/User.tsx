@@ -15,10 +15,9 @@ export default class User {
     this.username = username;
     this.userId = userId; // Should always be from authorization token
     this.groupList = groupList;
-    
   }
 
-  getGroupFromId(groupId: string) {
+  getGroupFromId(groupId: string): Group | undefined {
     if (this.groupList.find((group) => group.groupId === groupId)) {
       return this.groupList.find((group) => group.groupId === groupId);
     }
@@ -38,16 +37,15 @@ export default class User {
   }
 
   getAllNotifications(): Notification[] {
-    const notifs: Notification[] = []
+    const notifs: Notification[] = [];
 
     this.groupList.map((group) => {
       group.cameras.map((cam) => {
         cam.notifications.map((notif) => {
           notifs.push(notif);
-        })
-      })
-    })
+        });
+      });
+    });
     return notifs;
   }
-
 }

@@ -5,5 +5,5 @@ After=network.target
 
 [Service]
 WorkingDirectory=/usr/src/app
-ExecStart=node /usr/src/app/dist/index.js
+ExecStart=/usr/bin/npm run start:prod
 EnvironmentFile=/etc/sysconfig/app

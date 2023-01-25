@@ -57,16 +57,15 @@ export class CdkStack extends cdk.Stack {
     };
     const userData = readFileSync(path.join(cwd(), "assets", "userdata.sh"))
       .toString()
+      .replace("$AWS_REGION", cdk.Stack.of(this).region)
       .replace("$APP_SOURCE_S3_OBJ_URL", appSourceBundle.s3ObjectUrl)
       .replace("$APP_SYSTEMD_SERVICE_S3_OBJ_URL", appSystemdUnit.s3ObjectUrl)
       .replace("$APP_DB_PASSWORD_SECRET_ARN", db.secret?.secretFullArn!)
       .replace(
         "$INSERT_ENVIRONMENTFILE_HERE",
-        "cat << EOF\n" +
-          Array.from(Object.entries(appEnvironment))
-            .map(([key, val]) => `${key}=${val}`)
-            .join("\n") +
-          "\nEOF\n"
+        Array.from(Object.entries(appEnvironment))
+          .map(([key, val]) => `${key}=${val}`)
+          .join("\n")
       );
 
     const app = new ec2.Instance(this, "AppServer", {

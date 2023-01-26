@@ -152,6 +152,9 @@ export default function App(): React.ReactElement {
   const user: User = backendService.getUser();
   user.groupList = groups;
 
+  // Put all the cameras in a map
+  user.makeCameraMapFromGroups();
+
   return (
     <NavigationContainer ref={navigatorRef}>
       <UserContext.Provider value={user}>

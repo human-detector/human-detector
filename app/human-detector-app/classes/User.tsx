@@ -2,6 +2,7 @@
 /* eslint-disable array-callback-return */
 
 import Group from './Group';
+import Camera from './Camera';
 import Notification from './Notification';
 
 export default class User {
@@ -11,10 +12,13 @@ export default class User {
 
   groupList: Group[];
 
+  cameraMap: Map<string, Camera>;
+
   constructor(username: string, userId: string, groupList: Group[]) {
     this.username = username;
     this.userId = userId; // Should always be from authorization token
     this.groupList = groupList;
+    this.cameraMap = new Map<string, Camera>();
   }
 
   getGroupFromId(groupId: string): Group | undefined {
@@ -47,5 +51,13 @@ export default class User {
       });
     });
     return notifs;
+  }
+
+  makeCameraMapFromGroups(): void {
+    this.groupList.map((group) => {
+      group.cameras.map((cam) => {
+        this.cameraMap.set(cam.cameraId, cam);
+      });
+    });
   }
 }

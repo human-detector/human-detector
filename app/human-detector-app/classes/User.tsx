@@ -2,6 +2,7 @@
 /* eslint-disable array-callback-return */
 
 import Group from './Group';
+import Camera from './Camera';
 import Notification from './Notification';
 
 export default class User {
@@ -11,14 +12,16 @@ export default class User {
 
   groupList: Group[];
 
+  cameraMap: Map<string, Camera>;
+
   constructor(username: string, userId: string, groupList: Group[]) {
     this.username = username;
     this.userId = userId; // Should always be from authorization token
     this.groupList = groupList;
-    
+    this.cameraMap = new Map<string, Camera>();
   }
 
-  getGroupFromId(groupId: string) {
+  getGroupFromId(groupId: string): Group | undefined {
     if (this.groupList.find((group) => group.groupId === groupId)) {
       return this.groupList.find((group) => group.groupId === groupId);
     }
@@ -38,16 +41,23 @@ export default class User {
   }
 
   getAllNotifications(): Notification[] {
-    const notifs: Notification[] = []
+    const notifs: Notification[] = [];
 
     this.groupList.map((group) => {
       group.cameras.map((cam) => {
         cam.notifications.map((notif) => {
           notifs.push(notif);
-        })
-      })
-    })
+        });
+      });
+    });
     return notifs;
   }
 
+  makeCameraMapFromGroups(): void {
+    this.groupList.forEach((group) => {
+      group.cameras.forEach((cam) => {
+        this.cameraMap.set(cam.cameraId, cam);
+      });
+    });
+  }
 }

@@ -56,7 +56,7 @@ export default function App(): React.ReactElement {
         navigatorRef.isReady()
       ) {
         navigatorRef.navigate('Snapshot', {
-          snapshotId: notificationParse.data.notification.snapshotId,
+          snapshotId: notificationParse.data.snapshotId,
         });
       }
     });
@@ -113,7 +113,7 @@ export default function App(): React.ReactElement {
                         (cam) => cam.cameraId === pushNotificationData.cameraId
                       );
                       if (camera === undefined) {
-                        const notificationId = pushNotificationData.notification.id;
+                        const notificationId = pushNotificationData;
                         console.log(
                           `Received notification with ID "${notificationId}", which isn't associated with any known cameras.`
                         );
@@ -123,7 +123,7 @@ export default function App(): React.ReactElement {
                       // Don't notify again for a notification that has already been received
                       if (
                         camera.notifications.find(
-                          (notification) => notification.id === pushNotificationData.notification.id
+                          (notification) => notification.id === pushNotificationData.id
                         )
                       ) {
                         console.log('Ignoring notification', { pushNotificationData });
@@ -131,7 +131,7 @@ export default function App(): React.ReactElement {
                       }
 
                       // FIXME: this doesn't cause a re-render if the notification is received while on the notifications screen
-                      camera.notifications.push(pushNotificationData.notification);
+                      camera.notifications.push(pushNotificationData);
                       return {
                         shouldShowAlert: true,
                         shouldPlaySound: true,
@@ -151,6 +151,9 @@ export default function App(): React.ReactElement {
   // If the user is logged in return the stack with all the information
   const user: User = backendService.getUser();
   user.groupList = groups;
+
+  // Put all the cameras in a map
+  user.makeCameraMapFromGroups();
 
   return (
     <NavigationContainer ref={navigatorRef}>

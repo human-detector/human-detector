@@ -104,4 +104,33 @@ export const styles = StyleSheet.create({
     marginTop: 200,
     color: '#696969',
   },
+  notificationMenuItem: {
+    padding: 10,
+    backgroundColor: '#EDEDED',
+    fontSize: 24,
+    borderWidth: 1,
+    borderColor: '#D3D3D3',
+  },
+  dateText: {
+    fontSize: 20,
+    padding: 0,
+  },
+  notificationTimeText: {
+    flex: 1,
+    textAlign: 'left',
+    fontSize: 16,
+    color: '#949292',
+  },
+  notificationBottomText: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cameraNameText: {
+    flex: 1,
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'right',
+  },
 });

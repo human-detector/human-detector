@@ -75,7 +75,13 @@ describe(BackendService, () => {
             id: '473843',
             name: 'cameraname2',
             notifications: [
-              { id: '48374834', timestamp: '2022-06-14T03:24:00', snapshotId: 'test' },
+              {
+                id: '48374834',
+                timestamp: '2022-06-14T03:24:00',
+                snapshotId: 'test',
+                groupId: 'id',
+                cameraId: '473843',
+              },
             ],
           },
         ],
@@ -86,7 +92,7 @@ describe(BackendService, () => {
         new Group('group1', 'id', [
           new Camera('cameraname', '4324324', []),
           new Camera('cameraname2', '473843', [
-            new Notification('48374834', new Date('2022-06-14T03:24:00'), 'test'),
+            new Notification('48374834', new Date('2022-06-14T03:24:00'), 'test', 'id', '473843'),
           ]),
         ]),
       ];
@@ -120,8 +126,20 @@ describe(BackendService, () => {
       mockTokenManager.getUser.mockReturnValue(newUser);
 
       // make notification array
-      const notif1: Notification = new Notification('e', '2022-06-14T03:24:00', 'bee');
-      const notif2: Notification = new Notification('a', '2007-12-27T00:00:00', 'wawa');
+      const notif1: Notification = new Notification(
+        'e',
+        '2022-06-14T03:24:00',
+        'bee',
+        'groupId',
+        'cameraId'
+      );
+      const notif2: Notification = new Notification(
+        'a',
+        '2007-12-27T00:00:00',
+        'wawa',
+        'groupId',
+        'cameraId'
+      );
 
       const notifHistory: Notification[] = [notif1, notif2];
 

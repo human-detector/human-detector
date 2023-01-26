@@ -54,8 +54,8 @@ export default class User {
   }
 
   makeCameraMapFromGroups(): void {
-    this.groupList.map((group) => {
-      group.cameras.map((cam) => {
+    this.groupList.forEach((group) => {
+      group.cameras.forEach((cam) => {
         this.cameraMap.set(cam.cameraId, cam);
       });
     });

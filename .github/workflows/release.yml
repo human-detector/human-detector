@@ -10,6 +10,17 @@ on:
     types: [published]
 
 jobs:
+  trigger_pi_build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Repository Dispatch
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.PI_GEN_PAT }}
+        repository: eyespy-cam/pi-gen
+        event-type: eyespy-release
+        client-payload: '{"eyespy_tag ": "${{ github.ref }}"}'
+        
   build:
     env:
       GH_TOKEN: ${{ github.token }}

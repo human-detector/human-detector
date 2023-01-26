@@ -48,5 +48,5 @@ jobs:
         run: file human-detector-app.apk
         
       - name: Upload binaries to release
-        run: gh release upload ${{ github.event.release.upload_url }} human-detector-app.apk
+        run: gh release upload ${{ github.ref_name }} human-detector-app.apk
         if: ${{ github.event_name == 'release' }}

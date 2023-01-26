@@ -15,7 +15,7 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
     Alert.alert('Error when removing the group!');
   }
 
-  if (groupObj?.cameras.length == 0) { // when there are no cameras, should popup delete alert
+  if (groupObj?.cameras.length === 0) { // when there are no cameras, should popup delete alert
     Alert.alert(
       "Delete Group",
       "Would you like to delete this Group?",
@@ -45,7 +45,7 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
               const group = userContext.getGroupFromId(groupId);
               if (group) {
                 const groupIndex = userContext.groupList.indexOf(group);
-                if (groupIndex != -1) { // removes the group if it finds the index
+                if (groupIndex !== -1) { // removes the group if it finds the index
                   userContext.removeGroupFromList(groupIndex);
                 } else { // did not find the index.
                   console.error(`Trying to find the index of the group to be removed was not successful`);

@@ -4,20 +4,10 @@ import {  FontAwesome5 } from '@expo/vector-icons';
 import { styles } from '../src/styles';
 import { BackendContext } from '../contexts/backendContext';
 import { UserContext } from '../contexts/userContext';
+import BackendService from '../services/backendService';
+import User from '../classes/User';
 
-const showAlert = (groupId: string, cameraId: string) => {
-  const backendContext = React.useContext(BackendContext);
-  const userContext = React.useContext(UserContext);
-
-  if (!backendContext) {
-    console.error('no backend context!');
-    throw new Error('no backend context');
-  }
-  if (!userContext) {
-    console.error('no user context!');
-    throw new Error('no user context');
-  }
-
+const showAlert = (groupId: string, cameraId: string, backendContext: BackendService, userContext: User) => {
   Alert.alert(
     "Delete Camera",
     "Would you like to delete this Camera?\nWARNING: This will delete all notifications tied to this Camera.",
@@ -30,8 +20,8 @@ const showAlert = (groupId: string, cameraId: string) => {
       {
         text: "Delete",
         onPress: () => {async () => {
-          const response: boolean | null = await backendContext.deleteCameraAPI(groupId, cameraId);
-          if (response) { // if backend deletion was successful, moves onto deleting it for the user.
+          const response: number | null = await backendContext.deleteCameraAPI(groupId, cameraId);
+          if (response === 200) { // if backend deletion was successful, moves onto deleting it for the user.
             const groupObj = userContext.getGroupFromId(groupId);
             if (groupObj) {
               const cameraObj = groupObj.getCameraFromId(cameraId);
@@ -49,13 +39,23 @@ const showAlert = (groupId: string, cameraId: string) => {
 };
 
 export default function DeleteCameraButton(props: { groupId: string, cameraId: string }): React.ReactElement {
-  // MOVE USER CONTEXT AND BACKENDCONTEXT TO HERE AND ADD PARAMETERS
+  const backendContext = React.useContext(BackendContext);
+  const userContext = React.useContext(UserContext);
+
+  if (!backendContext) {
+    console.error('no backend context!');
+    throw new Error('no backend context');
+  }
+  if (!userContext) {
+    console.error('no user context!');
+    throw new Error('no user context');
+  }
   const { groupId, cameraId } = props;
   return (
     <TouchableOpacity 
       style={styles.menuItemSettingsButton}
       onPress={() => {
-        showAlert(groupId, cameraId);
+        showAlert(groupId, cameraId, backendContext, userContext);
       }}
     >
       <FontAwesome5 name="trash" size={24} color="black" />

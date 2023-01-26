@@ -35,7 +35,7 @@ defineFeature(feature, (test) => {
     em = testStack.module.get<MikroORM>(MikroORM).em.fork();
     cameraRepository = em.getRepository(Camera);
 
-    app = testStack.module.createNestApplication();
+    app = await testStack.module.createNestApplication();
     await app.init();
   }, TEST_STACK_TIMEOUT);
 

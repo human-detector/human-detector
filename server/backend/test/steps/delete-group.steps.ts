@@ -37,57 +37,19 @@ defineFeature(feature, (test) => {
 
     usersRepository = em.getRepository(User);
 
-    app = testStack.module.createNestApplication();
+    app = await testStack.module.createNestApplication();
     await app.init();
   }, TEST_STACK_TIMEOUT);
-  //jest.setTimeout(25000);
+
   afterAll(async () => {
     await app.close();
     await testStack.dbContainer.stop();
     await testStack.kcContainer.stop();
   });
 
-  test('Deleting a group with no cameras in it', ({
-    given,
-    and,
-    when,
-    then,
-  }) => {
-    let groupA: Group;
-    let userA: User;
-    let deleteRes: request.Response;
-    let token: string;
-    let groupId: string;
-    let userId: string;
-
-    given('I have a valid group ID', async () => {
-      const { id, tokenSet } =
-        await testStack.kcContainer.createDummyUserAndLogIn('UserA');
-      userA = await usersRepository.findOneOrFail(
-        { id },
-        { populate: ['groups'] },
-      );
-
-      groupA = new Group('Group-A');
-      userA.groups.add(groupA);
-      await usersRepository.flush();
-      token = tokenSet.access_token;
-    });
-    and('the group has no cameras associated with it', () => {
-      expect(groupA.cameras.length).toBe(0);
-    });
-    when('I request to delete the group', async () => {
-      deleteRes = await request(app.getHttpServer())
-        .delete(`/groups/${groupA.id}`)
-        .auth(token, { type: 'bearer' });
-    });
-    then('the group will be deleted', async () => {
-      expect(deleteRes.status).toBe(200);
-    });
-  });
-
   test('Deleting a group with 1 camera in it', ({ given, and, when, then }) => {
     let cameraA: Camera;
+    let userA: User;
     let token: string;
     let deleteRes: request.Response;
     let getRes: request.Response;
@@ -99,36 +61,82 @@ defineFeature(feature, (test) => {
       );
       cameraA = camera;
       cameraA.group = new Group('the-group');
-      cameraA.group.user = new User();
-      await groupRepository.persistAndFlush(cameraA.group);
+      userA = new User();
+      cameraA.group.user = userA;
+      await usersRepository.flush();
+      await groupRepository.flush();
       token = getCameraAuthToken(cameraA, keyPair.privateKey);
     });
     when('I request to delete the group', async () => {
-      deleteRes = await request(app.getHttpServer())
-        .delete(`/groups/${cameraA.group.id}`)
-        .set('Authorization', token);
+      deleteRes = await request(app.getHttpServer()).delete(
+        `/users/${userA.id}/groups/${cameraA.group.id}`,
+      );
     });
     then('I will receive a Not Found Error', () => {
       expect(deleteRes.status).toBe(404);
     });
     and('the group will still be active', async () => {
       getRes = await request(app.getHttpServer())
-        .get(`/groups/${cameraA.group.id}`)
+        .get(`/users/${userA.id}/groups/${cameraA.group.id}`)
         .set('Authorization', token);
       expect(getRes.status).toBe(200);
     });
   });
 
+  test('Deleting a group with no cameras in it', ({
+    given,
+    and,
+    when,
+    then,
+  }) => {
+    let groupB: Group;
+    let userB: User;
+    let token: string;
+    let deleteRes: request.Response;
+    let getRes: request.Response;
+
+    given('I have a valid group ID', async () => {
+      const { id, tokenSet } =
+        await testStack.kcContainer.createDummyUserAndLogIn('UserA');
+      userB = await usersRepository.findOneOrFail(
+        { id },
+        { populate: ['groups'] },
+      );
+
+      groupB = new Group('Group-A');
+      userB.groups.add(groupB);
+      await usersRepository.flush();
+      token = tokenSet.access_token;
+    });
+    and('the group has no cameras associated with it', () => {
+      expect(groupB.cameras.length).toBe(0);
+    });
+    when('I request to delete the group', async () => {
+      deleteRes = await request(app.getHttpServer()).delete(
+        `/users/${userB.id}/groups/${groupB.id}`,
+      );
+    });
+    then('the group will be deleted', async () => {
+      expect(deleteRes.status).toBe(200);
+      getRes = await request(app.getHttpServer())
+        .get(`/users/${userB.id}/groups/${groupB.id}`)
+        .set('Authorization', token);
+      expect(getRes.status).toBe(404);
+    });
+  });
+
   test('Deleting a group with an invalid group ID', ({ given, when, then }) => {
     let deleteRes: request.Response;
+    let userC: User;
     let groupId: string;
 
     given('I have an invalid group ID', () => {
       groupId = 'not-real-id';
+      userC = new User();
     });
     when('I request to delete the group', async () => {
       deleteRes = await request(app.getHttpServer()).delete(
-        `/groups/${groupId}`,
+        `/users/${userC.id}/groups/${groupId}`,
       );
     });
     then('I will receive a Not Found Error', () => {

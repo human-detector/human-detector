@@ -52,3 +52,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./app/human-detector-app/*.apk
           tag: ${{ github.ref }}
+          file_glob: true

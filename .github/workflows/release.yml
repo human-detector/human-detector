@@ -1,5 +1,9 @@
 name: release
 
+# Need write permission to release
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
   release:

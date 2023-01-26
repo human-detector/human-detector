@@ -7,6 +7,10 @@ on:
 
 jobs:
   build:
+    # This only works on "run" commands
+    defaults:
+      run:
+        working-directory: ./app/human-detector-app
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Setup repo
@@ -35,5 +39,16 @@ jobs:
           eas build --local \
           --platform=android \
           --profile=production \
-          --output=./app-build
+          --output=human-detector-app.apk \
           --non-interactive
+          
+      - name: List eas output
+        run: file human-detector-app.apk
+        
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        if: ${{ github.event_name == 'release' }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./app/human-detector-app/*.apk
+          tag: ${{ github.ref }}

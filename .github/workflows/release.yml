@@ -1,6 +1,7 @@
 name: release
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -25,6 +26,14 @@ jobs:
 
       - name: 📦 Install dependencies
         run: npm install
+        
+      - name: 🏗 Setup EAS Local builds
+        run: npm install -g eas-cli-local-build-plugin
 
       - name: 🚀 Build app
-        run: eas build --non-interactive
+        run: |
+          eas build --local \
+          --platform=android \
+          --profile=production \
+          --output=./app-build
+          --non-interactive

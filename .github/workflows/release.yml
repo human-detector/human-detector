@@ -39,11 +39,11 @@ jobs:
           eas build --local \
           --platform=android \
           --profile=production \
-          --output=./app-build \
+          --output=human-detector-app.apk \
           --non-interactive
           
       - name: List eas output
-        run: ls -a ./app-build
+        run: file human-detector-app.apk
         
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2

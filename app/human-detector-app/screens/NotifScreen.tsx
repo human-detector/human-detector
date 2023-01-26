@@ -38,11 +38,7 @@ export default function NotifScreen({ navigation, route }: Props): React.ReactEl
                   {notification.timestamp.toLocaleTimeString(undefined, { hour12: true })}
                 </Text>
                 <Text style={styles.cameraNameText} numberOfLines={1}>
-                  {
-                    userContext
-                      .getGroupFromId(notification.groupId)
-                      ?.getCameraFromId(notification.cameraId)?.cameraName
-                  }
+                  {userContext.cameraMap.get(notification.cameraId)?.cameraName}
                 </Text>
               </View>
             </TouchableOpacity>

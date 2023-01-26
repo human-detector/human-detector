@@ -7,6 +7,10 @@ on:
 
 jobs:
   build:
+    # This only works on "run" commands
+    defaults:
+      run:
+        working-directory: ./app/human-detector-app
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Setup repo

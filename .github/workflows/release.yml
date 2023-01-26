@@ -1,0 +1,39 @@
+name: release
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v3
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: 🏗 Setup Expo and EAS
+        uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: npm install
+        
+      - name: 🏗 Setup EAS Local builds
+        run: npm install -g eas-cli-local-build-plugin
+
+      - name: 🚀 Build app
+        run: |
+          eas build --local \
+          --platform=android \
+          --profile=production \
+          --output=./app-build
+          --non-interactive

@@ -39,5 +39,16 @@ jobs:
           eas build --local \
           --platform=android \
           --profile=production \
-          --output=./app-build
+          --output=./app-build \
           --non-interactive
+          
+      - name: List eas output
+        run: ls -a ./app-build
+        
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        if: ${{ github.event_name == 'release' }}
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./app/human-detector-app/*.apk
+          tag: ${{ github.ref }}

@@ -1,5 +1,9 @@
 name: release
 
+# Need write permission to release
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
   release:
@@ -7,6 +11,12 @@ on:
 
 jobs:
   build:
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BACKEND_URL: ${{ secrets.BACKEND_URL }}
+      KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      
     # This only works on "run" commands
     defaults:
       run:
@@ -46,10 +56,5 @@ jobs:
         run: file human-detector-app.apk
         
       - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+        run: gh release upload ${{ github.ref_name }} human-detector-app.apk
         if: ${{ github.event_name == 'release' }}
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./app/human-detector-app/*.apk
-          tag: ${{ github.ref }}
-          file_glob: true

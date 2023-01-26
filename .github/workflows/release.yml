@@ -19,7 +19,7 @@ jobs:
         token: ${{ secrets.PI_GEN_PAT }}
         repository: eyespy-cam/pi-gen
         event-type: eyespy-release
-        client-payload: '{"eyespy_tag": "${{ github.ref }}"}'
+        client-payload: '{"eyespy_tag": "${{ github.ref_name }}"}'
         
   build:
     env:

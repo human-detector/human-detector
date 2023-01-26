@@ -46,10 +46,5 @@ jobs:
         run: file human-detector-app.apk
         
       - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+        run: gh release upload ${{ github.event.release.upload_url }} human-detector-app.apk
         if: ${{ github.event_name == 'release' }}
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./app/human-detector-app/*.apk
-          tag: ${{ github.ref }}
-          file_glob: true

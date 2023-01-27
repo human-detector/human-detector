@@ -18,6 +18,7 @@ export default function NotifScreen({ navigation, route }: Props): React.ReactEl
 
   // Date object to be used to compare if the current day is today
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const sortedNotifications = notifications.sort(
     (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
   );
@@ -34,8 +35,7 @@ export default function NotifScreen({ navigation, route }: Props): React.ReactEl
               }}
             >
               <Text style={styles.dateText}>
-                {today.toLocaleDateString(undefined) ===
-                notification.timestamp.toLocaleDateString(undefined)
+                {notification.timestamp.getTime() - today.getTime() > 0
                   ? 'Today'
                   : notification.timestamp.toLocaleDateString(undefined, {
                       month: 'long',

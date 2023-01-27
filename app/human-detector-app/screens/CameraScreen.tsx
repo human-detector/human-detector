@@ -32,7 +32,7 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
               style={styles.menuItem}
               onPress={() => {
                 navigation.navigate('Notifications', {
-                  notifications: item.notifications,
+                  cams: [item.cameraId],
                 });
               }}
             >

@@ -177,7 +177,7 @@ export default function App(): React.ReactElement {
                     color="white"
                     onPress={() => {
                       navigation.navigate('Notifications', {
-                        notifications: user.getAllNotifications(),
+                        cams: [...user.cameraMap.keys()],
                       });
                     }}
                   />

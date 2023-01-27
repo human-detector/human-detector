@@ -13,7 +13,6 @@ export const zPushNotificationData = z
         zodNotif.notification.id,
         new Date(zodNotif.notification.timestamp),
         zodNotif.notification.snapshotId,
-        zodNotif.groupId,
         zodNotif.cameraId
       )
   );

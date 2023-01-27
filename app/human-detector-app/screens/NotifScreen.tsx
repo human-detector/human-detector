@@ -8,16 +8,20 @@ import { UserContext } from '../contexts/userContext';
 type Props = NativeStackScreenProps<RootStackParamList, 'Notifications'>;
 
 export default function NotifScreen({ navigation, route }: Props): React.ReactElement<Props> {
-  const { notifications } = route.params;
-  const sortedNotifications = notifications.sort(
-    (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-  );
-
   const userContext = React.useContext(UserContext);
-
   if (!userContext) {
     throw new Error('UserContext not found!');
   }
+
+  const { cams } = route.params;
+  const notifications = userContext.getNotifsFromCams(cams);
+
+  // Date object to be used to compare if the current day is today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const sortedNotifications = notifications.sort(
+    (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+  );
 
   return (
     <View style={styles.container}>
@@ -31,11 +35,19 @@ export default function NotifScreen({ navigation, route }: Props): React.ReactEl
               }}
             >
               <Text style={styles.dateText}>
-                {notification.timestamp.toLocaleDateString(undefined)}
+                {notification.timestamp.getTime() - today.getTime() > 0
+                  ? 'Today'
+                  : notification.timestamp.toLocaleDateString(undefined, {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
               </Text>
               <View style={styles.notificationBottomText}>
                 <Text style={styles.notificationTimeText}>
-                  {notification.timestamp.toLocaleTimeString(undefined, { hour12: true })}
+                  {notification.timestamp.toLocaleTimeString(undefined, {
+                    hour12: true,
+                  })}
                 </Text>
                 <Text style={styles.cameraNameText} numberOfLines={1}>
                   {userContext.cameraMap.get(notification.cameraId)?.cameraName}

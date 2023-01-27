@@ -37,7 +37,7 @@ APP_DB_PASSWORD_SECRET_ARN=$APP_DB_PASSWORD_SECRET_ARN
 # https://docs.aws.amazon.com/secretsmanager/latest/userguide/reference_secret_json_structure.html#reference_secret_json_structure_rds-postgres
 DB_SECRETS_JSON="$(aws secretsmanager get-secret-value --secret-id ${APP_DB_PASSWORD_SECRET_ARN} | jq -r .SecretString)"
 cat << EOF > /etc/sysconfig/app
-DB_PASSWORD=$(printf ${DB_SECRETS_JSON} | jq .password)
+DB_PASSWORD=$(printf ${DB_SECRETS_JSON} | jq -r .password)
 $INSERT_ENVIRONMENTFILE_HERE
 EOF
 
@@ -54,4 +54,4 @@ unzip -d /usr/src/app /tmp/app.zip
 # systemd stuff
 systemctl daemon-reload
 systemctl enable app
-systemctl service app start
+systemctl start app

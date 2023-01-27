@@ -31,7 +31,6 @@ export class CdkStack extends cdk.Stack {
 
     // TODO: setup cognito (user pools, clients, domain names etc.)
     // TODO: write sync-user lambda
-    // TODO: add simple API gateway routes directed at EC2 instance
 
     const vpc = new ec2.Vpc(this, "Vpc", {
       natGateways: 0, // NAT Gateways are billed by the hour, so we don't want any
@@ -124,7 +123,7 @@ export class CdkStack extends cdk.Stack {
     appSystemdUnit.grantRead(appScalingGroup.role);
 
     // Set up a load balancer for TLS termination
-    const loadBalancer = new elb.NetworkLoadBalancer(this, "AppNLB", {
+    const loadBalancer = new elb.ApplicationLoadBalancer(this, "AppNLB", {
       vpc,
       internetFacing: true,
       vpcSubnets: {
@@ -135,21 +134,15 @@ export class CdkStack extends cdk.Stack {
       domainName: config.appDomainName,
       validation: acm.CertificateValidation.fromDns(),
     });
-    const tlsListener = new elb.NetworkListener(this, "TLSListener", {
-      loadBalancer,
+    const tlsListener = loadBalancer.addListener("TLSListener", {
       port: 443,
       certificates: [appCert],
     });
-    const appPort = 3000;
     tlsListener.addTargets("TCPListenerTargets", {
-      port: appPort,
+      port: 3000,
+      protocol: elb.ApplicationProtocol.HTTP,
       targets: [appScalingGroup],
     });
-    // NLB needs access
-    appScalingGroup.connections.allowFrom(
-      ec2.Peer.ipv4(vpc.vpcCidrBlock),
-      ec2.Port.tcp(3000)
-    );
 
     /* Cognito */
     const syncLambda = new lambda.Function(this, "SyncUsersLambda", {

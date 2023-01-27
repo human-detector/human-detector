@@ -190,13 +190,7 @@ export default class BackendService {
       const newCamArr = group.cameras.map((cam: any) => {
         const newNotifArr = cam.notifications.map(
           (notif: any) =>
-            new Notification(
-              notif.id,
-              new Date(notif.timestamp),
-              notif.snapshotId,
-              group.id,
-              cam.id
-            )
+            new Notification(notif.id, new Date(notif.timestamp), notif.snapshotId, cam.id)
         );
         return new Camera(cam.name, cam.id, newNotifArr);
       });

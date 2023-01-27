@@ -40,15 +40,19 @@ export default class User {
     return groupRemoved;
   }
 
-  getAllNotifications(): Notification[] {
+  getNotifsFromCams(camIdArray: string[]): Notification[] {
     const notifs: Notification[] = [];
 
-    this.groupList.map((group) => {
-      group.cameras.map((cam) => {
-        cam.notifications.map((notif) => {
+    camIdArray.forEach((camId) => {
+      const notifsFromCamera = this.cameraMap.get(camId)?.notifications;
+
+      if (notifsFromCamera) {
+        notifsFromCamera.forEach((notif) => {
           notifs.push(notif);
         });
-      });
+      } else {
+        console.error(`${camId} not found in the camera map`);
+      }
     });
     return notifs;
   }

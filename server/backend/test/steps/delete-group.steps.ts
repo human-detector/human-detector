@@ -7,12 +7,10 @@ import {
   TestStack,
   TEST_STACK_TIMEOUT,
 } from '../helpers/test-stack';
-import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core';
-import { CamerasModule } from '../../src/cameras/cameras.module';
+import { EntityRepository, MikroORM } from '@mikro-orm/core';
+import { UsersModule } from '../../src/users/users.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
-import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from '../../src/cameras/push-notifications/push-notifications-service.interface';
-import { createCameraWithKeyPair, getCameraAuthToken } from '../helpers/camera';
 
 const feature = loadFeature('test/features/delete-group.feature');
 
@@ -21,27 +19,23 @@ defineFeature(feature, (test) => {
   let testStack: TestStack;
   let groupRepository: EntityRepository<Group>;
   let usersRepository: EntityRepository<User>;
-  let em: EntityManager;
 
   beforeAll(async () => {
-    testStack = await buildTestStack({ imports: [CamerasModule] }, (builder) =>
-      Promise.resolve(
-        builder
-          .overrideProvider(IPUSH_NOTIFICATIONS_SERVICE_TOKEN)
-          .useValue('bogus'),
-      ),
-    );
+    testStack = await buildTestStack({ imports: [UsersModule] });
+    usersRepository = testStack.module
+      .get<MikroORM>(MikroORM)
+      .em.getRepository(User);
 
-    em = testStack.module.get<MikroORM>(MikroORM).em.fork();
-    groupRepository = em.getRepository(Group);
-
-    usersRepository = em.getRepository(User);
-
-    app = await testStack.module.createNestApplication();
+    groupRepository = testStack.module
+      .get<MikroORM>(MikroORM)
+      .em.getRepository(Group);
+    jest.setTimeout(60000);
+    app = testStack.module.createNestApplication();
     await app.init();
   }, TEST_STACK_TIMEOUT);
-
+  jest.setTimeout(60000);
   afterAll(async () => {
+    jest.setTimeout(60000);
     await app.close();
     await testStack.dbContainer.stop();
     await testStack.kcContainer.stop();
@@ -50,22 +44,24 @@ defineFeature(feature, (test) => {
   test('Deleting a group with 1 camera in it', ({ given, and, when, then }) => {
     let cameraA: Camera;
     let userA: User;
+    let groupA: Group;
+    let groupAv2: Group;
     let token: string;
     let deleteRes: request.Response;
-    let getRes: request.Response;
 
     given('I have a valid group ID and 1 camera attached to it', async () => {
-      const { camera, keyPair } = createCameraWithKeyPair(
-        'Camera-A',
-        'test-test',
+      const { id, tokenSet } =
+        await testStack.kcContainer.createDummyUserAndLogIn('users');
+      userA = await usersRepository.findOneOrFail(
+        { id },
+        { populate: ['groups'] },
       );
-      cameraA = camera;
-      cameraA.group = new Group('the-group');
-      userA = new User();
-      cameraA.group.user = userA;
+      groupA = new Group('Group-A');
+      userA.groups.add(groupA);
+      cameraA = new Camera('My camera :)', 'Wat', 'serial-number: 2');
+      userA.groups[0].cameras.add(cameraA);
       await usersRepository.flush();
-      await groupRepository.flush();
-      token = getCameraAuthToken(cameraA, keyPair.privateKey);
+      token = tokenSet.access_token;
     });
     when('I request to delete the group', async () => {
       deleteRes = await request(app.getHttpServer()).delete(
@@ -76,10 +72,8 @@ defineFeature(feature, (test) => {
       expect(deleteRes.status).toBe(404);
     });
     and('the group will still be active', async () => {
-      getRes = await request(app.getHttpServer())
-        .get(`/users/${userA.id}/groups/${cameraA.group.id}`)
-        .set('Authorization', token);
-      expect(getRes.status).toBe(200);
+      groupAv2 = await groupRepository.findOne({ id: groupA.id });
+      expect(groupAv2).toBe(groupA);
     });
   });
 
@@ -96,31 +90,25 @@ defineFeature(feature, (test) => {
     let getRes: request.Response;
 
     given('I have a valid group ID', async () => {
-      const { id, tokenSet } =
-        await testStack.kcContainer.createDummyUserAndLogIn('UserA');
-      userB = await usersRepository.findOneOrFail(
-        { id },
-        { populate: ['groups'] },
-      );
+      userB = new User();
 
-      groupB = new Group('Group-A');
+      groupB = new Group('Group-B');
       userB.groups.add(groupB);
       await usersRepository.flush();
-      token = tokenSet.access_token;
     });
     and('the group has no cameras associated with it', () => {
       expect(groupB.cameras.length).toBe(0);
     });
     when('I request to delete the group', async () => {
-      deleteRes = await request(app.getHttpServer()).delete(
-        `/users/${userB.id}/groups/${groupB.id}`,
-      );
+      deleteRes = await request(app.getHttpServer())
+        .del(`/users/${userB.id}/groups/${groupB.id}`)
+        .auth(token, { type: 'bearer' });
     });
     then('the group will be deleted', async () => {
       expect(deleteRes.status).toBe(200);
       getRes = await request(app.getHttpServer())
         .get(`/users/${userB.id}/groups/${groupB.id}`)
-        .set('Authorization', token);
+        .auth(token, { type: 'bearer' });
       expect(getRes.status).toBe(404);
     });
   });

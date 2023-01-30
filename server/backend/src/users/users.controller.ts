@@ -96,7 +96,7 @@ export class UsersController {
     }
   }
 
-  @Delete(':id/groups')
+  @Delete(':id/groups/:name')
   async deleteGroup(
     @Param('id') userId: string,
     @Body('name') groupId: string,

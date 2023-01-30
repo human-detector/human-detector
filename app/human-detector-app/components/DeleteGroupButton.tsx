@@ -9,7 +9,6 @@ import User from '../classes/User';
 
 const showAlert = async (groupId: string, backendContext: BackendService, userContext: User) => {
   const groupObj = userContext.getGroupFromId(groupId);
-
   if (groupObj === null) {
     console.error(`Group object was not found with the given group ID '${groupId}'`);
     Alert.alert('Error when removing the group!');
@@ -27,21 +26,9 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
         },
         {
           text: "Delete",
-          onPress: () => {async () => {
-            const response: boolean | null = await backendContext.deleteGroupAPI(groupId);
-            if (response) { // if the backend deletion was successful, moves onto deleting it for the user.
-              /*
-              for (let i = 0; i < userContext.groupList.length; i++) {
-                if (userContext.groupList[i].groupId === groupId) {
-                  userContext.removeGroupFromList(i);
-                  break;
-                }
-                if (i == userContext.groupList.length-1) {
-                  throw new Error(`Group ID was not found in the user's group list.`);
-                }
-              }
-              */
-
+          onPress: async () => {  {
+            const response: number | null = await backendContext.deleteGroupAPI(groupId);
+            if (response === 200) { // if the backend deletion was successful, moves onto deleting it for the user.
               const group = userContext.getGroupFromId(groupId);
               if (group) {
                 const groupIndex = userContext.groupList.indexOf(group);
@@ -53,7 +40,6 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
                 }
               }
             } else {
-              console.error('Could not find the group object from the groupId during deletion.');
               Alert.alert('Error when removing the group!');
             }
           }}
@@ -76,8 +62,6 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
 };
 
 export default function DeleteGroupButton(props: { groupId: string  }): React.ReactElement {
-    // the delete button isnt working. and look at app lint tests to fix them.
-
     const backendContext = React.useContext(BackendContext);
     const userContext = React.useContext(UserContext);
   
@@ -89,13 +73,12 @@ export default function DeleteGroupButton(props: { groupId: string  }): React.Re
       Alert.alert('Error when removing the group!');
       throw new Error('no user context');
     }
-
   const { groupId } = props;
   return (
     <TouchableOpacity 
       style={styles.menuItemSettingsButton}
-      onPress={ async () => {
-        await showAlert(groupId, backendContext, userContext);
+      onPress={() => {
+        showAlert(groupId, backendContext, userContext);
       }}
     >
       <FontAwesome5 name="trash" size={24} color="black" />

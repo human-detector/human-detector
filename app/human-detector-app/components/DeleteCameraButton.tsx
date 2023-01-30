@@ -19,7 +19,7 @@ const showAlert = (groupId: string, cameraId: string, backendContext: BackendSer
       },
       {
         text: "Delete",
-        onPress: () => {async () => {
+        onPress: async () => { {
           const response: number | null = await backendContext.deleteCameraAPI(groupId, cameraId);
           if (response === 200) { // if backend deletion was successful, moves onto deleting it for the user.
             const groupObj = userContext.getGroupFromId(groupId);

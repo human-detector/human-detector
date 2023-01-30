@@ -138,19 +138,21 @@ export default class BackendService {
   }
 
   /**
-   * deleteGroupAOI() will delete a group in the backend for the user.
+   * deleteGroupAPI() will delete a group in the backend for the user.
    * 
    * @param groupId Group ID to be deleted
    * @returns true or error
    */
-  public async deleteGroupAPI(groupId: string): Promise<boolean | null> {
+  public async deleteGroupAPI(groupId: string): Promise<number | null> {
     const apiLinkWithExtension: string = 
     ServerUrl.apiLink + ServerUrl.removeGroupUrlExtension(this.getUser().userId, groupId);
+    // cant even get the gorups list in this function for some reason. literally copied and pasted from another function and got a 404 from Axios.
+
     try {
       const response = await this.axiosInstance.delete(apiLinkWithExtension);
-      return response.data;
+      return response.status;
     } catch (error) {
-      console.error(`error in deleteGroup status code:`, error);
+      console.error(`error in deleteGroupAPI with the axios deletion:`, error);
       return null;
     }
   }

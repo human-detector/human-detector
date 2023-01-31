@@ -65,7 +65,7 @@ export class CdkStack extends cdk.Stack {
 
     const appEnvironment = {
       DB_HOST: db.dbInstanceEndpointAddress,
-      DB_NAME: "TODO",
+      DB_NAME: "postgres",
       DB_USER: "postgres",
       // https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-userpools-server-contract-reference.html
       OIDC_ENDPOINT: `https://cognito-idp.${this.region}.amazonaws.com/${userPool.userPoolId}`,

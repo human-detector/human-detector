@@ -50,6 +50,10 @@ aws s3 cp ${APP_SYSTEMD_SERVICE_S3_OBJ_URL} /etc/systemd/system/app.service
 # Unpack app
 mkdir /usr/src/app
 unzip -d /usr/src/app /tmp/app.zip
+pushd /usr/src/app
+rm -rf node_modules
+npm i
+popd
 
 # systemd stuff
 systemctl daemon-reload

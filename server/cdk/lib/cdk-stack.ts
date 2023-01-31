@@ -9,15 +9,61 @@ import * as assets from "aws-cdk-lib/aws-s3-assets";
 import * as elb from "aws-cdk-lib/aws-elasticloadbalancingv2";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as autoscaling from "aws-cdk-lib/aws-autoscaling";
+import * as iam from "aws-cdk-lib/aws-iam";
+import * as custom from "aws-cdk-lib/custom-resources";
 import { readFileSync } from "fs";
 import { cwd } from "process";
 
 export interface CdkStackConfig {
-  // Domain name that should point at the app
-  appDomainName: string;
-  // Hostname of the configured auth provider (e.g. URL of a Keycloak realm or Cognito user pool).
-  authProviderHostname: string;
+  // Top-level domain name (ex. example.com) for the app
+  rootDomainName: string;
   expoAccessToken: string;
+  // IDP clients for Cognito third-party login
+  auth?: {
+    google?: {
+      clientId: string;
+      clientSecret: string;
+    };
+  };
+}
+
+// grantConnect is broken right now, so we need this instead
+// https://github.com/aws/aws-cdk/issues/11851
+// Code taken from this comment: https://github.com/aws/aws-cdk/issues/11851#issuecomment-901346090
+function grantIamAuth(
+  scope: cdk.Stack,
+  db: rds.DatabaseInstance,
+  grantPrincipal: iam.IPrincipal,
+  user: string
+) {
+  const dbResourceIdName = "DBInstances.0.DbiResourceId";
+  const dbResourceId = new custom.AwsCustomResource(
+    scope,
+    `PostgresDBResourceIdCR-${grantPrincipal}`,
+    {
+      onCreate: {
+        service: "RDS",
+        action: "describeDBInstances",
+        parameters: {
+          DBInstanceIdentifier: db.instanceIdentifier,
+        },
+        physicalResourceId:
+          custom.PhysicalResourceId.fromResponse(dbResourceIdName),
+        outputPaths: [dbResourceIdName],
+      },
+      policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
+        resources: custom.AwsCustomResourcePolicy.ANY_RESOURCE,
+      }),
+    }
+  );
+  const resourceId = dbResourceId.getResponseField(dbResourceIdName);
+
+  const dbUserArn = `arn:aws:rds-db:${scope.region}:${scope.account}:dbuser:${resourceId}/${user}`;
+  iam.Grant.addToPrincipal({
+    grantee: grantPrincipal,
+    actions: ["rds-db:connect"],
+    resourceArns: [dbUserArn],
+  });
 }
 
 export class CdkStack extends cdk.Stack {
@@ -29,8 +75,7 @@ export class CdkStack extends cdk.Stack {
   ) {
     super(scope, id, props);
 
-    // TODO: setup cognito (user pools, clients, domain names etc.)
-    // TODO: write sync-user lambda
+    // FIXME: Cognito hosted UI isn't giving the option to sign in with username-password?
 
     const vpc = new ec2.Vpc(this, "Vpc", {
       natGateways: 0, // NAT Gateways are billed by the hour, so we don't want any
@@ -53,6 +98,81 @@ export class CdkStack extends cdk.Stack {
         ec2.InstanceClass.T4G,
         ec2.InstanceSize.MICRO
       ),
+      iamAuthentication: true,
+    });
+
+    /* Cognito */
+    const dbSyncUser = "usersync";
+    const syncLambdaCode = new assets.Asset(this, "SyncUsersLambdaSource", {
+      path: path.resolve(cwd(), "..", "sync-users-lambda", "dist"),
+    });
+    const syncLambda = new lambda.Function(this, "SyncUsersLambda", {
+      runtime: lambda.Runtime.NODEJS_16_X,
+      code: lambda.Code.fromBucket(
+        syncLambdaCode.bucket,
+        syncLambdaCode.s3ObjectKey
+      ),
+      handler: "main.handler",
+      environment: {
+        DB_NAME: "postgres",
+        DB_USER: dbSyncUser,
+        DB_HOST: db.dbInstanceEndpointAddress,
+      },
+      vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+      },
+    });
+    grantIamAuth(this, db, syncLambda.grantPrincipal, dbSyncUser);
+    db.connections.allowFrom(syncLambda, ec2.Port.tcp(5432));
+    const authDomain = `auth2.${config.rootDomainName}`;
+    const authCert = new acm.Certificate(this, "AuthCert", {
+      domainName: authDomain,
+      validation: acm.CertificateValidation.fromDns(),
+    });
+    const userPool = new cognito.UserPool(this, "AppUserPool", {
+      userPoolName: "app-userpool",
+      signInCaseSensitive: false, // recommended in AWS docs
+      selfSignUpEnabled: true,
+      signInAliases: {
+        username: true,
+        email: true,
+      },
+      lambdaTriggers: {
+        postAuthentication: syncLambda,
+      },
+    });
+    const supportedIdentityProviders: cognito.UserPoolClientIdentityProvider[] =
+      [];
+    if (config.auth?.google !== undefined) {
+      new cognito.UserPoolIdentityProviderGoogle(this, "GoogleIDP", {
+        clientId: config.auth.google.clientId,
+        clientSecretValue: cdk.SecretValue.unsafePlainText(
+          config.auth.google.clientSecret
+        ),
+        userPool,
+      });
+      supportedIdentityProviders.push(
+        cognito.UserPoolClientIdentityProvider.GOOGLE
+      );
+    }
+    userPool.addDomain("AppUserPoolDomain", {
+      customDomain: {
+        domainName: authDomain,
+        certificate: authCert,
+      },
+    });
+    userPool.addClient("AppUserPoolClient", {
+      userPoolClientName: "eyespy-mobile",
+      authFlows: {
+        userPassword: true,
+        userSrp: true,
+      },
+      oAuth: {
+        callbackUrls: ["myapp://redirect", "eyespy://redirect"],
+      },
+      preventUserExistenceErrors: true,
+      supportedIdentityProviders,
     });
 
     /* App webserver */
@@ -107,9 +227,9 @@ export class CdkStack extends cdk.Stack {
         }),
       }
     );
-    // FIXME: this is hardcoded for us-west-2's Instance Connect range
+    // FIXME: this is hardcoded for us-east-1's Instance Connect range
     appScalingGroup.connections.allowFrom(
-      ec2.Peer.ipv4("18.237.140.160/29"),
+      ec2.Peer.ipv4("18.206.107.24/29"),
       ec2.Port.tcp(22),
       "EC2 Instance Connect"
     );
@@ -124,7 +244,7 @@ export class CdkStack extends cdk.Stack {
     appSystemdUnit.grantRead(appScalingGroup.role);
 
     // Set up a load balancer for TLS termination
-    const loadBalancer = new elb.ApplicationLoadBalancer(this, "AppNLB", {
+    const loadBalancer = new elb.ApplicationLoadBalancer(this, "AppALB", {
       vpc,
       internetFacing: true,
       vpcSubnets: {
@@ -132,37 +252,18 @@ export class CdkStack extends cdk.Stack {
       },
     });
     const appCert = new acm.Certificate(this, "AppCert", {
-      domainName: config.appDomainName,
+      domainName: `api2.${config.rootDomainName}`,
       validation: acm.CertificateValidation.fromDns(),
     });
     const tlsListener = loadBalancer.addListener("TLSListener", {
       port: 443,
       certificates: [appCert],
     });
-    tlsListener.addTargets("TCPListenerTargets", {
+    tlsListener.addTargets("TLSListenerTargets", {
       port: 3000,
       protocol: elb.ApplicationProtocol.HTTP,
       targets: [appScalingGroup],
     });
 
-    /* Cognito */
-    const syncLambda = new lambda.Function(this, "SyncUsersLambda", {
-      runtime: lambda.Runtime.NODEJS_16_X,
-      code: lambda.Code.fromInline(""), // TODO: write this lambda + bundle properly here
-      handler: "handler",
-    });
-    new cognito.UserPool(this, "CustomerPool", {
-      userPoolName: "customer-userpool",
-      signInCaseSensitive: false, // recommended in AWS docs
-      selfSignUpEnabled: true,
-      // userVerification: TODO
-      signInAliases: {
-        username: true,
-        email: true,
-      },
-      lambdaTriggers: {
-        postConfirmation: syncLambda,
-      },
-    });
   }
 }

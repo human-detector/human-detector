@@ -1,0 +1,21 @@
+{
+  "name": "sync-users-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.110",
+    "@types/pg": "^8.6.6",
+    "esbuild": "0.17.5",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@aws-sdk/rds-signer": "^3.259.0",
+    "pg": "^8.9.0"
+  }
+}

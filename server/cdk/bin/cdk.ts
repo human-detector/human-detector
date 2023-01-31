@@ -6,14 +6,9 @@ import config from "../config";
 
 const app = new cdk.App();
 new CdkStack(app, "CdkStack", config, {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+  // Using a custom domain with Cognito's hosted UI requires deploying your
+  // ACM certificate to 'us-east-1' (see https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-add-custom-domain.html)
+  // and cross-region referencing is painful without using Route53 or hacks (https://github.com/aws/aws-cdk/issues/9274),
+  // so let's just deploy to 'us-east-1'
+  env: { region: "us-east-1" },
 });

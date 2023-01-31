@@ -68,7 +68,7 @@ export default class TokenFetcher {
   public async getTokenManager(): Promise<TokenManager> {
     const request = this.makeAuthRequest();
     const discovery = await AuthSession.fetchDiscoveryAsync(this.issuer.toString());
-    const response = await request.promptAsync(discovery);
+    const response = await request.promptAsync(discovery, { showInRecents: true });
     if (response.type !== 'success') {
       throw new Error(`Expected successful auth response, got type ${response.type}`);
     }

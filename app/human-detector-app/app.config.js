@@ -3,7 +3,7 @@ module.exports = {
     version: '1.0.0',
     "owner": "eyespy",
     extra: {
-      keycloakUrl: process.env.KEYCLOAK_URL,
+      oidcEndpoint: process.env.OIDC_ENDPOINT,
       backendUrl: process.env.BACKEND_URL,
       clientId: process.env.CLIENT_ID,
       experienceId: '@eyespy/human-detector',

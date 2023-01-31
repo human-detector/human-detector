@@ -25,8 +25,8 @@ export default function LoginScreen({ onSuccessfulLogin }: Props): React.ReactEl
         title="Login"
         onPress={() => {
           const clientId = Constants.manifest?.extra?.clientId;
-          const issuerOrigin = Constants.manifest?.extra?.keycloakUrl;
-          const issuer = new URL('/realms/users', issuerOrigin);
+          const issuerOrigin = Constants.manifest?.extra?.oidcEndpoint;
+          const issuer = new URL(issuerOrigin);
           const redirectUri = makeRedirectUri({
             path: 'redirect',
           });

@@ -64,7 +64,8 @@ class EyeSpyService:
             if new_reason == FailReason.BACKEND_DOWN:
                 self.on_camera_state_change(CameraState.BACKEND_DOWN)
             elif ((self.state == CameraState.BOOT and time() - self.boot_time > START_TIMEOUT)
-                or new_reason == FailReason.FORBIDDEN):
+                or new_reason == FailReason.FORBIDDEN
+                or new_reason == FailReason.INCORRECT_SECRETS):
                 self.on_camera_state_change(CameraState.BLE_UP)
                 self.keys.clear_keys()
 

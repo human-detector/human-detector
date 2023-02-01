@@ -16,5 +16,4 @@ export const registerCameraUrlExtension = (userId: string, groupId: string): str
 export const registerGroupUrlExtension = (userId: string): string => `/users/${userId}/groups`;
 export const snapshotUrl = (snapshotId: string): string => `/snapshots/${snapshotId}`;
 export const removeCameraUrlExtension = (userId: string, groupId: string, cameraId: string): string => `/users/${userId}/groups/${groupId}/cameras/${cameraId}`;
-export const removeNotificationUrlExtension = (userId: string, groupId: string, cameraId: string): string => `/users/${userId}/groups/${groupId}/cameras/${cameraId}/notifications`;
 export const removeGroupUrlExtension = (userId: string, groupId: string): string => `/users/${userId}/groups/${groupId}`;

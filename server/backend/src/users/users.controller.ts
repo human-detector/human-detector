@@ -146,9 +146,9 @@ export class UsersController {
     }
   }
 
-  @Delete(':uid/groups/:gid/cameras/:cid')
+  @Delete(':id/groups/:gid/cameras/:cid')
   async removeCamera(
-    @Param('uid') userId: string,
+    @Param('id') userId: string,
     @Param('gid') groupId: string,
     @Param('cid') cameraId: string,
   ): Promise<boolean> {

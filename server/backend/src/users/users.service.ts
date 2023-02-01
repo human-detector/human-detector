@@ -179,10 +179,13 @@ export class UsersService {
    * @param idCam
    */
   public async removeCamera(idCam: string): Promise<boolean> {
+    // add the thing where it checks that the user owns the idCam param.
+
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
       {
         populate: [
+          'group',
           'group.cameras',
           'notifications',
           'notifications.camera',

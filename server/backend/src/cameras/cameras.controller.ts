@@ -1,7 +1,6 @@
 import {
   Get,
   Put,
-  Delete,
   Param,
   Controller,
   UseGuards,
@@ -55,20 +54,6 @@ export class CamerasController {
         timestamp: notification.timestamp,
         camera: notification.camera.id,
       }));
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        throw new UnauthorizedException();
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  @Delete(':id')
-  async removeCamera(@Param('id') id: string): Promise<boolean> {
-    try {
-      const camRemoved = await this.camerasService.removeCamera(id);
-      return camRemoved;
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new UnauthorizedException();

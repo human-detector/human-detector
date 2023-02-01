@@ -46,7 +46,8 @@ export type RegisterGroupResponse = {
 @Controller('users')
 @UseGuards(JwtIdentityGuard)
 export class UsersController {
-  constructor(@Inject(UsersService) private usersService: UsersService) {}
+  constructor(
+    @Inject(UsersService) private usersService: UsersService) {}
 
   @Get(':id/groups')
   async getGroups(@Param('id') id: string): Promise<GetGroupsOutput> {
@@ -140,6 +141,20 @@ export class UsersController {
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  @Delete(':id')
+  async removeCamera(@Param('id') id: string): Promise<boolean> {
+    try {
+      const camRemoved = await this.usersService.removeCamera(id);
+      return camRemoved;
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new UnauthorizedException();
       } else {
         throw error;
       }

@@ -12,6 +12,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: EntityRepository<User>,
     @InjectRepository(Group) private groupRepository: EntityRepository<Group>,
+    @InjectRepository(Camera)
+    private cameraRepository: EntityRepository<Camera>,
   ) {}
 
   /**
@@ -144,6 +146,65 @@ export class UsersService {
     await this.groupRepository.flush();
 
     return newCamera;
+  }
+
+  /**
+   * Removes all notifications associated with Camera idCam.
+   * @param idCam
+   */
+  public async removeNotifications(idCam: string): Promise<boolean> {
+    const cam = await this.cameraRepository.findOne(
+      { id: idCam },
+      {
+        populate: [
+          'notifications',
+          'notifications.camera',
+          'notifications.camera.id',
+        ],
+      },
+    );
+
+    if (cam === null) {
+      throw new NotFoundError(`Camera with given ID does not exist.`);
+    }
+
+    cam.notifications.removeAll();
+    await this.cameraRepository.flush();
+
+    return true;
+  }
+
+  /**
+   * Removes a given camera from one of the user's groups.
+   * @param idCam
+   */
+  public async removeCamera(idCam: string): Promise<boolean> {
+    const cam = await this.cameraRepository.findOne(
+      { id: idCam },
+      {
+        populate: [
+          'group.cameras',
+          'notifications',
+          'notifications.camera',
+          'notifications.camera.id',
+        ],
+      },
+    );
+
+    if (cam === null) {
+      throw new NotFoundError(`Camera with given ID does not exist.`);
+    }
+    // removes notifications before removing the camera.
+    if (await this.removeNotifications(idCam)) {
+      this.cameraRepository.remove(cam);
+      await this.cameraRepository.flush();
+    } else {
+      throw new Error(
+        `During the removal of notifications, there was an error and the deletion of the camera will not proceed.`,
+      );
+    }
+
+    return true;
   }
 
   /**

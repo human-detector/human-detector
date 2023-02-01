@@ -75,8 +75,6 @@ export class CdkStack extends cdk.Stack {
   ) {
     super(scope, id, props);
 
-    // FIXME: Cognito hosted UI isn't giving the option to sign in with username-password?
-
     const vpc = new ec2.Vpc(this, "Vpc", {
       natGateways: 0, // NAT Gateways are billed by the hour, so we don't want any
     });
@@ -143,7 +141,7 @@ export class CdkStack extends cdk.Stack {
       },
     });
     const supportedIdentityProviders: cognito.UserPoolClientIdentityProvider[] =
-      [];
+      [cognito.UserPoolClientIdentityProvider.COGNITO];
     if (config.auth?.google !== undefined) {
       new cognito.UserPoolIdentityProviderGoogle(this, "GoogleIDP", {
         clientId: config.auth.google.clientId,

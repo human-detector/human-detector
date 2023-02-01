@@ -110,6 +110,7 @@ export default class BackendService {
     // deletes the camera next.
     const apiLinkWithExtension: string = 
       ServerUrl.apiLink + ServerUrl.removeCameraUrlExtension(this.getUser().userId, groupId, cameraId);
+      console.log(apiLinkWithExtension);
     try {
       const response = await this.axiosInstance.delete(apiLinkWithExtension);
       return response.status;

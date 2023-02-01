@@ -46,8 +46,7 @@ export type RegisterGroupResponse = {
 @Controller('users')
 @UseGuards(JwtIdentityGuard)
 export class UsersController {
-  constructor(
-    @Inject(UsersService) private usersService: UsersService) {}
+  constructor(@Inject(UsersService) private usersService: UsersService) {}
 
   @Get(':id/groups')
   async getGroups(@Param('id') id: string): Promise<GetGroupsOutput> {

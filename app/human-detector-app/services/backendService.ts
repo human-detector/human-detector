@@ -98,11 +98,15 @@ export default class BackendService {
    */
   public async deleteCameraAPI(groupId: string, cameraId: string): Promise<number | null> {
     // first starts by deleting the notifications.
+
+    /*
     const notifResponse = await this.deleteNotificationAPI(groupId, cameraId);
     if (notifResponse !== 200) {
       console.error(`deleteNotification's status code was:`, notifResponse);
       return null;
     }
+
+  */
     // deletes the camera next.
     const apiLinkWithExtension: string = 
       ServerUrl.apiLink + ServerUrl.removeCameraUrlExtension(this.getUser().userId, groupId, cameraId);

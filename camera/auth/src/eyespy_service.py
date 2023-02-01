@@ -61,9 +61,11 @@ class EyeSpyService:
             # We wait a bit during boot before allowing a failure to cause a state change
             # in case the PI is booting from a power outage (and the wifi router is slow)
             # or some other weird state
+            timedout = time() - self.boot_time > START_TIMEOUT and self.state == CameraState.BOOT
+
             if new_reason == FailReason.BACKEND_DOWN:
                 self.on_camera_state_change(CameraState.BACKEND_DOWN)
-            elif ((self.state == CameraState.BOOT and time() - self.boot_time > START_TIMEOUT)
+            elif ((timedout and new_reason == FailReason.SSID_NOT_FOUND)
                 or new_reason == FailReason.FORBIDDEN
                 or new_reason == FailReason.INCORRECT_SECRETS):
                 # Remove configuration if fail to connect

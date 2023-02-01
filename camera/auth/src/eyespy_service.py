@@ -66,8 +66,11 @@ class EyeSpyService:
             elif ((self.state == CameraState.BOOT and time() - self.boot_time > START_TIMEOUT)
                 or new_reason == FailReason.FORBIDDEN
                 or new_reason == FailReason.INCORRECT_SECRETS):
-                self.on_camera_state_change(CameraState.BLE_UP)
+                # Remove configuration if fail to connect
+                # This factory resets the camera
                 self.keys.clear_keys()
+                self.wifi.delete_old_config()
+                self.on_camera_state_change(CameraState.BLE_UP)
 
         elif new_state == WifiState.ATTEMPTING_PING:
             self.heartbeat.stop()

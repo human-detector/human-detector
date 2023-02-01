@@ -178,7 +178,11 @@ export class UsersService {
    * Removes a given camera from one of the user's groups.
    * @param idCam
    */
-  public async removeCamera(idCam: string): Promise<boolean> {
+  public async removeCamera(
+    idUser: string,
+    idGroup: string,
+    idCam: string,
+  ): Promise<boolean> {
     // add the thing where it checks that the user owns the idCam param.
 
     const cam = await this.cameraRepository.findOne(

@@ -153,7 +153,11 @@ export class UsersController {
     @Param('cid') cameraId: string,
   ): Promise<boolean> {
     try {
-      const camRemoved = await this.usersService.removeCamera(cameraId);
+      const camRemoved = await this.usersService.removeCamera(
+        userId,
+        groupId,
+        cameraId,
+      );
       return camRemoved;
     } catch (error) {
       if (error instanceof NotFoundError) {

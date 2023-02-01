@@ -146,10 +146,14 @@ export class UsersController {
     }
   }
 
-  @Delete(':id')
-  async removeCamera(@Param('id') id: string): Promise<boolean> {
+  @Delete(':uid/groups/:gid/cameras/:cid')
+  async removeCamera(
+    @Param('uid') userId: string,
+    @Param('gid') groupId: string,
+    @Param('cid') cameraId: string,
+  ): Promise<boolean> {
     try {
-      const camRemoved = await this.usersService.removeCamera(id);
+      const camRemoved = await this.usersService.removeCamera(cameraId);
       return camRemoved;
     } catch (error) {
       if (error instanceof NotFoundError) {

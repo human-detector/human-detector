@@ -29,13 +29,11 @@ defineFeature(feature, (test) => {
     groupRepository = testStack.module
       .get<MikroORM>(MikroORM)
       .em.getRepository(Group);
-    jest.setTimeout(60000);
     app = testStack.module.createNestApplication();
     await app.init();
   }, TEST_STACK_TIMEOUT);
-  jest.setTimeout(60000);
+
   afterAll(async () => {
-    jest.setTimeout(60000);
     await app.close();
     await testStack.dbContainer.stop();
     await testStack.kcContainer.stop();

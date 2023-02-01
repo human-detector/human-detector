@@ -28,7 +28,7 @@ export interface TestStack {
  * Timeout for the 'beforeAll()' hook in Jest tests. Docker containers take some time to spin up,
  * even more so if it needs to pull the image during setup.
  */
-export const TEST_STACK_TIMEOUT = 600000;
+export const TEST_STACK_TIMEOUT = 60000;
 
 /**
  * Builds a test instance of our Nest application with our dependencies (e.g. Postgres)

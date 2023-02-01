@@ -146,8 +146,6 @@ export default class BackendService {
   public async deleteGroupAPI(groupId: string): Promise<number | null> {
     const apiLinkWithExtension: string = 
     ServerUrl.apiLink + ServerUrl.removeGroupUrlExtension(this.getUser().userId, groupId);
-    // cant even get the gorups list in this function for some reason. literally copied and pasted from another function and got a 404 from Axios.
-
     try {
       const response = await this.axiosInstance.delete(apiLinkWithExtension);
       return response.status;

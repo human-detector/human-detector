@@ -78,7 +78,10 @@ export class UsersService {
    */
   public async deleteGroup(userId: string, groupId: string): Promise<boolean> {
     // finds user and then groupObj from the parameters.
-    const user = await this.usersRepository.findOne({ id: userId });
+    const user = await this.usersRepository.findOne(
+      { id: userId },
+      { populate: ['groups'] },
+    );
 
     if (user == null) {
       throw new NotFoundError(`User with ID "${userId}" does not exist`);

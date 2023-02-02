@@ -96,6 +96,7 @@ export class CdkStack extends cdk.Stack {
         ec2.InstanceClass.T4G,
         ec2.InstanceSize.MICRO
       ),
+      allocatedStorage: 20, // Free tier only covers 20GB of storage
       iamAuthentication: true,
     });
 

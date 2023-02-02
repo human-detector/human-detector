@@ -55,7 +55,7 @@ export default function BluetoothScreen({ navigation }: Props): React.ReactEleme
     });
 
     return () => {
-      bleService.stopScanForDevices();
+      bleService.stopScanForDevices(setAllDevices);
     };
   }, []);
 

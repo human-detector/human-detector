@@ -88,8 +88,9 @@ export class BLEService {
   /**
    * Stop scanning for new devices
    */
-  public stopScanForDevices() {
+  public stopScanForDevices(callback: (devices: Device[]) => void) {
     this.devices = [];
+    callback(this.devices);
     this.bleManager.stopDeviceScan();
   }
 

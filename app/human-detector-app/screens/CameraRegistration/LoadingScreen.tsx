@@ -9,6 +9,7 @@ import { BLEContext } from '../../contexts/bleContext';
 import { BLEParamList } from '../../src/navigation/bleParamList';
 import { UserContext } from '../../contexts/userContext';
 import { styles } from '../../src/styles';
+import { BackendContext } from '../../contexts/backendContext';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
 
@@ -19,16 +20,22 @@ const END_LOGGING_TIMEOUT = 3 * 1000;
  */
 
 type Props = NativeStackScreenProps<BLEParamList, 'Loading'>;
-export default function LoadingScreen({ navigation }: Props): React.ReactElement {
+export default function LoadingScreen({ navigation, route }: Props): React.ReactElement {
   const [connState, setConnState] = useState<ConnectionNotification>();
   const [bleSub, setBleSub] = useState<Subscription>();
   const [connString, setConnString] = useState<String>('Connecting to WiFi');
   const [icon, setIcon] = useState<LoadingState>(LoadingState.Loading);
 
+  const backendContext = useContext(BackendContext);
   const bleContext = useContext(BLEContext);
   const userContext = useContext(UserContext);
   const currentDevice = bleContext.getCurrentConnectedDevice();
 
+  const {groupId, cameraId} = route.params;
+
+  if (!backendContext) {
+    throw new Error('Backend context is null');
+  }
   if (!userContext) {
     throw new Error('user context is null');
   }
@@ -56,6 +63,7 @@ export default function LoadingScreen({ navigation }: Props): React.ReactElement
         setIcon(LoadingState.Failure);
         userContext.groupList.pop();
         setConnString(`Failure!\n${FailReason[connState.Reason]}`);
+        backendContext.deleteCameraAPI(groupId, cameraId);
         endLoading(true);
         break;
       case ConnectionStatus.SUCCESS:

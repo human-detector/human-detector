@@ -6,8 +6,9 @@ import { BackendContext } from '../contexts/backendContext';
 import { UserContext } from '../contexts/userContext';
 import BackendService from '../services/backendService';
 import User from '../classes/User';
+import Group from '../classes/Group';
 
-const showAlert = async (groupId: string, backendContext: BackendService, userContext: User) => {
+const showAlert = async (groupId: string, backendContext: BackendService, userContext: User, setGroups: (groupList:Group[]) => void) => {
   const groupObj = userContext.getGroupFromId(groupId);
   if (groupObj === null) {
     console.error(`Group object was not found with the given group ID '${groupId}'`);
@@ -34,6 +35,7 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
                 const groupIndex = userContext.groupList.indexOf(group);
                 if (groupIndex !== -1) { // removes the group if it finds the index
                   userContext.removeGroupFromList(groupIndex);
+                  setGroups(userContext.groupList);
                 } else { // did not find the index.
                   console.error(`Trying to find the index of the group to be removed was not successful`);
                   Alert.alert('Error when removing the group!');
@@ -61,7 +63,7 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
   }
 };
 
-export default function DeleteGroupButton(props: { groupId: string  }): React.ReactElement {
+export default function DeleteGroupButton(props: { groupId: string, setGroups: (groupList:Group[]) => void }): React.ReactElement {
     const backendContext = React.useContext(BackendContext);
     const userContext = React.useContext(UserContext);
   
@@ -73,12 +75,12 @@ export default function DeleteGroupButton(props: { groupId: string  }): React.Re
       Alert.alert('Error when removing the group!');
       throw new Error('no user context');
     }
-  const { groupId } = props;
+  const { groupId, setGroups } = props;
   return (
     <TouchableOpacity 
       style={styles.menuItemSettingsButton}
       onPress={() => {
-        showAlert(groupId, backendContext, userContext);
+        showAlert(groupId, backendContext, userContext, setGroups);
       }}
     >
       <FontAwesome5 name="trash" size={24} color="black" />

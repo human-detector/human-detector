@@ -6,6 +6,7 @@ import { UserContext } from '../contexts/userContext';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 import { styles } from '../src/styles';
 import DeleteCameraButton from '../components/DeleteCameraButton';
+import Camera from '../classes/Camera';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Cameras'>;
 export default function CameraScreen({ navigation, route }: Props): React.ReactElement {
@@ -23,10 +24,12 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
     throw new Error('Group to view not valid');
   }
 
+  const [cameras, setCameras] = React.useState<Camera[]>(groupToView.cameras);
+
   return (
     <View style={styles.container}>
       <ScrollView>
-        {groupToView?.cameras.map((item) => (
+        {groupToView.cameras.map((item) => (
           <View key={item.cameraId}>
             <TouchableOpacity
               style={styles.menuItem}
@@ -37,7 +40,7 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
               }}
             >
               <Text style={styles.menuButtonText}> {item.cameraName} </Text>
-              <DeleteCameraButton groupId={groupId} cameraId={item.cameraId} />
+              <DeleteCameraButton groupId={groupId} cameraId={item.cameraId} setCameras={setCameras} />
             </TouchableOpacity>
           </View>
         ))}

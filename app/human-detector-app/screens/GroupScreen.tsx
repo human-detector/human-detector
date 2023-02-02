@@ -6,10 +6,11 @@ import { RootStackParamList } from '../src/navigation/stackParamList';
 import { UserContext } from '../contexts/userContext';
 import { styles } from '../src/styles';
 import DeleteGroupButton from '../components/DeleteGroupButton';
+import Group from '../classes/Group';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Groups'>;
 export default function GroupScreen({ navigation }: Props): React.ReactElement {
-  const userContext = React.useContext(UserContext);
+  const userContext= React.useContext(UserContext);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isFocused = useIsFocused();
 
@@ -17,6 +18,8 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
     console.error('User context not defined!');
     throw new Error('Error in GroupScreen.');
   }
+
+  const [groups, setGroups] = React.useState<Group[]>(userContext.groupList);
 
   const pressHandler = (groupId: string) => {
     // TODO: Navigate with the camera array for the group press
@@ -35,7 +38,7 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
               }}
             >
               <Text style={styles.menuButtonText}> {item.groupName} </Text>
-              <DeleteGroupButton groupId={item.groupId} />
+              <DeleteGroupButton groupId={item.groupId} setGroups={setGroups} />
             </TouchableOpacity>
           </View>
         ))}

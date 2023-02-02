@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, TextInput, Button, KeyboardAvoidingView } from 'react-native';
+import { View, TextInput, Button, KeyboardAvoidingView, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WifiSecType, CameraSerial } from '../../src/ble/bleServices';
 import { BackendContext } from '../../contexts/backendContext';
@@ -61,6 +61,21 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
           return;
         }
 
+        const groupObj = userContext.getGroupFromId(groupId);
+        if (groupObj === undefined) {
+          console.error(`Group with id" ${groupId} " was not found.`);
+          return;
+        } // verifying that the cameraName isn't already used in this group
+        for (const camera of groupObj.cameras) {
+          if (camera.cameraName === cameraName) {
+            Alert.alert('Error: You cannot use the same name for a camera more than once.');
+            console.error(`cameraName was used more than once called: ${cameraName}`);
+            navigation.goBack();
+            return;
+          }          
+        }
+
+        // begins work on registering the camera
         const uuid = await backendContext.registerCamera(
           cameraName,
           serial.Serial,
@@ -80,9 +95,9 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
         const newCam = new Camera(cameraName, uuid, []);
 
         userContext.getGroupFromId(groupId)?.cameras.push(newCam);
-        navigation.navigate('Loading');
-
+        navigation.navigate('Loading', { groupId: groupId, cameraId: uuid });
         userContext.cameraMap.set(newCam.cameraId, newCam);
+
       })
       .catch((error) => {
         console.error(error);

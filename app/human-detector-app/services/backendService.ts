@@ -70,44 +70,13 @@ export default class BackendService {
   }
 
   /**
-   * deletes the notifications of the given camera.
-   * 
-   * @param groupId group id of the camera to be deleted
-   * @param cameraId camera id that the user wants to delete
-   * @returns status code or error
-   */
-  private async deleteNotificationAPI(groupId: string, cameraId: string): Promise<number | null> {
-    const apiLinkWithExtension: string = 
-    ServerUrl.apiLink + ServerUrl.removeNotificationUrlExtension(this.getUser().userId, groupId, cameraId);
-
-    try {
-      const response = await this.axiosInstance.delete(apiLinkWithExtension);
-      return response.status;
-    } catch (error) {
-      console.error(`error in deleteNotification status code:`, error);
-      return null;
-    }
-  }
-
-  /**
-   * deletes the notifications and then the camera and returns the status code.
+   * deletes the camera and returns the status code.
    * 
    * @param groupId group id of the camera to be deleted
    * @param cameraId camera id that the user wants to delete
    * @returns the status code or error
    */
   public async deleteCameraAPI(groupId: string, cameraId: string): Promise<number | null> {
-    // first starts by deleting the notifications.
-
-    /*
-    const notifResponse = await this.deleteNotificationAPI(groupId, cameraId);
-    if (notifResponse !== 200) {
-      console.error(`deleteNotification's status code was:`, notifResponse);
-      return null;
-    }
-
-  */
-    // deletes the camera next.
     const apiLinkWithExtension: string = 
       ServerUrl.apiLink + ServerUrl.removeCameraUrlExtension(this.getUser().userId, groupId, cameraId);
     try {

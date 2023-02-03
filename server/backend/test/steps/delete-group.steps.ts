@@ -54,20 +54,22 @@ defineFeature(feature, (test) => {
         { id },
         { populate: ['groups'] },
       );
-      groupA = new Group('Group-A');
-      userA.groups.add(groupA);
-      cameraA = new Camera('My camera :)', 'Wat', 'serial-number: 2');
-      userA.groups[0].cameras.add(cameraA);
-      await usersRepository.flush();
       token = tokenSet.access_token;
+      groupA = new Group('Group-A');
+      cameraA = new Camera('My camera :)', 'Wat', 'serial-number: 2');
+
+      userA.groups.add(groupA);
+      groupA.cameras.add(cameraA);
+
+      await usersRepository.flush();
     });
     when('I request to delete the group', async () => {
-      deleteRes = await request(app.getHttpServer()).delete(
-        `/users/${userA.id}/groups/${cameraA.group.id}`,
-      );
+      deleteRes = await request(app.getHttpServer())
+        .delete(`/users/${userA.id}/groups/${groupA.id}`)
+        .auth(token, { type: 'bearer' });
     });
     then('I will receive a Not Found Error', () => {
-      expect(deleteRes.status).toBe(404);
+      expect(deleteRes.status).toBe(409);
     });
     and('the group will still be active', async () => {
       groupAv2 = await groupRepository.findOne({ id: groupA.id });
@@ -88,8 +90,14 @@ defineFeature(feature, (test) => {
     let getRes: request.Response;
 
     given('I have a valid group ID', async () => {
-      userB = new User();
+      const { id, tokenSet } =
+        await testStack.kcContainer.createDummyUserAndLogIn('users');
+      userB = await usersRepository.findOneOrFail(
+        { id },
+        { populate: ['groups'] },
+      );
 
+      token = tokenSet.access_token;
       groupB = new Group('Group-B');
       userB.groups.add(groupB);
       await usersRepository.flush();
@@ -113,17 +121,26 @@ defineFeature(feature, (test) => {
 
   test('Deleting a group with an invalid group ID', ({ given, when, then }) => {
     let deleteRes: request.Response;
+    let token: string;
     let userC: User;
     let groupId: string;
 
-    given('I have an invalid group ID', () => {
-      groupId = 'not-real-id';
-      userC = new User();
+    given('I have an invalid group ID', async () => {
+      groupId = '';
+      const { id, tokenSet } =
+        await testStack.kcContainer.createDummyUserAndLogIn('users');
+      userC = await usersRepository.findOneOrFail(
+        { id },
+        { populate: ['groups'] },
+      );
+
+      token = tokenSet.access_token;
+      await usersRepository.flush();
     });
     when('I request to delete the group', async () => {
-      deleteRes = await request(app.getHttpServer()).delete(
-        `/users/${userC.id}/groups/${groupId}`,
-      );
+      deleteRes = await request(app.getHttpServer())
+        .delete(`/users/${userC.id}/groups/${groupId}`)
+        .auth(token, { type: 'bearer' });
     });
     then('I will receive a Not Found Error', () => {
       expect(deleteRes.status).toBe(404);

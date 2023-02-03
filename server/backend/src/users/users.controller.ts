@@ -153,7 +153,6 @@ export class UsersController {
     @Param('cid') cameraId: string,
   ): Promise<boolean> {
     try {
-      console.log('hello');
       const camRemoved = await this.usersService.removeCamera(
         userId,
         groupId,

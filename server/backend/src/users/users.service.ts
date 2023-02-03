@@ -1,6 +1,6 @@
 import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
 import { Camera } from '../cameras/camera.entity';
 import { Group } from '../groups/group.entity';
@@ -98,9 +98,13 @@ export class UsersService {
       throw new NotFoundError(`Group with ID "${groupId}" does not exist`);
     }
 
+    if (userId != groupObj.user.id) {
+      throw new ForbiddenException();
+    }
+
     // ensures that no cameras are in the group.
     if (groupObj.cameras.length != 0) {
-      throw new Error(
+      throw new ConflictException(
         `Group "${groupObj.name}" is not empty and still has cameras associated with it on the backend.`,
       );
     }
@@ -185,26 +189,20 @@ export class UsersService {
   ): Promise<boolean> {
     // add the thing where it checks that the user owns the idCam param.
 
-    const cam = await this.cameraRepository.findOne(
-      { id: idCam },
-      {
-        populate: [
-          'group',
-          'group.cameras',
-          'notifications',
-          'notifications.camera',
-          'notifications.camera.id',
-        ],
-      },
+    const group = await this.groupRepository.findOne(
+      { id: idGroup },
+      { populate: ['cameras'] },
     );
 
-    if (cam === null) {
+    const camera = await this.cameraRepository.findOne({ id: idCam });
+
+    if (group === null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
     // removes notifications before removing the camera.
     if (await this.removeNotifications(idCam)) {
-      this.cameraRepository.remove(cam);
-      await this.cameraRepository.flush();
+      group.cameras.remove(camera);
+      await this.groupRepository.flush();
     } else {
       throw new Error(
         `During the removal of notifications, there was an error and the deletion of the camera will not proceed.`,

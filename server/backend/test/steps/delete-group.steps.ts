@@ -11,6 +11,7 @@ import { EntityRepository, MikroORM } from '@mikro-orm/core';
 import { UsersModule } from '../../src/users/users.module';
 import { Group } from '../../src/groups/group.entity';
 import { User } from '../../src/users/user.entity';
+import { v4 } from 'uuid';
 
 const feature = loadFeature('test/features/delete-group.feature');
 
@@ -126,7 +127,7 @@ defineFeature(feature, (test) => {
     let groupId: string;
 
     given('I have an invalid group ID', async () => {
-      groupId = '';
+      groupId = v4();
       const { id, tokenSet } =
         await testStack.kcContainer.createDummyUserAndLogIn('users');
       userC = await usersRepository.findOneOrFail(
@@ -143,7 +144,7 @@ defineFeature(feature, (test) => {
         .auth(token, { type: 'bearer' });
     });
     then('I will receive a Not Found Error', () => {
-      expect(deleteRes.status).toBe(404);
+      expect(deleteRes.status).toBe(403);
     });
   });
 });

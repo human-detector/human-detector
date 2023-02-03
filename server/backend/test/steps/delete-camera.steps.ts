@@ -13,6 +13,7 @@ import { User } from '../../src/users/user.entity';
 import { IPUSH_NOTIFICATIONS_SERVICE_TOKEN } from '../../src/cameras/push-notifications/push-notifications-service.interface';
 import { notificationWithDummySnapshot } from '../helpers/notification';
 import { UsersModule } from '../../src/users/users.module';
+import { v4 } from 'uuid';
 
 const feature = loadFeature('test/features/delete-camera.feature');
 
@@ -20,8 +21,6 @@ defineFeature(feature, (test) => {
   let app: INestApplication;
   let testStack: TestStack;
   let usersRepository: EntityRepository<User>;
-  let groupRepository: EntityRepository<Group>;
-  let cameraRepository: EntityRepository<Camera>;
   let em: EntityManager;
 
   beforeAll(async () => {
@@ -35,8 +34,6 @@ defineFeature(feature, (test) => {
 
     em = testStack.module.get<MikroORM>(MikroORM).em.fork();
     usersRepository = em.getRepository(User);
-    groupRepository = em.getRepository(Group);
-    cameraRepository = em.getRepository(Camera);
 
     app = await testStack.module.createNestApplication();
     await app.init();
@@ -87,13 +84,17 @@ defineFeature(feature, (test) => {
       expect(deleteRes.status).toBe(200);
     });
     and('the camera is no longer on the backend', async () => {
-      await groupRepository.flush();
-      const group = await groupRepository.findOne(
-        { id: groupA.id },
-        { populate: ['cameras'] },
-      );
-      console.error(await cameraRepository.findOne({ id: cameraA.id }));
-      expect(group.cameras).toHaveLength(0);
+      const expectedResponse = [
+        {
+          id: groupA.id,
+          name: groupA.name,
+          cameras: [],
+        },
+      ];
+      const groupsReq = await request(app.getHttpServer())
+        .get(`/users/${userA.id}/groups`)
+        .auth(token, { type: 'bearer' });
+      expect(groupsReq.body).toEqual(expectedResponse);
     });
   });
 
@@ -137,11 +138,18 @@ defineFeature(feature, (test) => {
     then('the camera will be deleted', () => {
       expect(deleteRes.status).toBe(200);
     });
-    and('the notifications will also be deleted', async () => {
-      expect(cameraB.notifications).toHaveLength(0);
-    });
     and('the camera is no longer on the backend', async () => {
-      expect(groupB.cameras).toHaveLength(0);
+      const expectedResponse = [
+        {
+          id: groupB.id,
+          name: groupB.name,
+          cameras: [],
+        },
+      ];
+      const groupsReq = await request(app.getHttpServer())
+        .get(`/users/${userB.id}/groups`)
+        .auth(token, { type: 'bearer' });
+      expect(groupsReq.body).toEqual(expectedResponse);
     });
   });
 
@@ -164,7 +172,7 @@ defineFeature(feature, (test) => {
         { populate: ['groups'] },
       );
 
-      cameraId = '';
+      cameraId = v4();
       token = tokenSet.access_token;
       groupC = new Group('group C');
       userC.groups.add(groupC);

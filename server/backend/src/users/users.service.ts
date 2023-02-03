@@ -156,7 +156,7 @@ export class UsersService {
    * Removes all notifications associated with Camera idCam.
    * @param idCam
    */
-  public async removeNotifications(idCam: string): Promise<boolean> {
+  public async removeNotifications(idCam: string): Promise<void> {
     const cam = await this.cameraRepository.findOne(
       { id: idCam },
       {
@@ -174,8 +174,6 @@ export class UsersService {
 
     cam.notifications.removeAll();
     await this.cameraRepository.flush();
-
-    return true;
   }
 
   /**
@@ -196,19 +194,18 @@ export class UsersService {
 
     const camera = await this.cameraRepository.findOne({ id: idCam });
 
-    if (group === null) {
+    if (group === null || camera == null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);
     }
-    // removes notifications before removing the camera.
-    if (await this.removeNotifications(idCam)) {
-      group.cameras.remove(camera);
-      await this.groupRepository.flush();
-    } else {
-      throw new Error(
-        `During the removal of notifications, there was an error and the deletion of the camera will not proceed.`,
-      );
+
+    if (camera.group.user.id != idUser) {
+      throw new ForbiddenException();
     }
 
+    // removes notifications before removing the camera.
+    await this.removeNotifications(idCam);
+    group.cameras.remove(camera);
+    await this.groupRepository.flush();
     return true;
   }
 

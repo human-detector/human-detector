@@ -13,7 +13,6 @@ import {
 import { JwtIdentityGuard } from '../auth/jwt-identity.guard';
 import { NotFoundError } from '../errors.types';
 import { UsersService } from './users.service';
-import { UnauthorizedException } from '@nestjs/common/exceptions';
 
 export type GetGroupsOutput = {
   id: string;
@@ -106,7 +105,7 @@ export class UsersController {
       return groupRemoved;
     } catch (error) {
       if (error instanceof NotFoundError) {
-        throw new UnauthorizedException();
+        throw new ForbiddenException();
       } else {
         throw error;
       }
@@ -161,7 +160,7 @@ export class UsersController {
       return camRemoved;
     } catch (error) {
       if (error instanceof NotFoundError) {
-        throw new UnauthorizedException();
+        throw new ForbiddenException();
       } else {
         throw error;
       }

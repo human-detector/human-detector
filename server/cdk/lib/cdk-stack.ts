@@ -133,6 +133,11 @@ export class CdkStack extends cdk.Stack {
       userPoolName: "app-userpool",
       signInCaseSensitive: false, // recommended in AWS docs
       selfSignUpEnabled: true,
+      standardAttributes: {
+        email: {
+          required: true,
+        },
+      },
       signInAliases: {
         username: true,
         email: true,

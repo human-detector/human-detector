@@ -40,7 +40,6 @@ export default function GroupRegInfoScreen({ navigation }: Props): React.ReactEl
               Alert.alert('Error: You cannot use the same name for a group more than once.');
               console.error(`groupName was used more than once called: ${groupName}`);
               navigation.goBack();
-              return;
             }    
           })
 

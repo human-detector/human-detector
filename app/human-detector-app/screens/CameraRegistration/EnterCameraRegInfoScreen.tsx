@@ -71,9 +71,8 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
             Alert.alert('Error: You cannot use the same name for a camera more than once.');
             console.error(`cameraName was used more than once called: ${cameraName}`);
             navigation.goBack();
-            return;
           }          
-      })
+        })
 
         // begins work on registering the camera
         const uuid = await backendContext.registerCamera(

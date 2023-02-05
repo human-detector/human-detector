@@ -69,7 +69,7 @@ defineFeature(feature, (test) => {
         .delete(`/users/${userA.id}/groups/${groupA.id}`)
         .auth(token, { type: 'bearer' });
     });
-    then('I will receive a Not Found Error', () => {
+    then('I will receive a Conflict Error', () => {
       expect(deleteRes.status).toBe(409);
     });
     and('the group will still be active', async () => {
@@ -114,9 +114,9 @@ defineFeature(feature, (test) => {
     then('the group will be deleted', async () => {
       expect(deleteRes.status).toBe(200);
       getRes = await request(app.getHttpServer())
-        .get(`/users/${userB.id}/groups/${groupB.id}`)
+        .get(`/users/${userB.id}/groups/`)
         .auth(token, { type: 'bearer' });
-      expect(getRes.status).toBe(404);
+      expect(getRes.body).toEqual([]);
     });
   });
 
@@ -143,7 +143,7 @@ defineFeature(feature, (test) => {
         .delete(`/users/${userC.id}/groups/${groupId}`)
         .auth(token, { type: 'bearer' });
     });
-    then('I will receive a Not Found Error', () => {
+    then('I will receive a Forbidden Error', () => {
       expect(deleteRes.status).toBe(403);
     });
   });

@@ -187,4 +187,47 @@ defineFeature(feature, (test) => {
       expect(res.status).toBe(403);
     });
   });
+
+  test('Trying to delete a camera that belongs to another user', ({
+    given,
+    and,
+    when,
+    then,
+  }) => {
+    let userD: User;
+    let token: string;
+    let userE: User;
+    let groupE: Group;
+    let cameraE: Camera;
+    let res: request.Response;
+
+    given('I am a registered user', async () => {
+      const { id: id, tokenSet } =
+        await testStack.kcContainer.createDummyUserAndLogIn('users');
+      userD = await usersRepository.findOneOrFail({ id: id });
+      token = tokenSet.access_token;
+    });
+    and('there is another user with a registered camera', async () => {
+      const { id: id } = await testStack.kcContainer.createDummyUserAndLogIn(
+        'users',
+      );
+      userE = await usersRepository.findOneOrFail(
+        { id: id },
+        { populate: ['groups'] },
+      );
+      groupE = new Group('groupE');
+      cameraE = new Camera('CameraE', 'publicKeyE', '2077');
+      userE.groups.add(groupE);
+      groupE.cameras.add(cameraE);
+      await usersRepository.flush();
+    });
+    when('I request to delete the camera of another user', async () => {
+      res = await request(app.getHttpServer())
+        .delete(`/users/${userD.id}/groups/${groupE.id}/cameras/${cameraE.id}`)
+        .auth(token, { type: 'bearer' });
+    });
+    then('I will receive a Forbidden error', () => {
+      expect(res.status).toEqual(403);
+    });
+  });
 });

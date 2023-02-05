@@ -35,14 +35,14 @@ export default function GroupRegInfoScreen({ navigation }: Props): React.ReactEl
           /**
            * Upon button press, register a group after verifying the groupName isn't the same
            */
-          for (const group of userContext.groupList) {
+          userContext.groupList.forEach(group => {
             if (group.groupName === groupName) {
               Alert.alert('Error: You cannot use the same name for a group more than once.');
               console.error(`groupName was used more than once called: ${groupName}`);
               navigation.goBack();
               return;
             }    
-          }
+          })
 
           const groupId: string | null = await backendContext.registerGroupAPI(groupName);
           if (groupId) {

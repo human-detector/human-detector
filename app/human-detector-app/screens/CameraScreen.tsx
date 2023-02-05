@@ -24,7 +24,7 @@ export default function CameraScreen({ navigation, route }: Props): React.ReactE
     throw new Error('Group to view not valid');
   }
 
-  const [cameras, setCameras] = React.useState<Camera[]>(groupToView.cameras);
+  const [, setCameras] = React.useState<Camera[]>(groupToView.cameras);
 
   return (
     <View style={styles.container}>

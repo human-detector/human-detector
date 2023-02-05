@@ -66,14 +66,14 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
           console.error(`Group with id" ${groupId} " was not found.`);
           return;
         } // verifying that the cameraName isn't already used in this group
-        for (const camera of groupObj.cameras) {
+        groupObj.cameras.forEach(camera => {
           if (camera.cameraName === cameraName) {
             Alert.alert('Error: You cannot use the same name for a camera more than once.');
             console.error(`cameraName was used more than once called: ${cameraName}`);
             navigation.goBack();
             return;
           }          
-        }
+      })
 
         // begins work on registering the camera
         const uuid = await backendContext.registerCamera(
@@ -95,7 +95,7 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
         const newCam = new Camera(cameraName, uuid, []);
 
         userContext.getGroupFromId(groupId)?.cameras.push(newCam);
-        navigation.navigate('Loading', { groupId: groupId, cameraId: uuid });
+        navigation.navigate('Loading', { groupId, cameraId: uuid });
         userContext.cameraMap.set(newCam.cameraId, newCam);
 
       })

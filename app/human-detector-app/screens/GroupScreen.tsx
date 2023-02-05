@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../src/navigation/stackParamList';
 import { UserContext } from '../contexts/userContext';
@@ -19,7 +19,7 @@ export default function GroupScreen({ navigation }: Props): React.ReactElement {
     throw new Error('Error in GroupScreen.');
   }
 
-  const [groups, setGroups] = React.useState<Group[]>(userContext.groupList);
+  const [, setGroups] = React.useState<Group[]>(userContext.groupList);
 
   const pressHandler = (groupId: string) => {
     // TODO: Navigate with the camera array for the group press

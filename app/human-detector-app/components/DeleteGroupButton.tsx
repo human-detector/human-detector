@@ -27,7 +27,7 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
         },
         {
           text: "Delete",
-          onPress: async () => {  {
+          onPress: async () => {  
             const response: number | null = await backendContext.deleteGroupAPI(groupId);
             if (response === 200) { // if the backend deletion was successful, moves onto deleting it for the user.
               const group = userContext.getGroupFromId(groupId);
@@ -35,16 +35,19 @@ const showAlert = async (groupId: string, backendContext: BackendService, userCo
                 const groupIndex = userContext.groupList.indexOf(group);
                 if (groupIndex !== -1) { // removes the group if it finds the index
                   userContext.removeGroupFromList(groupIndex);
-                  setGroups(userContext.groupList);
+                  setGroups([...userContext.groupList]);
                 } else { // did not find the index.
                   console.error(`Trying to find the index of the group to be removed was not successful`);
                   Alert.alert('Error when removing the group!');
                 }
+              } else {
+                console.error(`Could not find the groupId: "${groupId}" in the userContext`);
+                Alert.alert('Error when removing the group!');
               }
             } else {
               Alert.alert('Error when removing the group!');
             }
-          }}
+          }
         }
       ]
     );

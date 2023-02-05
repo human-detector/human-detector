@@ -20,7 +20,7 @@ const showAlert = (groupId: string, cameraId: string, backendContext: BackendSer
       },
       {
         text: "Delete",
-        onPress: async () => { {
+        onPress: async () => {
           const response: number | null = await backendContext.deleteCameraAPI(groupId, cameraId);
           if (response === 200) { // if backend deletion was successful, moves onto deleting it for the user.
             const groupObj = userContext.getGroupFromId(groupId);
@@ -31,11 +31,19 @@ const showAlert = (groupId: string, cameraId: string, backendContext: BackendSer
                 const groupIndex = userContext.groupList.indexOf(groupObj);
                 const camIndex = groupObj.cameras.indexOf(cameraObj);
                 groupObj.removeCameraFromGroup(camIndex);
-                setCameras(userContext.groupList[groupIndex].cameras);
+                setCameras([...userContext.groupList[groupIndex].cameras]);
+              } else {
+                Alert.alert('Error when removing the camera!');
+                console.error(`Could not find the cameraId: "${cameraId}" in the group that was found with id: "${groupId}"`);
               }
+            } else {
+              Alert.alert('Error when removing the camera!');
+              console.error(`Could not find the groupId: "${groupId}" in the userContext`);
             }
+          } else {
+            Alert.alert('Error when removing the camera!');
           }
-        }}
+        }
       }
     ]
   );

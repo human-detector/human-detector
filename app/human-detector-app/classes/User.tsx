@@ -29,7 +29,7 @@ export default class User {
   }
 
   removeGroupFromList(groupIndex: number): Group {
-    if (groupIndex > this.groupList.length) {
+    if (groupIndex >= this.groupList.length) {
       throw new Error('Invalid index');
     }
     if (this.groupList[groupIndex].cameras.length > 0) {

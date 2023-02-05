@@ -18,3 +18,9 @@ Scenario: Trying to delete a camera that does not exist
   Given I have an invalid camera ID
   When I request to delete the camera
   Then a 'Forbidden' error will be received
+
+Scenario: Trying to delete a camera that belongs to another user
+  Given I am a registered user
+  And there is another user with a registered camera
+  When I request to delete the camera of another user
+  Then I will receive a Forbidden error

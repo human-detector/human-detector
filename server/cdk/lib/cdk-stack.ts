@@ -270,6 +270,20 @@ export class CdkStack extends cdk.Stack {
     });
 
     /* Users */
+    new iam.User(this, "CDKDeployer", {
+      managedPolicies: [
+        new iam.ManagedPolicy(this, "CDKFullAccess", {
+          statements: [
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              actions: ["sts:AssumeRole"],
+              resources: ["arn:aws:iam::*:role/cdk-*"],
+            }),
+          ],
+        }),
+      ],
+    });
+
     // Log + console access for debugging the app, but not the deployment
     new iam.User(this, "Dev", {
       managedPolicies: [

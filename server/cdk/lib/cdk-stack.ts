@@ -284,6 +284,13 @@ export class CdkStack extends cdk.Stack {
       ],
     });
 
+    // Admin access. Use this instead of the root user
+    new iam.User(this, "Admin", {
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName("AdministratorAccess"),
+      ],
+    });
+
     // Log + console access for debugging the app, but not the deployment
     new iam.User(this, "Dev", {
       managedPolicies: [

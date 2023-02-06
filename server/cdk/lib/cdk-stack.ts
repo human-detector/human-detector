@@ -269,5 +269,13 @@ export class CdkStack extends cdk.Stack {
       targets: [appScalingGroup],
     });
 
+    /* Users */
+    // Log + console access for debugging the app, but not the deployment
+    new iam.User(this, "Dev", {
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLogsFullAccess"),
+        iam.ManagedPolicy.fromAwsManagedPolicyName("EC2InstanceConnect"),
+      ],
+    });
   }
 }

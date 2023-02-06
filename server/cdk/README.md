@@ -23,3 +23,5 @@ in mind when deploying:
   manually, run the init scripts in `server/database/init` (you can use EC2 instance connect to
   connect to the database), and grant `usersync` permissions to insert data into the `user` table
   we create
+- Consider [enabling console access](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_admin-change-user.html)
+  for the `Dev` user to enable log access for everyone on the team

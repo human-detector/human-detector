@@ -167,7 +167,10 @@ export class UsersService {
       { populate: ['cameras'] },
     );
 
-    const camera = await this.cameraRepository.findOne({ id: idCam });
+    const camera = await this.cameraRepository.findOne(
+      { id: idCam },
+      { populate: ['notifications'] },
+    );
 
     if (group === null || camera == null) {
       throw new NotFoundError(`Camera with given ID does not exist.`);

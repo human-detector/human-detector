@@ -65,38 +65,42 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
         if (groupObj === undefined) {
           console.error(`Group with id" ${groupId} " was not found.`);
           return;
-        } // verifying that the cameraName isn't already used in this group
+        }
+        // checks that the sameName isn't used for any camera in the groupObj.
+        let sameName = false;
         groupObj.cameras.forEach(camera => {
           if (camera.cameraName === cameraName) {
-            Alert.alert('Error: You cannot use the same name for a camera more than once.');
-            console.error(`cameraName was used more than once called: ${cameraName}`);
-            navigation.goBack();
+            sameName = true;
           }          
         })
 
-        // begins work on registering the camera
-        const uuid = await backendContext.registerCamera(
-          cameraName,
-          serial.Serial,
-          serial.PubKey,
-          groupId
-        );
+        if (sameName) {
+          Alert.alert('Error: You cannot use the same name for a camera more than once.');
+          console.error(`cameraName was used more than once called: ${cameraName}`);
+          navigation.goBack();
+        } else { // begins work on registering the camera
+          const uuid = await backendContext.registerCamera(
+            cameraName,
+            serial.Serial,
+            serial.PubKey,
+            groupId
+          );
 
-        if (uuid === null) {
-          navigation.navigate('BluetoothDeviceList');
-          return;
+          if (uuid === null) {
+            navigation.navigate('BluetoothDeviceList');
+            return;
+          }
+
+          bleContext.writeCameraWifi(user, pass, uuid).catch((error) => {
+            console.error(error);
+            navigation.navigate('BluetoothDeviceList');
+          });
+          const newCam = new Camera(cameraName, uuid, []);
+
+          userContext.getGroupFromId(groupId)?.cameras.push(newCam);
+          navigation.navigate('Loading', { groupId, cameraId: uuid });
+          userContext.cameraMap.set(newCam.cameraId, newCam);
         }
-
-        bleContext.writeCameraWifi(user, pass, uuid).catch((error) => {
-          console.error(error);
-          navigation.navigate('BluetoothDeviceList');
-        });
-        const newCam = new Camera(cameraName, uuid, []);
-
-        userContext.getGroupFromId(groupId)?.cameras.push(newCam);
-        navigation.navigate('Loading', { groupId, cameraId: uuid });
-        userContext.cameraMap.set(newCam.cameraId, newCam);
-
       })
       .catch((error) => {
         console.error(error);

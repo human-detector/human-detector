@@ -95,10 +95,10 @@ export class UsersController {
     }
   }
 
-  @Delete(':id/groups/:name')
+  @Delete(':id/groups/:gid')
   async deleteGroup(
     @Param('id') userId: string,
-    @Param('name') groupId: string,
+    @Param('gid') groupId: string,
   ): Promise<boolean> {
     try {
       const groupRemoved = await this.usersService.deleteGroup(userId, groupId);

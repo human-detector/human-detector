@@ -35,24 +35,28 @@ export default function GroupRegInfoScreen({ navigation }: Props): React.ReactEl
           /**
            * Upon button press, register a group after verifying the groupName isn't the same
            */
+          let sameName = false;
           userContext.groupList.forEach(group => {
             if (group.groupName === groupName) {
-              Alert.alert('Error: You cannot use the same name for a group more than once.');
-              console.error(`groupName was used more than once called: ${groupName}`);
-              navigation.goBack();
+              sameName = true;
             }    
           })
 
-          const groupId: string | null = await backendContext.registerGroupAPI(groupName);
-          if (groupId) {
-            const newGroup = new Group(groupName, groupId, []);
-            userContext.groupList.push(newGroup);
-          } else {
-            console.error('Error in getting the groupId!');
-            Alert.alert('Error when adding a group!');
+          if (sameName) { // if same name, error is thrown
+            Alert.alert('Error: You cannot use the same name for a group more than once.');
+            console.error(`groupName was used more than once called: ${groupName}`);
+            navigation.goBack();
+          } else { // registers the group to the backend
+            const groupId: string | null = await backendContext.registerGroupAPI(groupName);
+            if (groupId) {
+              const newGroup = new Group(groupName, groupId, []);
+              userContext.groupList.push(newGroup);
+            } else {
+              console.error('Error in getting the groupId!');
+              Alert.alert('Error when adding a group!');
+            }
             navigation.goBack();
           }
-          navigation.goBack();
         }}
       />
     </View>

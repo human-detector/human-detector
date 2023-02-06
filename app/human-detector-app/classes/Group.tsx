@@ -23,11 +23,4 @@ export default class Group {
   removeCameraFromGroup(camerasIndex: number) {
     this.cameras.splice(camerasIndex, 1);
   }
-  
-  getCameraFromId(cameraId: string) {
-    if (this.cameras.find((cam) => cam.cameraId === cameraId)) {
-      return this.cameras.find((cam) => cam.cameraId === cameraId);
-    }
-    throw new Error("Camera doesn't exist!");
-  }
 }

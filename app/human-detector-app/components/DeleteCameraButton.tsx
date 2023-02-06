@@ -25,13 +25,18 @@ const showAlert = (groupId: string, cameraId: string, backendContext: BackendSer
           if (response === 200) { // if backend deletion was successful, moves onto deleting it for the user.
             const groupObj = userContext.getGroupFromId(groupId);
             if (groupObj) {
-              const cameraObj = groupObj.getCameraFromId(cameraId);
+              const cameraObj = userContext.cameraMap.get(cameraId);
               if (cameraObj) { // "removes" the notifications and the camera.
                 cameraObj.notifications = [];
                 const groupIndex = userContext.groupList.indexOf(groupObj);
                 const camIndex = groupObj.cameras.indexOf(cameraObj);
                 groupObj.removeCameraFromGroup(camIndex);
-                setCameras([...userContext.groupList[groupIndex].cameras]);
+                if (!userContext.cameraMap.delete(cameraId)) {
+                  Alert.alert('Error when removing the camera!');
+                  console.error(`The camera: "${cameraId}" was not found in the cameraMap when it should have been there to delete()`);
+                } else {
+                  setCameras([...userContext.groupList[groupIndex].cameras]);
+                }
               } else {
                 Alert.alert('Error when removing the camera!');
                 console.error(`Could not find the cameraId: "${cameraId}" in the group that was found with id: "${groupId}"`);

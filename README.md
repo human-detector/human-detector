@@ -30,7 +30,8 @@ To run only behavior tests through jest-cucumber, you can use the command `npm r
 
 ## Running the Mobile Application
 
-To run the app, you must have the expo cli installed on your machine. You also must set the Keycloak environment variable for authentication.
+To run the app, you must have the expo cli installed on your machine. You also must specify an OpenID Connect endpoint
+for authentication (Keycloak for local development, Cognito for production).
 
 ```
 npm install -g expo-cli // install the expo-cli if you haven't already for glpbal expo cli
@@ -45,7 +46,7 @@ npm install //install dependencies
 eas:build android // For android development
 eas:build ios // For iOS development
 
-KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> expo start --dev-client // Start the mobile application 
+OIDC_ENDPOINT=<authUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> expo start --dev-client // Start the mobile application 
 
 ```
 
@@ -60,7 +61,7 @@ npm install -g expo-cli // install the expo-cli if you haven't already for glpba
 
 npm install
 
-KEYCLOAK_URL=<keycloakUrl> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> npx expo start // Start the mobile application without EAS-CLI
+OIDC_ENDPOINT=<auth> BACKEND_URL=<backendUrl> CLIENT_ID=<clientId> npx expo start // Start the mobile application without EAS-CLI
 ```
 
 

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { IAUTH_SERVICE_TOKEN } from './auth-service.interface';
 import { JwtIdentityGuard } from './jwt-identity.guard';
-import { KeycloakAuthService } from './keycloak-auth.service';
+import { OpenIDAuthService } from './open-id-auth.service';
 
 @Module({
   providers: [
     {
       provide: IAUTH_SERVICE_TOKEN,
-      useClass: KeycloakAuthService('users'),
+      useClass: OpenIDAuthService,
     },
     JwtIdentityGuard,
   ],

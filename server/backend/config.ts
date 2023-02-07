@@ -1,7 +1,6 @@
 export default () => ({
-  keycloak: {
-    host: process.env['KEYCLOAK_HOST'],
-    use_tls: process.env['KEYCLOAK_USE_TLS'],
+  auth: {
+    oidc_endpoint: process.env['OIDC_ENDPOINT'],
   },
   expo: {
     access_token: process.env['EXPO_ACCESS_TOKEN'],

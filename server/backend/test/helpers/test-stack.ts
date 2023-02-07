@@ -84,8 +84,8 @@ export async function buildTestStack(
         isGlobal: true,
         load: [
           () => ({
-            keycloak: {
-              host: `localhost:${kcContainer.getPort()}`,
+            auth: {
+              oidc_endpoint: `http://localhost:${kcContainer.getPort()}/realms/users`,
             },
           }),
         ],

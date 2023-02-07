@@ -25,7 +25,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       BACKEND_URL: ${{ secrets.BACKEND_URL }}
-      KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
+      OIDC_ENDPOINT: ${{ secrets.OIDC_ENDPOINT }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       
     # This only works on "run" commands

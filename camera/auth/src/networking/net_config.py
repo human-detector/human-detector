@@ -7,7 +7,7 @@ class NetConfig:
     """
     Contains backend configuration
     """
-    URL_API="https://api.averycb.net"
+    URL_API="https://api2.averycb.net"
 
     @staticmethod
     def get_heartbeat_url(uuid):

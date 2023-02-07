@@ -22,7 +22,7 @@ export class Group {
   @ManyToOne(() => User)
   user!: User;
 
-  @OneToMany(() => Camera, (camera) => camera.group)
+  @OneToMany(() => Camera, (camera) => camera.group, { orphanRemoval: true })
   cameras = new Collection<Camera>(this);
 
   constructor(name: string) {

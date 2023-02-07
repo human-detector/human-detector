@@ -1,6 +1,6 @@
 import { Collection, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { NotFoundError } from '../errors.types';
 import { Camera } from '../cameras/camera.entity';
 import { Group } from '../groups/group.entity';
@@ -12,6 +12,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: EntityRepository<User>,
     @InjectRepository(Group) private groupRepository: EntityRepository<Group>,
+    @InjectRepository(Camera)
+    private cameraRepository: EntityRepository<Camera>,
   ) {}
 
   /**
@@ -71,6 +73,49 @@ export class UsersService {
   }
 
   /**
+   * Deletes a given group from the user's list of created groups.
+   *
+   * @param userId the user's ID
+   * @param groupId the group ID that is going to be deleted
+   */
+  public async deleteGroup(userId: string, groupId: string): Promise<boolean> {
+    // finds user and then groupObj from the parameters.
+    const user = await this.usersRepository.findOne(
+      { id: userId },
+      { populate: ['groups'] },
+    );
+
+    if (user == null) {
+      throw new NotFoundError(`User with ID "${userId}" does not exist`);
+    }
+
+    const groupObj = await this.groupRepository.findOne(
+      { id: groupId },
+      { populate: ['cameras'] },
+    );
+
+    if (groupObj == null) {
+      throw new NotFoundError(`Group with ID "${groupId}" does not exist`);
+    }
+
+    if (userId != groupObj.user.id) {
+      throw new ForbiddenException();
+    }
+
+    // ensures that no cameras are in the group.
+    if (groupObj.cameras.length != 0) {
+      throw new ConflictException(
+        `Group "${groupObj.name}" is not empty and still has cameras associated with it on the backend.`,
+      );
+    }
+
+    user.groups.remove(groupObj);
+    await this.usersRepository.flush();
+
+    return true;
+  }
+
+  /**
    * Register a camera to the given user and group
    *
    * @param userId the user's ID.
@@ -105,6 +150,38 @@ export class UsersService {
     await this.groupRepository.flush();
 
     return newCamera;
+  }
+
+  /**
+   * Removes a given camera from one of the user's groups.
+   * Also removes the notifications as orphan removal is enabled.
+   * @param idCam
+   */
+  public async removeCamera(
+    idUser: string,
+    idGroup: string,
+    idCam: string,
+  ): Promise<boolean> {
+    const group = await this.groupRepository.findOne(
+      { id: idGroup },
+      { populate: ['cameras'] },
+    );
+
+    const camera = await this.cameraRepository.findOne(
+      { id: idCam },
+      { populate: ['notifications'] },
+    );
+
+    if (group === null || camera == null) {
+      throw new NotFoundError(`Camera with given ID does not exist.`);
+    }
+
+    if (camera.group.user.id != idUser) {
+      throw new ForbiddenException();
+    }
+    group.cameras.remove(camera);
+    await this.groupRepository.flush();
+    return true;
   }
 
   /**

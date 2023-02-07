@@ -7,6 +7,7 @@ import {
   Inject,
   Param,
   Put,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
 import { JwtIdentityGuard } from '../auth/jwt-identity.guard';
@@ -94,6 +95,23 @@ export class UsersController {
     }
   }
 
+  @Delete(':id/groups/:gid')
+  async deleteGroup(
+    @Param('id') userId: string,
+    @Param('gid') groupId: string,
+  ): Promise<boolean> {
+    try {
+      const groupRemoved = await this.usersService.deleteGroup(userId, groupId);
+      return groupRemoved;
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
+  }
+
   @Put(':uid/groups/:gid/cameras')
   async registerCamera(
     @Param('uid') userId: string,
@@ -118,6 +136,28 @@ export class UsersController {
       return {
         id: camera.id,
       };
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new ForbiddenException();
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  @Delete(':id/groups/:gid/cameras/:cid')
+  async removeCamera(
+    @Param('id') userId: string,
+    @Param('gid') groupId: string,
+    @Param('cid') cameraId: string,
+  ): Promise<boolean> {
+    try {
+      const camRemoved = await this.usersService.removeCamera(
+        userId,
+        groupId,
+        cameraId,
+      );
+      return camRemoved;
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new ForbiddenException();

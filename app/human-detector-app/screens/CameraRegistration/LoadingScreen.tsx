@@ -49,8 +49,8 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
     }, END_LOGGING_TIMEOUT);
   };
 
-  const addCamera = (cameraName, cameraId, groupId) => {
-    const newCam = new Camera(cameraName, cameraId, []);
+  const addCamera = () => {
+    const newCam = new Camera(name, cameraId, []);
     userContext.getGroupFromId(groupId)?.cameras.push(newCam);
     userContext.cameraMap.set(newCam.cameraId, newCam);
   }

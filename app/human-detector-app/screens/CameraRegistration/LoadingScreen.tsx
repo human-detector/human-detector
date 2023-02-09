@@ -111,7 +111,7 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
     // When a new device is detected, monitor for network connection statuses
     bleContext
       .checkCameraNotification(bleCallback)
-      .then(async (sub: Subscription) => {
+      .then((sub: Subscription) => {
         // Save off subscription so that we can cancel monitoring later
         setBleSub(sub);
         

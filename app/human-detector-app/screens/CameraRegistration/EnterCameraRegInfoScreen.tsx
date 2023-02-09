@@ -6,6 +6,7 @@ import { BackendContext } from '../../contexts/backendContext';
 import { BLEContext } from '../../contexts/bleContext';
 import { BLEParamList } from '../../src/navigation/bleParamList';
 import { UserContext } from '../../contexts/userContext';
+import Camera from '../../classes/Camera';
 import { styles } from '../../src/styles';
 
 /**
@@ -90,7 +91,15 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
             return;
           }
 
-          navigation.navigate('Loading', { groupId, cameraId: uuid, user, pass, name: cameraName });
+          bleContext.writeCameraWifi(user, pass, uuid).catch((error) => {
+            console.error(error);
+            navigation.navigate('BluetoothDeviceList');
+          });
+          const newCam = new Camera(cameraName, uuid, []);
+
+          userContext.getGroupFromId(groupId)?.cameras.push(newCam);
+          navigation.navigate('Loading', { groupId, cameraId: uuid });
+          userContext.cameraMap.set(newCam.cameraId, newCam);
         }
       })
       .catch((error) => {

@@ -49,6 +49,12 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
     }, END_LOGGING_TIMEOUT);
   };
 
+  const addCamera = (cameraName, cameraId, groupId) => {
+    const newCam = new Camera(cameraName, cameraId, []);
+    userContext.getGroupFromId(groupId)?.cameras.push(newCam);
+    userContext.cameraMap.set(newCam.cameraId, newCam);
+  }
+
   useEffect(() => {
     if (connState === undefined) return;
 
@@ -69,10 +75,8 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
         endLoading();
         break;
       case ConnectionStatus.SUCCESS:
-        const newCam = new Camera(name, cameraId, []);
-        userContext.getGroupFromId(groupId)?.cameras.push(newCam);
-        userContext.cameraMap.set(newCam.cameraId, newCam);
-        
+        // ESLint doesn't like variable declerations here :(
+        addCamera(name, cameraId, groupId);
         setIcon(LoadingState.Success);
         setConnString('Success!');
         endLoading();

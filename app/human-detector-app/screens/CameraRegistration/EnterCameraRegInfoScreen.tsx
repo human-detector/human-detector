@@ -43,13 +43,18 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
   const submitWifiToPi = () => {
     if (currentDevice === null) return;
 
-    if (displayPass && pass === '') {
-      // TODO: Display error
+    if (cameraName === '') {
+      Alert.alert('Camera name field is empty');
       return;
     }
 
     if (displayUser && user === '') {
-      // TODO: Display error
+      Alert.alert('Username field is empty');
+      return;
+    }
+
+    if (displayPass && pass === '') {
+      Alert.alert('Password field is empty.');
       return;
     }
 
@@ -117,11 +122,19 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
     bleContext
       .checkWifiType()
       .then((type: WifiSecType) => {
+        if (type === WifiSecType.NO_NETWORK_FOUND) {
+          Alert.alert('Error: Raspberry Pi could not find the wifi network the phone is currently connected too.');
+          navigation.goBack();
+        } else if (type === WifiSecType.UNKNOWN) {
+          Alert.alert('Error: Unknown Wifi security type.');
+          navigation.goBack();
+        }
         setDisplayUser(type === WifiSecType.WPA2_802_1X);
         setDisplayPass(type === WifiSecType.WPA2_802_1X || type === WifiSecType.WPA2_PSK);
       })
       .catch((error) => {
         console.error(error);
+        Alert.alert('Error: Failed to find network security type. Make sure your phone is connected to a wifi network.');
         navigation.navigate('BluetoothDeviceList');
       });
   }, [currentDevice]);

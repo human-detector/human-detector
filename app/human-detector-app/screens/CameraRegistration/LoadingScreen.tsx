@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
 import { View, Text } from 'react-native';
+import { EventArg } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BleError, Subscription, BleErrorCode } from 'react-native-ble-plx';
 import { LoadingIcon, LoadingState } from '../../components/LoadingIcon';
@@ -25,6 +26,7 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
   const [bleSub, setBleSub] = useState<Subscription>();
   const [connString, setConnString] = useState<String>('Connecting to WiFi');
   const [icon, setIcon] = useState<LoadingState>(LoadingState.Loading);
+  const [loadingEnded, setLoadingEnded] = useState<Boolean>(false);
 
   const backendContext = useContext(BackendContext);
   const bleContext = useContext(BLEContext);
@@ -41,6 +43,7 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
   }
 
   const endLoading = (failure: boolean) => {
+    setLoadingEnded(true);
     bleSub!.remove();
     bleContext.disconnectFromDevice();
     setTimeout(() => {
@@ -80,6 +83,19 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
         break;
     }
   }, [connState]);
+
+  // gestureEnabled only works on iOS, so this is needed here to
+  // actually disable going back on Android
+  useEffect(() => {
+    const backListener = (e: EventArg<'beforeRemove', true, any>) => {
+      if (!loadingEnded) {
+        e.preventDefault();
+      }
+    };
+
+    navigation.addListener('beforeRemove', backListener);
+    return () => navigation.removeListener('beforeRemove', backListener);
+  }, [navigation, loadingEnded]);
 
   useEffect(() => {
     if (currentDevice === null) return;

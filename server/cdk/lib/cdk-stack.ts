@@ -144,6 +144,11 @@ export class CdkStack extends cdk.Stack {
       },
       lambdaTriggers: {
         postAuthentication: syncLambda,
+        // HACK: the parameters used in syncLambda are common between the post-auth
+        //       and post-confirm triggers, so we can reuse it here (for now).
+        //       If the post-confirm trigger starts breaking, something probably
+        //       changed and it'll need a dedicated lambda function.
+        postConfirmation: syncLambda,
       },
     });
     const supportedIdentityProviders: cognito.UserPoolClientIdentityProvider[] =

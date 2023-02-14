@@ -41,7 +41,7 @@ export default function BLEScreens({ route }: Props) {
       <Stack.Screen
         name="Loading"
         component={LoadingScreen}
-        options={{ title: 'Connecting Camera to WiFi...' }}
+        options={{ title: 'Connecting Camera to WiFi...', headerBackVisible: false, gestureEnabled: false }}
       />
     </Stack.Navigator>
   );

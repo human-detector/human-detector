@@ -40,21 +40,25 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
     throw new Error('user context is null!');
   }
 
+  const alertWithOk = (title: String, desc: String) => {
+    Alert.alert(title, desc, [ { text: 'Ok' } ]);
+  }
+
   const submitWifiToPi = () => {
     if (currentDevice === null) return;
 
     if (cameraName === '') {
-      Alert.alert('Camera name field is empty');
+      alertWithOk('Error', 'Camera name field is empty');
       return;
     }
 
     if (displayUser && user === '') {
-      Alert.alert('Username field is empty');
+      alertWithOk('Error', 'Username field is empty');
       return;
     }
 
     if (displayPass && pass === '') {
-      Alert.alert('Password field is empty.');
+      alertWithOk('Error', 'Password field is empty');
       return;
     }
 
@@ -80,7 +84,7 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
         })
 
         if (sameName) {
-          Alert.alert('Error: You cannot use the same name for a camera more than once.');
+          alertWithOk('Error', 'You cannot use the same name for a camera more than once.');
           console.error(`cameraName was used more than once called: ${cameraName}`);
           navigation.goBack();
         } else { // begins work on registering the camera
@@ -123,10 +127,10 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
       .checkWifiType()
       .then((type: WifiSecType) => {
         if (type === WifiSecType.NO_NETWORK_FOUND) {
-          Alert.alert('Error: Raspberry Pi could not find the wifi network the phone is currently connected too.');
+          alertWithOk('Error', 'Raspberry Pi could not find the wifi network the phone is currently connected to.');
           navigation.goBack();
         } else if (type === WifiSecType.UNKNOWN) {
-          Alert.alert('Error: Unknown Wifi security type.');
+          alertWithOk('Error', 'Unknown network type');
           navigation.goBack();
         }
         setDisplayUser(type === WifiSecType.WPA2_802_1X);
@@ -134,7 +138,7 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
       })
       .catch((error) => {
         console.error(error);
-        Alert.alert('Error: Failed to find network security type. Make sure your phone is connected to a wifi network.');
+        alertWithOk('Error', 'Failed to find network security type. Make sure your phone is connected to a wifi network.');
         navigation.navigate('BluetoothDeviceList');
       });
   }, [currentDevice]);

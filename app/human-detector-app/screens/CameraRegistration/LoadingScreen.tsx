@@ -11,6 +11,7 @@ import { BLEParamList } from '../../src/navigation/bleParamList';
 import { UserContext } from '../../contexts/userContext';
 import { styles } from '../../src/styles';
 import { BackendContext } from '../../contexts/backendContext';
+import Camera from '../../classes/Camera';
 
 const END_LOGGING_TIMEOUT = 3 * 1000;
 
@@ -33,7 +34,7 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
   const userContext = useContext(UserContext);
   const currentDevice = bleContext.getCurrentConnectedDevice();
 
-  const {groupId, cameraId} = route.params;
+  const {groupId, cameraId, user, pass, name} = route.params;
 
   if (!backendContext) {
     throw new Error('Backend context is null');
@@ -42,43 +43,52 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
     throw new Error('user context is null');
   }
 
-  const endLoading = (failure: boolean) => {
+  const endLoading = () => {
     setLoadingEnded(true);
     bleSub!.remove();
     bleContext.disconnectFromDevice();
     setTimeout(() => {
-      navigation.navigate(failure ? 'CameraRegistrationInfo' : 'BluetoothDeviceList');
+      navigation.navigate('BluetoothDeviceList');
     }, END_LOGGING_TIMEOUT);
   };
+
+  const addCamera = () => {
+    const newCam = new Camera(name, cameraId, []);
+    userContext.getGroupFromId(groupId)?.cameras.push(newCam);
+    userContext.cameraMap.set(newCam.cameraId, newCam);
+  }
 
   useEffect(() => {
     if (connState === undefined) return;
 
     switch (connState.State) {
       case ConnectionStatus.DISCONNECTED:
-        setConnString('Disconnected from old WiFi');
-        break; // Do nothing
+        // Do nothing. This usually occurs after a Fail, so isn't important
+        // This also is the first thing sent usually, but is quickly replaced by
+        // connecting.
+        break;
       case ConnectionStatus.CONNECTING:
         setIcon(LoadingState.Loading);
         setConnString('Connecting to WiFi');
         break;
       case ConnectionStatus.FAIL:
         setIcon(LoadingState.Failure);
-        userContext.groupList.pop();
         setConnString(`Failure!\n${FailReason[connState.Reason]}`);
         backendContext.deleteCameraAPI(groupId, cameraId);
-        endLoading(true);
+        endLoading();
         break;
       case ConnectionStatus.SUCCESS:
+        // ESLint doesn't like variable declerations here :(
+        addCamera(name, cameraId, groupId);
         setIcon(LoadingState.Success);
         setConnString('Success!');
-        endLoading(false);
+        endLoading();
         break;
       case ConnectionStatus.ATTEMPTING_PING:
         setConnString('Attempting to contact Backend');
         break;
       default:
-        endLoading(false);
+        endLoading();
         console.error('UNKNOWN STATE!');
         break;
     }
@@ -120,6 +130,13 @@ export default function LoadingScreen({ navigation, route }: Props): React.React
       .then((sub: Subscription) => {
         // Save off subscription so that we can cancel monitoring later
         setBleSub(sub);
+        
+        // Write to camera after starting notifications, so that we don't miss
+        // any fails that may occur soon after sending wifi details.
+        bleContext.writeCameraWifi(user, pass, cameraId).catch((error) => {
+          console.error(error);
+          navigation.navigate('BluetoothDeviceList');
+        });
       })
       .catch((error) => {
         console.error(error);

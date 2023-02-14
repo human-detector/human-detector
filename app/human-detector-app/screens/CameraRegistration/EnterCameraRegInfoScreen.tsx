@@ -39,16 +39,25 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
     throw new Error('user context is null!');
   }
 
+  const alertWithOk = (title: String, desc: String) => {
+    Alert.alert(title, desc, [ { text: 'Ok' } ]);
+  }
+
   const submitWifiToPi = () => {
     if (currentDevice === null) return;
 
-    if (displayPass && pass === '') {
-      // TODO: Display error
+    if (cameraName === '') {
+      alertWithOk('Error', 'Camera name field is empty');
       return;
     }
 
     if (displayUser && user === '') {
-      // TODO: Display error
+      alertWithOk('Error', 'Username field is empty');
+      return;
+    }
+
+    if (displayPass && pass === '') {
+      alertWithOk('Error', 'Password field is empty');
       return;
     }
 
@@ -74,7 +83,7 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
         })
 
         if (sameName) {
-          Alert.alert('Error: You cannot use the same name for a camera more than once.');
+          alertWithOk('Error', 'You cannot use the same name for a camera more than once.');
           console.error(`cameraName was used more than once called: ${cameraName}`);
           navigation.goBack();
         } else { // begins work on registering the camera
@@ -108,11 +117,19 @@ export default function EnterCameraRegInfoScreen({ navigation, route }: Props): 
     bleContext
       .checkWifiType()
       .then((type: WifiSecType) => {
+        if (type === WifiSecType.NO_NETWORK_FOUND) {
+          alertWithOk('Error', 'Raspberry Pi could not find the wifi network the phone is currently connected to.');
+          navigation.goBack();
+        } else if (type === WifiSecType.UNKNOWN) {
+          alertWithOk('Error', 'Unknown network type');
+          navigation.goBack();
+        }
         setDisplayUser(type === WifiSecType.WPA2_802_1X);
         setDisplayPass(type === WifiSecType.WPA2_802_1X || type === WifiSecType.WPA2_PSK);
       })
       .catch((error) => {
         console.error(error);
+        alertWithOk('Error', 'Failed to find network security type. Make sure your phone is connected to a wifi network.');
         navigation.navigate('BluetoothDeviceList');
       });
   }, [currentDevice]);

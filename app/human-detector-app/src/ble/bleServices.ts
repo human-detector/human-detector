@@ -19,6 +19,7 @@ export enum WifiSecType {
   OPEN = 'OPEN',
   UNSUPPORTED = 'UNSUPPORTED',
   UNKNOWN = '',
+  NO_NETWORK_FOUND = 'No Network Found',
 }
 
 /**

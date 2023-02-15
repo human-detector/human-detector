@@ -155,6 +155,10 @@ export class CdkStack extends cdk.Stack {
       [cognito.UserPoolClientIdentityProvider.COGNITO];
     if (config.auth?.google !== undefined) {
       new cognito.UserPoolIdentityProviderGoogle(this, "GoogleIDP", {
+        attributeMapping: {
+          email: cognito.ProviderAttribute.GOOGLE_EMAIL,
+        },
+        scopes: ["profile", "email", "openid"],
         clientId: config.auth.google.clientId,
         clientSecretValue: cdk.SecretValue.unsafePlainText(
           config.auth.google.clientSecret

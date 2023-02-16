@@ -107,13 +107,13 @@ export default function App(): React.ReactElement {
                       const pushNotificationData = pushNotificationDataParseResult.data;
 
                       const group = groupsRef.current.find(
-                        (grp) => grp.groupId === pushNotificationData.groupId
+                        (grp) => grp.groupId === pushNotification.request.content.data.groupId
                       );
                       const camera = group?.cameras.find(
                         (cam) => cam.cameraId === pushNotificationData.cameraId
                       );
                       if (camera === undefined) {
-                        const notificationId = pushNotificationData;
+                        const notificationId = pushNotificationData.id;
                         console.log(
                           `Received notification with ID "${notificationId}", which isn't associated with any known cameras.`
                         );

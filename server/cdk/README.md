@@ -11,6 +11,16 @@ for infrastructure changes. Read more about the AWS CDK [here](https://aws.amazo
 
 ## Setup
 
+### Prerequisites
+- A domain name with `api2` and `auth2` registered as subdomains. You can get
+  a free domain name through services like [Duck DNS](https://www.duckdns.org/).
+  It doesn't have to be a nice domain name; these domains are just used by the backend
+  and mobile app, and are never visible to users.
+- Grab the Expo access token from our Expo project
+- Grab the OAuth2 client secret from the `eyespy-login` Google Cloud project
+- Copy `config/index.example.ts` to `config/index.ts` and enter your configuration
+  details there
+
 The [Getting Started](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)
 guide in the AWS docs covers pretty much everything. There are a few things to keep
 in mind when deploying:

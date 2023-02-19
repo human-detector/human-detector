@@ -27,6 +27,7 @@ jobs:
       BACKEND_URL: ${{ secrets.BACKEND_URL }}
       OIDC_ENDPOINT: ${{ secrets.OIDC_ENDPOINT }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
       
     # This only works on "run" commands
     defaults:

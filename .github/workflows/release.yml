@@ -13,21 +13,22 @@ jobs:
   trigger_pi_build:
     runs-on: ubuntu-latest
     steps:
-    - name: Repository Dispatch
-      uses: peter-evans/repository-dispatch@v2
-      with:
-        token: ${{ secrets.PI_GEN_PAT }}
-        repository: eyespy-cam/pi-gen
-        event-type: eyespy-release
-        client-payload: '{"eyespy_tag": "${{ github.ref_name }}"}'
-        
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PI_GEN_PAT }}
+          repository: eyespy-cam/pi-gen
+          event-type: eyespy-release
+          client-payload: '{"eyespy_tag": "${{ github.ref_name }}"}'
+
   build:
     env:
       GH_TOKEN: ${{ github.token }}
       BACKEND_URL: ${{ secrets.BACKEND_URL }}
       OIDC_ENDPOINT: ${{ secrets.OIDC_ENDPOINT }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
     # This only works on "run" commands
     defaults:
       run:
@@ -51,7 +52,7 @@ jobs:
 
       - name: 📦 Install dependencies
         run: npm install
-        
+
       - name: 🏗 Setup EAS Local builds
         run: npm install -g eas-cli-local-build-plugin
 
@@ -62,10 +63,10 @@ jobs:
           --profile=production \
           --output=human-detector-app.apk \
           --non-interactive
-          
+
       - name: List eas output
         run: file human-detector-app.apk
-        
+
       - name: Upload binaries to release
         run: gh release upload ${{ github.ref_name }} human-detector-app.apk
         if: ${{ github.event_name == 'release' }}

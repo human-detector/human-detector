@@ -27,7 +27,7 @@ jobs:
       BACKEND_URL: ${{ secrets.BACKEND_URL }}
       OIDC_ENDPOINT: ${{ secrets.OIDC_ENDPOINT }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+      GOOGLE_SERVICES_JSON: "./google_services.json"
       
     # This only works on "run" commands
     defaults:
@@ -56,6 +56,12 @@ jobs:
       - name: 🏗 Setup EAS Local builds
         run: npm install -g eas-cli-local-build-plugin
 
+      - name: Write secrets
+        run: 'echo "$GOOGLE_JSON" > ./google_services.json'
+        shell: bash
+        env:
+          GOOGLE_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+  
       - name: 🚀 Build app
         run: |
           eas build --local \
